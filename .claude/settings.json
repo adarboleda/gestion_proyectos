@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .specify/extensions/metricas/scripts/powershell/sesion.ps1 actividad" }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "*", "hooks": [{ "type": "command", "command": "node -e \"try{require('fs').writeFileSync(require('path').join(process.env.CLAUDE_PROJECT_DIR||'.','metricas','.ultima-actividad'),String(Date.now()))}catch{}\"" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "node -e \"try{require('fs').writeFileSync(require('path').join(process.env.CLAUDE_PROJECT_DIR||'.','metricas','.ultima-actividad'),String(Date.now()))}catch{}\"" }] }
+    ]
+  }
+}

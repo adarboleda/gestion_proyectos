@@ -1,0 +1,5 @@
+
+# speckit-metricas: estado de sesion local y salidas regenerables
+metricas/.sesion-activa.json
+metricas/.ultima-actividad
+metricas/salidas/
