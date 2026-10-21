@@ -33,10 +33,24 @@ def test_serie_de_forma_150_x_19_con_las_primeras_150_filas(origen_sintetico, ay
     np.testing.assert_array_equal(sim.serie, esperado)
 
 
-def test_defectos_fuera_de_las_primeras_150_filas_no_detienen(origen_sintetico, ayudas):
-    ayudas.poner_valor(origen_sintetico / "LOCA" / "7.csv", "P", 155, "")
-    sim = leer_simulacion(origen_sintetico, "LOCA", "7.csv")
+@pytest.mark.parametrize(
+    "valor, causa",
+    [("", "valor faltante"), ("abc", "valor no numérico"), ("inf", "valor no finito")],
+)
+def test_defectos_en_cualquier_fila_del_archivo_detienen(origen_sintetico, ayudas, valor, causa):
+    # FR-012: el archivo se valida completo, también las filas posteriores a los 150 pasos usados.
+    ayudas.poner_valor(origen_sintetico / "LOCA" / "7.csv", "P", 155, valor)
+    with pytest.raises(ErrorDatos) as info:
+        leer_simulacion(origen_sintetico, "LOCA", "7.csv")
+    assert str(info.value).startswith("ERROR: LOCA/7.csv: ")
+    assert causa in str(info.value) and "[variable P]" in str(info.value)
+
+
+def test_un_archivo_valido_mas_largo_solo_aporta_sus_primeros_150_pasos(origen_sintetico, ayudas):
+    sim = leer_simulacion(origen_sintetico, "LOCA", "7.csv")  # el archivo sintético tiene 160 filas
+    esperado = ayudas.leer_independiente(origen_sintetico / "LOCA" / "7.csv", ayudas.VARIABLES, filas=160)
     assert sim.serie.shape == (150, 19)
+    np.testing.assert_array_equal(sim.serie, esperado[:150])
 
 
 @pytest.mark.parametrize(
@@ -78,6 +92,7 @@ def test_carpeta_de_clase_inexistente(origen_sintetico):
         descubrir_simulaciones(origen_sintetico)
     assert "no existe la carpeta de clase" in str(info.value)
     assert "ATWS" in str(info.value)
+
 
 def test_normal_y_atws_pueden_tener_cualquier_nombre_de_archivo(origen_sintetico):
     (origen_sintetico / "Normal" / "1.csv").rename(origen_sintetico / "Normal" / "base_normal.csv")

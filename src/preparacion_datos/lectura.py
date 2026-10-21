@@ -83,10 +83,12 @@ def _convertir_columna(valores, relativo: str, variable: str) -> np.ndarray:
 
 
 def leer_simulacion(origen, carpeta: str, nombre: str) -> Simulacion:
-    """Lee los primeros 150 pasos de las 19 variables requeridas de un archivo.
+    """Valida el archivo completo y devuelve sus primeros 150 pasos de las 19 variables requeridas.
 
     Los valores se convierten con ``float()`` de Python (conversión exacta del texto). Cualquier
-    defecto en esas filas lanza ``ErrorDatos``; el resto del archivo no se valida porque no se usa.
+    defecto en cualquier fila del archivo (variable ausente, valor no numérico, faltante o no
+    finito, o menos de 150 pasos) lanza ``ErrorDatos``; solo los primeros 150 pasos entran en la
+    muestra.
     """
     origen = Path(origen)
     relativo = f"{carpeta}/{nombre}"
@@ -97,9 +99,7 @@ def leer_simulacion(origen, carpeta: str, nombre: str) -> Simulacion:
         for variable in VARIABLES:
             if variable not in cabecera:
                 raise ErrorDatos(relativo, "falta la variable", variable)
-        datos = pd.read_csv(
-            ruta, usecols=VARIABLES, nrows=PASOS, dtype=str, keep_default_na=False, na_filter=False
-        )
+        datos = pd.read_csv(ruta, usecols=VARIABLES, dtype=str, keep_default_na=False, na_filter=False)
     except FileNotFoundError:
         raise ErrorDatos(relativo, "el archivo no existe") from None
     except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError) as error:
@@ -108,7 +108,7 @@ def leer_simulacion(origen, carpeta: str, nombre: str) -> Simulacion:
         raise ErrorDatos(relativo, f"menos de {PASOS} pasos (tiene {len(datos)})")
     serie = np.column_stack(
         [_convertir_columna(datos[variable].tolist(), relativo, variable) for variable in VARIABLES]
-    )
+    )[:PASOS]
     severidad = None if clase in CLASES_SIN_SEVERIDAD else int(Path(nombre).stem)
     return Simulacion(clase, etiqueta, severidad, relativo, serie)
 

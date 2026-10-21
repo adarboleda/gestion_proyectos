@@ -69,7 +69,7 @@ Texto impreso y contenido de `metadata.json`: conteos por clase y por conjunto, 
 
 ## Reglas de validación
 
-- Toda simulación tiene las 19 variables, al menos 150 filas y valores numéricos finitos en esas 150 filas; si no, la ejecución se detiene con un error que nombra el archivo y la causa, y no se escribe ningún conjunto.
+- Toda simulación tiene las 19 variables, al menos 150 filas y valores numéricos finitos en todas sus filas; si no, la ejecución se detiene con un error que nombra el archivo y la causa, y no se escribe ningún conjunto.
 - Forma de salida: `X_*` `(N,150,12)`, `margins_*` `(N,150,7)`, `y_*` `(N,)`, con el mismo `N` y el mismo orden en los tres arreglos de un conjunto.
 - La suma de muestras de `train`, `val` y `test` es igual al número de simulaciones leídas.
 

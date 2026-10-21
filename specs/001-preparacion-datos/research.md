@@ -22,9 +22,9 @@ No quedaban marcadores `NEEDS CLARIFICATION`; este documento registra las decisi
 
 ## 4. Qué se valida en cada archivo
 
-- **Decision**: se lee solo la cabecera y las primeras 150 filas (`pandas.read_csv(..., usecols=<19 variables>, nrows=150, dtype=str)`) y cada valor se convierte con `float()` de Python, para que la conversión del texto sea exacta (SC-003). Es defectuoso, y detiene toda la preparación, un archivo al que le falta alguna de las 19 variables, que tiene menos de 150 filas o que en esas 150 filas tiene valores no numéricos, vacíos, `NaN` o infinitos. El error nombra el archivo, la variable y la causa.
-- **Rationale**: solo esas filas entran en la salida (FR-002); validar el resto del archivo detendría la preparación por datos que no se usan. Las 202 simulaciones del dataset actual pasan esta validación.
-- **Alternatives considered**: validar el archivo completo (más estricto, pero sin efecto sobre la salida).
+- **Decision**: se lee cada archivo completo en las 19 columnas requeridas (`pandas.read_csv(..., usecols=<19 variables>, dtype=str)`) y cada valor se convierte con `float()` de Python, para que la conversión del texto sea exacta (SC-003). Es defectuoso, y detiene toda la preparación, un archivo al que le falta alguna de las 19 variables, que tiene menos de 150 filas o que en **cualquier fila** tiene valores no numéricos, vacíos, `NaN` o infinitos. El error nombra el archivo, la variable y la causa. Solo las primeras 150 filas entran en la muestra.
+- **Rationale**: es la lectura literal de FR-012 y de los casos límite de la spec (el archivo con valores no numéricos o faltantes detiene la preparación), y evita aceptar en silencio un archivo corrupto cuyo defecto cae después de los 150 pasos. El costo es despreciable (archivos de 300 a 550 filas). Los 202 archivos del dataset actual pasan esta validación.
+- **Alternatives considered**: validar solo las 150 filas usadas (más permisivo, pero acepta archivos corruptos y se aparta de la spec).
 
 ## 5. Tipos y forma de los arreglos
 
