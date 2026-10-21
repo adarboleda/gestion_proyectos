@@ -88,6 +88,40 @@ gestion_proyectos/
 
 ---
 
+## Preparación de datos (funcionalidad 001)
+
+Prepara los datos de simulación NPPAD (carpeta `Operation_csv_data`) para entrenar y evaluar después un clasificador de accidentes PWR, sin fuga de información: las simulaciones se reparten completas (70/15/15, semilla 42), una simulación nunca está en dos conjuntos y el escalador se ajusta solo con entrenamiento.
+
+**Instalación** (Python 3.11 o superior, desde la raíz del repositorio):
+
+```
+pip install -e ".[dev]"
+```
+
+**Ejecución** (un solo comando; imprime el reporte y escribe `data_processed/`):
+
+```
+preparar-datos
+```
+
+Equivale a `python -m preparacion_datos`. Opciones: `--origen RUTA` (por defecto `../IA-Nuclear/NuclearPowerPlantAccidentData/Operation_csv_data`, solo lectura), `--salida RUTA`, `--semilla N` y `--referencia RUTA` o `--sin-referencia`. Si un archivo de origen es defectuoso, el comando termina con código 1, nombra el archivo y la causa, y no escribe ningún conjunto.
+
+**Salida** en `data_processed/` (se regenera con el comando; no se edita a mano):
+
+| Archivo | Contenido |
+|---|---|
+| `X_train/val/test.npy` | `(N,150,12)` float32: 12 variables de planta escaladas |
+| `y_train/val/test.npy` | `(N,)` int64: 0 = NORM, 1 = LOCA, 2 = LOCAC, 3 = ATWS |
+| `margins_train/val/test.npy` | `(N,150,7)` float64: 7 márgenes térmicos sin escalar |
+| `scaler_mean.npy`, `scaler_std.npy` | `(12,)` parámetros de escala, ajustados solo con entrenamiento |
+| `metadata.json` | conteos, simulaciones de cada conjunto, advertencias y limitaciones |
+
+Normal y ATWS tienen una sola simulación en el dataset: van completas a entrenamiento y no tienen muestras de validación ni de prueba; el reporte lo advierte.
+
+**Pruebas**: `pytest`. Detalle y validaciones: [specs/001-preparacion-datos/quickstart.md](specs/001-preparacion-datos/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
