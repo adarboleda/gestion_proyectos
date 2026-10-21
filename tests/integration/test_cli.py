@@ -1,4 +1,5 @@
 """Pruebas de extremo a extremo de la línea de órdenes sobre un dataset sintético."""
+import io
 import subprocess
 import sys
 
@@ -116,6 +117,7 @@ def test_salida_previa_se_reemplaza_sin_tocar_archivos_ajenos(origen_sintetico, 
     assert (salida / "notas.txt").read_text() == "archivo ajeno"
     assert np.load(salida / "X_train.npy").shape == (142, 150, 12)
 
+
 def test_python_m_preparacion_datos_ejecuta_la_preparacion(origen_sintetico, tmp_path):
     salida = tmp_path / "salida"
     resultado = subprocess.run(
@@ -129,3 +131,14 @@ def test_python_m_preparacion_datos_ejecuta_la_preparacion(origen_sintetico, tmp
         assert (salida / nombre).is_file(), nombre
     assert b"REPORTE" in resultado.stdout
 
+
+def test_consola_con_codificacion_limitada_no_interrumpe_la_salida(origen_sintetico, tmp_path, monkeypatch):
+    """Con una salida estándar ASCII el reporte se imprime con `?` en lugar de lanzar un error."""
+    buffer = io.BytesIO()
+    flujo = io.TextIOWrapper(buffer, encoding="ascii")
+    monkeypatch.setattr(sys, "stdout", flujo)
+    assert ejecutar(origen_sintetico, tmp_path / "salida", "--sin-referencia") == 0
+    flujo.flush()
+    texto = buffer.getvalue().decode("ascii")
+    assert "REPORTE DE PREPARACI?N DE DATOS NPPAD" in texto
+    assert (tmp_path / "salida" / "metadata.json").is_file()

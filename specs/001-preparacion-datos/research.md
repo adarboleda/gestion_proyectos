@@ -67,3 +67,9 @@ No quedaban marcadores `NEEDS CLARIFICATION`; este documento registra las decisi
 - **Decision**: `data_processed/` es salida regenerable; se recomienda añadirla a `.gitignore` en las tareas, de modo que los conjuntos se regeneren con el comando en vez de versionarse.
 - **Rationale**: principio III (los artefactos generados no se editan a mano y se regeneran).
 - **Alternatives considered**: versionar los `.npy` (tamaño pequeño, pero puede desincronizarse del código).
+
+## 12. Salida tolerante a consolas con codificación limitada
+
+- **Decision**: `main` reconfigura la salida estándar y la de error con `errors="replace"` antes de imprimir (si el flujo lo permite). Un carácter que la consola no pueda representar se muestra como `?`.
+- **Rationale**: el reporte se imprime *después* de publicar los artefactos. Con una salida ASCII (por ejemplo `PYTHONIOENCODING=ascii` o una canalización mal configurada) un acento lanzaría `UnicodeEncodeError`: el comando terminaría con traza y código distinto de cero aunque los archivos ya estén escritos. Cubierto por una prueba con una salida ASCII.
+- **Alternatives considered**: forzar UTF-8 en la salida (puede mostrar caracteres ilegibles en consolas antiguas); no tratarlo (falla confusa tras escribir los archivos).
