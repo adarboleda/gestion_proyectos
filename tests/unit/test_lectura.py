@@ -78,3 +78,21 @@ def test_carpeta_de_clase_inexistente(origen_sintetico):
         descubrir_simulaciones(origen_sintetico)
     assert "no existe la carpeta de clase" in str(info.value)
     assert "ATWS" in str(info.value)
+
+def test_normal_y_atws_pueden_tener_cualquier_nombre_de_archivo(origen_sintetico):
+    (origen_sintetico / "Normal" / "1.csv").rename(origen_sintetico / "Normal" / "base_normal.csv")
+    (origen_sintetico / "ATWS" / "1.csv").rename(origen_sintetico / "ATWS" / "atws.csv")
+    simulaciones = descubrir_simulaciones(origen_sintetico)
+    normal = [s for s in simulaciones if s.clase == "NORM"]
+    atws = [s for s in simulaciones if s.clase == "ATWS"]
+    assert [(s.archivo, s.severidad) for s in normal] == [("Normal/base_normal.csv", None)]
+    assert [(s.archivo, s.severidad) for s in atws] == [("ATWS/atws.csv", None)]
+    assert leer_simulacion(origen_sintetico, "Normal", "base_normal.csv").serie.shape == (150, 19)
+
+
+def test_loca_y_locac_siguen_exigiendo_nombre_numerico(origen_sintetico):
+    (origen_sintetico / "LOCA" / "7.csv").rename(origen_sintetico / "LOCA" / "siete.csv")
+    with pytest.raises(ErrorDatos) as info:
+        descubrir_simulaciones(origen_sintetico)
+    assert "LOCA/siete.csv" in str(info.value)
+    assert "severidad" in str(info.value)

@@ -51,9 +51,12 @@ def descubrir_simulaciones(origen) -> List[Simulacion]:
         directorio = origen / carpeta
         if not directorio.is_dir():
             raise ErrorDatos(carpeta, "no existe la carpeta de clase")
-        archivos = sorted(
-            directorio.glob("*.csv"), key=lambda r: _clave_archivo(r, f"{carpeta}/{r.name}")
-        )
+        if clase in CLASES_SIN_SEVERIDAD:
+            archivos = sorted(directorio.glob("*.csv"), key=lambda r: r.name)
+        else:
+            archivos = sorted(
+                directorio.glob("*.csv"), key=lambda r: _clave_archivo(r, f"{carpeta}/{r.name}")
+            )
         if not archivos:
             raise ErrorDatos(carpeta, "la carpeta de clase no contiene simulaciones (.csv)")
         for ruta in archivos:
