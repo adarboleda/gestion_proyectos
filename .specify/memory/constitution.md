@@ -1,50 +1,66 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# IANuclear Constitution
+<!-- Sistema consultivo de apoyo al operador para detectar accidentes LOCA y ATWS en reactores PWR con datos simulados -->
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. IA estrictamente consultiva (NON-NEGOTIABLE)
+La IA solo aconseja: MUST NOT actuar sobre la planta, sustituir la lógica de protección existente ni
+tener autoridad de control. El operador valida y ejecuta cualquier acción. Toda salida del sistema
+(diagnóstico, procedimiento, alerta) MUST presentarse como recomendación, y toda interfaz o reporte
+MUST decirlo de forma visible.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Cero fuga de datos (NON-NEGOTIABLE)
+Las particiones entrenamiento/validación/prueba MUST hacerse por simulación completa, nunca por fila;
+las simulaciones emparejadas (mismo escenario con y sin accidente, o de igual severidad) MUST ir al
+mismo grupo. Los escaladores y cualquier transformación aprendida MUST ajustarse solo con
+entrenamiento. Una predicción en el instante `t` MUST NOT usar información posterior a `t`.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Honestidad y reproducibilidad
+Se MUST reportar lo que salió, incluidos los resultados negativos, las metas no cumplidas y las
+limitaciones. Toda meta MUST enunciarse con su definición exacta (qué se mide, sobre qué conjunto).
+Todo resultado MUST poder regenerarse con un comando documentado; los artefactos generados MUST NOT
+editarse a mano.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Procedencia de datos
+El dataset original MUST conservarse sin modificar; todo dato derivado se genera aparte y de forma
+reproducible. Datos de plantas o configuraciones distintas (p. ej. NPPAD y PWR 3L) MUST NOT mezclarse:
+cada modelo se entrena y evalúa con datos de una sola planta.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Alcance acotado a LOCA y ATWS
+El alcance es la detección de accidentes LOCA y ATWS en reactores PWR con datos simulados. Otros
+accidentes, ciberataques y datos de planta real quedan fuera; cualquier ampliación MUST pasar por
+una enmienda de esta constitución. Las estimaciones del sistema MUST NOT presentarse como reemplazo
+del cálculo termohidráulico del simulador.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Restricciones Adicionales
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Lenguaje**: Python.
+- **Estructura**: el código MUST vivir en `src/` y las pruebas en `tests/`.
+- **Idioma**: la documentación MUST estar en español.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Flujo de Desarrollo
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- **Spec Kit completo**: cada funcionalidad MUST seguir `specify → clarify → plan → tasks → analyze →
+  implement` y vivir en `specs/NNN-nombre/`.
+- **Pruebas**: todo comportamiento crítico MUST tener pruebas automáticas en `tests/`, escritas antes
+  de dar la tarea por terminada.
+- **Commits**: el mensaje MUST tener la forma `feat(NNN): descripción`, donde `NNN` es el número de la
+  funcionalidad (p. ej. `feat(001): descripción`). Cuando el commit elimine o reescriba código
+  existente MUST incluir el trailer `Causa: requisito|defecto|refactor`, con exactamente uno de esos
+  tres valores. El historial publicado MUST NOT reescribirse.
+- **Métricas SDD**: cada fase Spec Kit MUST registrarse como sesión con la extensión `metricas`
+  (se abre por hook; se cierra con `/speckit-metricas-cerrar`); el trailer `Causa:` alimenta la
+  clasificación del código eliminado.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Esta constitución prevalece sobre cualquier otra práctica del proyecto. Una enmienda requiere:
+descripción del cambio, motivo, impacto sobre las especificaciones existentes y actualización de
+`Version`/`Last Amended`. El versionado es semántico: MAJOR por eliminar o redefinir un principio de
+forma incompatible, MINOR por añadir un principio o sección o ampliar materialmente su guía, PATCH por
+aclaraciones de redacción. Los principios I y II no admiten excepciones. Toda revisión de
+especificación, plan o tarea MUST verificar el cumplimiento de estos principios (sección
+*Constitution Check* de cada `plan.md`); cualquier desviación MUST justificarse en *Complexity
+Tracking*. La guía operativa diaria está en `README.md`.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 2.0.0 | **Ratified**: 2026-10-20 | **Last Amended**: 2026-10-20

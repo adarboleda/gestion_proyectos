@@ -3,3 +3,10 @@
 metricas/.sesion-activa.json
 metricas/.ultima-actividad
 metricas/salidas/
+
+# Python y artefactos regenerables de la preparacion de datos
+data_processed/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/

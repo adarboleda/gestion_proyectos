@@ -20,7 +20,8 @@
     ".agents/",
     ".github/",
     ".claude/",
-    "specs-referencia/"
+    "specs-referencia/",
+    "data_processed/"
   ],
   "archivos_excluidos": "(^|/)(package-lock\\.json|pnpm-lock\\.yaml|yarn\\.lock|poetry\\.lock|Cargo\\.lock)$",
   "extensiones_codigo": [
