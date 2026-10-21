@@ -1,4 +1,7 @@
 """Pruebas de extremo a extremo de la línea de órdenes sobre un dataset sintético."""
+import subprocess
+import sys
+
 import numpy as np
 import pytest
 
@@ -112,3 +115,17 @@ def test_salida_previa_se_reemplaza_sin_tocar_archivos_ajenos(origen_sintetico, 
     assert ejecutar(origen_sintetico, salida) == 0
     assert (salida / "notas.txt").read_text() == "archivo ajeno"
     assert np.load(salida / "X_train.npy").shape == (142, 150, 12)
+
+def test_python_m_preparacion_datos_ejecuta_la_preparacion(origen_sintetico, tmp_path):
+    salida = tmp_path / "salida"
+    resultado = subprocess.run(
+        [sys.executable, "-m", "preparacion_datos", "--origen", str(origen_sintetico),
+         "--salida", str(salida), "--sin-referencia"],
+        capture_output=True,
+        cwd=tmp_path,
+    )
+    assert resultado.returncode == 0, resultado.stderr.decode(errors="replace")
+    for nombre in ARTEFACTOS + ["margins_train.npy", "metadata.json"]:
+        assert (salida / nombre).is_file(), nombre
+    assert b"REPORTE" in resultado.stdout
+
