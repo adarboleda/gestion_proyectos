@@ -210,3 +210,13 @@ Task: "Escalador en src/preparacion_datos/escalado.py"
 - Verificar que las pruebas fallan antes de implementar
 - Hacer commit tras cada tarea o grupo lógico, con la forma `feat(001): descripción` (y el trailer `Causa:` si se elimina o reescribe código)
 - Evitar tareas vagas, conflictos en un mismo archivo y dependencias entre historias que rompan su independencia
+
+---
+
+## Phase 7: Convergence
+
+- [X] T035 Hacer que `publicar` en `src/preparacion_datos/salida.py` deje la carpeta de salida exactamente como estaba si falla el movimiento de cualquier archivo (guardar copia de los artefactos que va a reemplazar y restaurarlos ante el error) y añadir en `tests/unit/test_salida.py` una prueba que fuerce un fallo a mitad de la publicación y compruebe que la salida previa queda byte a byte igual; si se decide relajar el contrato, corregir en su lugar la frase «Se publican todos juntos o ninguno» de `specs/001-preparacion-datos/contracts/salidas.md` per plan: contracts/salidas.md (partial)
+- [X] T036 Exigir nombre numérico (severidad) solo a los archivos de LOCA y LOCAC en `src/preparacion_datos/lectura.py`, ordenando por nombre los de Normal y ATWS, y añadir en `tests/unit/test_lectura.py` una prueba con un CSV de Normal de nombre no numérico que se lea sin error per FR-001 (unrequested)
+- [X] T037 Añadir en `tests/integration/test_cli.py` una prueba que ejecute `python -m preparacion_datos` con `subprocess` sobre el dataset sintético y compruebe código de salida 0 y los artefactos escritos per plan: Project Type (partial)
+- [X] T038 Justificar `_tolerar_consolas_limitadas` de `src/preparacion_datos/cli.py` en `specs/001-preparacion-datos/research.md` y cubrirla con una prueba en `tests/integration/test_cli.py`, o eliminarla si no se justifica per plan: sin decisión asociada (unrequested)
+- [X] T039 Alinear la validación de FR-012 con la spec: validar los valores no numéricos o faltantes en el archivo completo en `src/preparacion_datos/lectura.py`, o bien aclarar en `specs/001-preparacion-datos/spec.md` (FR-012) y en `specs/001-preparacion-datos/research.md` §4 que solo se validan las primeras 150 filas; ajustar `tests/unit/test_lectura.py` en consecuencia (depende de T036) per FR-012 (partial)
