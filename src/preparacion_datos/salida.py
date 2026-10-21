@@ -43,14 +43,18 @@ def construir_conjunto(simulaciones: List[Simulacion]) -> Tuple[np.ndarray, np.n
 def publicar(salida, archivos: Dict[str, object]) -> None:
     """Escribe todos los archivos en un directorio temporal y luego los mueve a `salida`.
 
-    Un fallo antes de mover deja `salida` sin cambios. Solo se reemplazan los archivos publicados:
-    cualquier otro archivo que ya estuviera en `salida` no se toca.
-    `archivos` asocia nombre -> arreglo de numpy (se guarda como .npy) o texto/bytes.
+    Todos juntos o ninguno: si falla la escritura o el movimiento de cualquier archivo, `salida`
+    queda exactamente como estaba (se restauran los archivos reemplazados y se quitan los nuevos).
+    Solo se reemplazan los archivos publicados: cualquier otro archivo que ya estuviera en `salida`
+    no se toca. `archivos` asocia nombre -> arreglo de numpy (se guarda como .npy) o texto/bytes.
     """
     salida = Path(salida)
     salida.parent.mkdir(parents=True, exist_ok=True)
     temporal = salida.parent / f".{salida.name}.tmp-{uuid.uuid4().hex[:8]}"
-    temporal.mkdir()
+    respaldo = temporal / "_respaldo"
+    respaldo.mkdir(parents=True)
+    salida_existia = salida.exists()
+    movidos: List[Tuple[str, bool]] = []  # (nombre, tenía una versión previa)
     try:
         for nombre, contenido in archivos.items():
             destino = temporal / nombre
@@ -62,7 +66,25 @@ def publicar(salida, archivos: Dict[str, object]) -> None:
                 destino.write_text(contenido, encoding="utf-8")
         salida.mkdir(exist_ok=True)
         for nombre in archivos:
-            os.replace(temporal / nombre, salida / nombre)
+            destino = salida / nombre
+            previo = destino.exists()
+            if previo:
+                os.replace(destino, respaldo / nombre)
+            movidos.append((nombre, previo))
+            os.replace(temporal / nombre, destino)
+    except BaseException:
+        for nombre, previo in reversed(movidos):
+            destino = salida / nombre
+            if previo:
+                os.replace(respaldo / nombre, destino)
+            else:
+                destino.unlink(missing_ok=True)
+        if not salida_existia:
+            try:
+                salida.rmdir()
+            except OSError:
+                pass
+        raise
     finally:
         shutil.rmtree(temporal, ignore_errors=True)
 
