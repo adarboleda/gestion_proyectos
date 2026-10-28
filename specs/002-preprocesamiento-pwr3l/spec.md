@@ -10,6 +10,16 @@
 
 **Input**: User description: "Preparar los datos de las 106 simulaciones PWR 3L (1 dato por segundo) que están en `PWR 3L` (carpetas `ATWS`, `LOCA COLD`, `LOCA HOT`, `LOCA PORV`, `NORM`, `TRIP_OK` y `auto\R*_<CLASE>`, cada corrida con su archivo de datos de planta), en muestras de 300 pasos de 1 s con cinco clases: NORM, LOCA, LOCAC, ATWS y TRIP_OK. Las corridas OOD (eventos desconocidos) no son una clase de entrenamiento. Es una planta distinta de NPPAD (2705 MWt) y no debe mezclarse con ella."
 
+## Clarifications
+
+### Session 2026-10-28
+
+> Las respuestas las eligió el agente (Claude Code) por delegación del responsable, tomando en cada caso la opción recomendada; quedan registradas para que el responsable las revise en el PR.
+
+- Q: Ante una corrida de clase de entrenamiento con menos de 300 pasos (el simulador terminó antes; en el dataset hay 9: R38, R41, R42, R43, R82, R91, R98, R55 y R63, con 289 a 299 filas), ¿se detiene la preparación, se excluye la corrida con aviso o se completan los pasos que faltan? → A: Se excluye la corrida con una advertencia que nombra el archivo y sus filas; no aporta muestra, no se rellena nada y el reporte la cuenta como «corta». Detenerse bloquearía siempre el dataset real, y completar los pasos inventaría datos (principio III).
+- Q: ¿Qué significa «igual severidad» para emparejar LOCA y LOCAC en PWR 3L? → A: La misma área de rotura (cm²), tomada del nombre de la carpeta o de la descripción de la corrida: todas las corridas de LOCA y LOCAC con la misma área forman un solo grupo (incluidas las repeticiones de la misma área dentro de una clase), y una LOCA o LOCAC sin área identificable detiene la preparación nombrando el archivo.
+- Q: ¿Las corridas OOD se preparan aparte (escaladas y guardadas) para probar después la detección de novedades? → A: No en esta iteración: solo se descubren y se listan en el reporte y en los metadatos, sin leer ni guardar sus datos; prepararlas queda para la funcionalidad del monitor de novedades.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Conjuntos de 300 s y cinco clases sin fuga (Priority: P1)
@@ -63,14 +73,15 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 
 ### Edge Cases
 
-- Una corrida con menos de 300 pasos (el simulador terminó antes): [NEEDS CLARIFICATION: ¿se detiene la preparación nombrando el archivo, se excluye la corrida con aviso o se completan los pasos que faltan?]
+- Una corrida con menos de 300 pasos (el simulador terminó antes; hay 9 en el dataset): se excluye con una advertencia que nombra el archivo y sus filas, y no se rellena nada (FR-006).
 - Corridas fuera de distribución (OOD, p. ej. PORV trabada, rotura de tubos del generador de vapor, rotura de línea de vapor): no son una clase de entrenamiento; no aportan muestras y se listan en el reporte.
 - Corridas que el equipo ya descartó (R07, contaminada y repetida como R07b; R27 y R28, intentos de mitigación y boración): no aportan muestras y se listan con su motivo.
 - Una carpeta manual con dos archivos de datos (R27: tramo fallido y tramo de mitigación) o una carpeta sin archivo de datos.
 - Un archivo con variables requeridas ausentes, valores no numéricos, faltantes o no finitos, o con un tiempo que no avanza de 1 s en 1 s desde 0: la preparación se detiene con un error que nombra el archivo y la causa.
 - Dos carpetas con el mismo identificador de corrida, o una carpeta automática con una clase desconocida.
 - Corridas emparejadas en las que una de las dos no aporta muestra: la otra se asigna sola, sin romper la regla de no compartir conjunto.
-- LOCA y LOCAC de la misma severidad: [NEEDS CLARIFICATION: ¿qué significa «igual severidad» en PWR 3L, donde las corridas no están numeradas por severidad como en NPPAD?]
+- LOCA y LOCAC de la misma severidad: en PWR 3L la severidad es el área de rotura (cm²); todas las corridas de LOCA y LOCAC con la misma área forman un grupo. El grupo de 2000 cm² reúne 8 corridas y pesa mucho en el reparto; el reporte muestra los conteos reales.
+- Una corrida de LOCA o LOCAC cuya área de rotura no puede identificarse: la preparación se detiene nombrando el archivo.
 - Una variable de entrada sin variación en entrenamiento: se informa en lugar de producir valores no válidos.
 - Los formatos de archivo difieren entre corridas manuales (libros de Excel con extensión `.xls`, o texto separado por comas) y automáticas (texto separado por comas).
 - Re-ejecución sobre una salida previa: mismo resultado, sin restos de ejecuciones anteriores.
@@ -81,12 +92,12 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 
 - **FR-001**: El sistema MUST descubrir las corridas de las carpetas de clase manuales (`ATWS`, `LOCA COLD`, `LOCA HOT`, `LOCA PORV`, `NORM`, `TRIP_OK`) y de la carpeta `auto` (`R<n>_<CLASE>`), leer sus datos de planta en los dos formatos presentes y MUST NOT modificar ningún archivo de origen.
 - **FR-002**: El sistema MUST asignar la clase por la carpeta: `NORM`→NORM, `LOCA HOT`→LOCA, `LOCA COLD`→LOCAC, `ATWS`→ATWS, `TRIP_OK`→TRIP_OK, `LOCA PORV`→OOD y, en `auto`, el sufijo del nombre; con las etiquetas NORM = 0, LOCA = 1, LOCAC = 2, ATWS = 3 y TRIP_OK = 4. LOCA y LOCAC MUST quedar como clases separadas.
-- **FR-003**: Las corridas OOD MUST NOT aportar muestras a ningún conjunto y MUST listarse en el reporte.
+- **FR-003**: Las corridas OOD MUST NOT aportar muestras a ningún conjunto y MUST listarse en el reporte; sus datos no se leen ni se guardan en esta funcionalidad.
 - **FR-004**: Las corridas descartadas por el equipo (R07, R27 y R28) MUST NOT aportar muestras, MUST listarse en el reporte con su motivo y la lista MUST estar documentada.
 - **FR-005**: El sistema MUST producir exactamente una muestra por corrida usable, formada por sus primeros 300 pasos consecutivos de 1 s (de 0 s a 299 s), con su etiqueta y el identificador de la corrida.
-- **FR-006**: Ante una corrida de clase de entrenamiento con menos de 300 pasos, el sistema MUST [NEEDS CLARIFICATION: detenerse, excluirla con aviso o completarla].
+- **FR-006**: Ante una corrida de clase de entrenamiento con menos de 300 pasos, el sistema MUST excluirla con una advertencia que nombre el archivo y su número de filas, MUST NOT completar los pasos que faltan y MUST seguir con las demás corridas.
 - **FR-007**: El sistema MUST asignar cada corrida usable completa a exactamente uno de los conjuntos de entrenamiento, validación o prueba, con un reparto cercano a 70 % / 15 % / 15 % y una semilla fija.
-- **FR-008**: El sistema MUST asignar al mismo conjunto las corridas emparejadas: cada ATWS con su gemela TRIP_OK, y las corridas de LOCA y LOCAC de igual severidad.
+- **FR-008**: El sistema MUST asignar al mismo conjunto las corridas emparejadas: cada ATWS con su gemela TRIP_OK, y todas las corridas de LOCA y LOCAC con la misma área de rotura (igual severidad).
 - **FR-009**: El sistema MUST usar como entrada de cada muestra solo variables medibles en sala de control (presión, temperaturas, caudales y niveles del primario y del secundario, flujo neutrónico, inyección y carga, y presión, temperatura y radiación de contención) y MUST NOT usar el caudal de fuga ni otras variables no medibles.
 - **FR-010**: El sistema MUST calcular los parámetros de escala de las variables de entrada solo con entrenamiento, aplicarlos a los tres conjuntos y persistirlos.
 - **FR-011**: El sistema MUST conservar para cada muestra las 7 variables de margen térmico en sus unidades originales, sin escalar y alineadas paso a paso con las entradas.
@@ -129,4 +140,5 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 - Las gemelas ATWS/TRIP_OK son las del plan de corridas del proyecto (R21–R59, R22–R60, R23–R61, R24–R62, R29–R63, R26–R53 y las automáticas R47–R54 … R98–R106).
 - El estado «REVISAR» que asigna el validador de corridas del proyecto (evento antes de lo planeado, poco tramo previo) no impide usar la corrida; el estado «REPETIR» solo lo tenía R07, que ya está descartada.
 - Se propone un reparto 70 % / 15 % / 15 % por grupos con semilla fija; con unas 20 corridas por clase, validación y prueba tendrán solo unas 3 por clase.
+- Con las 9 corridas cortas excluidas quedan 91 corridas usables (NORM 19, LOCA 16, LOCAC 20, ATWS 18, TRIP_OK 18), medido al escribir esta spec; el reporte da las cifras reales de cada ejecución.
 - Construir el clasificador queda fuera de esta funcionalidad, igual que las transformaciones de las entradas (cambios respecto al estado inicial, ruido de sensores).

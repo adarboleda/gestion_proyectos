@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,6 +31,6 @@
 
 ## Notes
 
-- Pendiente: dos marcadores [NEEDS CLARIFICATION] (FR-006, corridas de menos de 300 pasos; caso límite de «igual severidad» de LOCA y LOCAC, que condiciona FR-008). Se resuelven con `/speckit-clarify` y se vuelve a validar.
+- Los dos marcadores [NEEDS CLARIFICATION] (FR-006, corridas de menos de 300 pasos; «igual severidad» de LOCA y LOCAC en FR-008) se resolvieron con `/speckit-clarify` el 2026-10-28, junto con una tercera pregunta sobre las corridas OOD. Validación repetida: 16/16.
 - Los nombres de variables (P, TAVG, DNBR, …), de carpetas (`LOCA COLD`, `auto`) y de corridas (R07, R27) son términos del dominio del dataset, no detalles de implementación.
 - La mención de los formatos de archivo (libro de Excel, texto separado por comas) describe el dato de origen tal como existe, no una decisión de diseño.
