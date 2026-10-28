@@ -27,7 +27,7 @@ python -m preparacion_pwr3l [mismas opciones]
 ERROR: <ruta relativa al origen>: <causa> [variable <nombre>]
 ```
 
-Causas: `no existe la carpeta de origen`, `carpeta no reconocida`, `nombre de corrida no reconocido`, `clase desconocida`, `identificador de corrida repetido (también en <otra ruta>)`, `no hay archivo de datos`, `hay más de un archivo de datos`, `no se pudo determinar el área de rotura`, `archivo ilegible (<tipo>)`, `falta la variable`, `valor no numérico`, `valor faltante`, `valor no finito`, `el tiempo no avanza de 1 s en 1 s desde 0 (fila <i>)`, `no hay corridas de la clase <CLASE>`.
+Causas: `no existe la carpeta de origen`, `carpeta no reconocida`, `nombre de corrida no reconocido`, `clase desconocida`, `identificador de corrida repetido (también en <otra ruta>)`, `no hay archivo de datos`, `hay más de un archivo de datos`, `no se pudo determinar el área de rotura`, `la gemela declarada en config.json (<Rx>) no coincide con la tabla (<Ry>)`, `archivo ilegible (<tipo>)`, `falta la variable`, `valor no numérico`, `valor faltante`, `valor no finito`, `el tiempo no avanza de 1 s en 1 s desde 0 (fila <i>)`, `no hay corridas de la clase <CLASE>`.
 
 ## Reporte (salida estándar)
 

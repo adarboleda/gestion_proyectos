@@ -12,7 +12,7 @@ Un comando de línea de órdenes (`preparar-pwr3l`) recorre la carpeta `PWR 3L` 
 
 **Language/Version**: Python 3.11 o superior (entorno de desarrollo: CPython 3.12 en un `.venv` creado con `uv`)
 
-**Primary Dependencies**: pandas (3.0), numpy (2.x), scikit-learn (1.9, `StandardScaler`), openpyxl (3.1; los `.xls` de PCTran son libros xlsx)
+**Primary Dependencies**: pandas (3.1), numpy (2.5), scikit-learn (1.9, `StandardScaler`), openpyxl (3.1; los `.xls` de PCTran son libros xlsx)
 
 **Storage**: archivos locales; entrada de solo lectura (`.csv`, `.xls`/`.xlsx`, `config.json`), salida `.npy` y `.json` en `data_processed_pwr3l/`
 

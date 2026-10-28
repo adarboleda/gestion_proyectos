@@ -79,6 +79,8 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 - Una carpeta manual con dos archivos de datos (R27: tramo fallido y tramo de mitigación) o una carpeta sin archivo de datos.
 - Un archivo con variables requeridas ausentes, valores no numéricos, faltantes o no finitos, o con un tiempo que no avanza de 1 s en 1 s desde 0: la preparación se detiene con un error que nombra el archivo y la causa.
 - Dos carpetas con el mismo identificador de corrida, o una carpeta automática con una clase desconocida.
+- Una clase de entrenamiento sin ninguna corrida en el origen (se detiene: el origen está incompleto) o con todas sus corridas cortas (sigue, con la clase en cero y advertencias).
+- Una corrida automática cuya configuración declara una gemela distinta de la tabla del proyecto: se detiene, porque una pareja no registrada podría repartirse entre dos conjuntos.
 - Corridas emparejadas en las que una de las dos no aporta muestra: la otra se asigna sola, sin romper la regla de no compartir conjunto.
 - LOCA y LOCAC de la misma severidad: en PWR 3L la severidad es el área de rotura (cm²); todas las corridas de LOCA y LOCAC con la misma área forman un grupo. El grupo de 2000 cm² reúne 8 corridas y pesa mucho en el reparto; el reporte muestra los conteos reales.
 - Una corrida de LOCA o LOCAC cuya área de rotura no puede identificarse: la preparación se detiene nombrando el archivo.
@@ -96,20 +98,20 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 - **FR-004**: Las corridas descartadas por el equipo (R07, R27 y R28) MUST NOT aportar muestras, MUST listarse en el reporte con su motivo y la lista MUST estar documentada.
 - **FR-005**: El sistema MUST producir exactamente una muestra por corrida usable, formada por sus primeros 300 pasos consecutivos de 1 s (de 0 s a 299 s), con su etiqueta y el identificador de la corrida.
 - **FR-006**: Ante una corrida de clase de entrenamiento con menos de 300 pasos, el sistema MUST excluirla con una advertencia que nombre el archivo y su número de filas, MUST NOT completar los pasos que faltan y MUST seguir con las demás corridas.
-- **FR-007**: El sistema MUST asignar cada corrida usable completa a exactamente uno de los conjuntos de entrenamiento, validación o prueba, con un reparto cercano a 70 % / 15 % / 15 % y una semilla fija.
+- **FR-007**: El sistema MUST asignar cada corrida usable completa a exactamente uno de los conjuntos de entrenamiento, validación o prueba con una semilla fija. El reparto busca 70 % / 15 % / 15 % de las corridas dentro de cada familia de clases (NORM; LOCA y LOCAC; ATWS y TRIP_OK) asignando grupos completos, uno a uno en orden aleatorio, al conjunto que más lejos está de su meta; así ningún conjunto supera su meta en tanto como el grupo más grande, y el reporte da los conteos reales.
 - **FR-008**: El sistema MUST asignar al mismo conjunto las corridas emparejadas: cada ATWS con su gemela TRIP_OK, y todas las corridas de LOCA y LOCAC con la misma área de rotura (igual severidad).
 - **FR-009**: El sistema MUST usar como entrada de cada muestra solo variables medibles en sala de control (presión, temperaturas, caudales y niveles del primario y del secundario, flujo neutrónico, inyección y carga, y presión, temperatura y radiación de contención) y MUST NOT usar el caudal de fuga ni otras variables no medibles.
 - **FR-010**: El sistema MUST calcular los parámetros de escala de las variables de entrada solo con entrenamiento, aplicarlos a los tres conjuntos y persistirlos.
 - **FR-011**: El sistema MUST conservar para cada muestra las 7 variables de margen térmico en sus unidades originales, sin escalar y alineadas paso a paso con las entradas.
 - **FR-012**: El sistema MUST emitir un reporte con las muestras por clase y conjunto, las corridas y grupos de cada conjunto, todas las corridas sin muestra con su motivo y las limitaciones conocidas.
-- **FR-013**: El reporte MUST advertir de forma visible toda clase sin muestras en un conjunto y toda corrida de clase de entrenamiento que no aporte muestra.
-- **FR-014**: El sistema MUST detenerse con un error que nombre el archivo y la causa, sin escribir ningún conjunto, cuando falten variables requeridas, haya valores no numéricos, faltantes o no finitos, el tiempo no avance de 1 s en 1 s desde 0, una carpeta no tenga exactamente un archivo de datos, la clase sea desconocida o un identificador de corrida se repita; MUST NOT rellenar valores en silencio.
+- **FR-013**: El reporte MUST advertir de forma visible toda clase sin muestras en un conjunto (incluida una clase cuyas corridas son todas cortas) y toda corrida de clase de entrenamiento que no aporte muestra.
+- **FR-014**: El sistema MUST detenerse con un error que nombre el archivo o la carpeta y la causa, sin escribir ningún conjunto, cuando falten variables requeridas, haya valores no numéricos, faltantes o no finitos, el tiempo no avance de 1 s en 1 s desde 0, una carpeta no tenga exactamente un archivo de datos, la clase sea desconocida, un identificador de corrida se repita, la gemela declarada en la configuración de una corrida automática no coincida con la tabla de gemelas, o una clase de entrenamiento no tenga ninguna corrida en el origen; MUST NOT rellenar valores en silencio.
 - **FR-015**: El sistema MUST producir el mismo resultado al repetir la preparación con los mismos datos y la misma configuración.
 - **FR-016**: El sistema MUST regenerar todos los resultados con una sola ejecución documentada, en una salida propia, separada de la de NPPAD; los artefactos generados MUST NOT editarse a mano.
 
 ### Key Entities
 
-- **Corrida**: una simulación PWR 3L de unos 300 s con una fila por segundo; tiene identificador (`R<n>`, p. ej. `R07b`), clase, origen (manual o automática), archivo de datos y, cuando aplica, gemela o severidad.
+- **Corrida**: una simulación PWR 3L (en esta spec, «corrida» y «simulación» son lo mismo) de unos 300 s con una fila por segundo; tiene identificador (`R<n>`, p. ej. `R07b`), clase, origen (manual o automática), archivo de datos y, cuando aplica, gemela o severidad.
 - **Muestra**: los primeros 300 pasos de una corrida usable, con las variables de entrada escaladas, los márgenes térmicos, la etiqueta y el identificador de la corrida.
 - **Variables de entrada**: las 26 variables medibles en sala de control (P, TAVG, THA, THB, TCA, TCB, WRCA, WRCB, LVPZ, LVCR, PWNT, PSGA, PSGB, NSGA, NSGB, WFWA, WFWB, WSTA, WSTB, TBLD, WHPI, WCHG, WECS, PRB, TRB, RM1).
 - **Márgenes térmicos**: DNBR, TPCT, SCMA, SCMB, TSAT, FRCL y FRZR, sin escalar y no usados como entrada.
@@ -141,4 +143,5 @@ El analista recibe un reporte con las muestras por clase y por conjunto, las cor
 - El estado «REVISAR» que asigna el validador de corridas del proyecto (evento antes de lo planeado, poco tramo previo) no impide usar la corrida; el estado «REPETIR» solo lo tenía R07, que ya está descartada.
 - Se propone un reparto 70 % / 15 % / 15 % por grupos con semilla fija; con unas 20 corridas por clase, validación y prueba tendrán solo unas 3 por clase.
 - Con las 9 corridas cortas excluidas quedan 91 corridas usables (NORM 19, LOCA 16, LOCAC 20, ATWS 18, TRIP_OK 18), medido al escribir esta spec; el reporte da las cifras reales de cada ejecución.
+- Varias corridas NORM repiten el mismo rechazo de carga con otra condición inicial (p. ej. R33 y R35, 10 %). No son emparejadas en el sentido del principio II (no hay un mismo escenario con y sin accidente) y no se agrupan; el parecido puede inflar algo las métricas de NORM y el reporte lo declara como limitación.
 - Construir el clasificador queda fuera de esta funcionalidad, igual que las transformaciones de las entradas (cambios respecto al estado inicial, ruido de sensores).
