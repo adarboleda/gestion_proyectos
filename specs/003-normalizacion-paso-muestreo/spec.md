@@ -116,7 +116,7 @@ El analista ve en el reporte y en los metadatos de la preparación el paso de mu
 - **SC-002**: Con los datos reales, el paso publicado es el medido: 10 s en NPPAD (202 simulaciones) y 1 s en las corridas PWR 3L de entrenamiento (100 archivos), sin ninguna constante de paso en la configuración.
 - **SC-003**: Los parámetros de normalización coinciden (tolerancia relativa 1e-12) con los calculados solo sobre entrenamiento, y cambiar validación o prueba deja el 100 % de los parámetros sin cambios.
 - **SC-004**: Tras normalizar, cada variable de entrada de entrenamiento queda con |media| < 1e-4 y |desviación − 1| < 1e-4 (salvo las sin varianza, que se informan).
-- **SC-005**: Ninguna prueba existente de 001 o 002 deja de pasar por esta funcionalidad, salvo las que verifican exactamente el texto del mensaje de tiempo de 002, que se actualizan.
+- **SC-005**: Ninguna prueba existente de 001 o 002 deja de pasar por esta funcionalidad, salvo las que verifican el conjunto exacto de claves de `metadata.json` de 001 (que suma `duracion_muestra_segundos` por FR-007) o el texto del mensaje de tiempo de 002, que se actualizan.
 - **SC-006**: Dos ejecuciones con los mismos datos producen el mismo paso y parámetros idénticos byte a byte.
 
 ## Assumptions
