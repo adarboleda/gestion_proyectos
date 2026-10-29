@@ -16,6 +16,7 @@ from preparacion_datos.lectura import ErrorDatos, cargar_simulaciones
 from preparacion_datos.particion import repartir
 from preparacion_datos.reporte import comparar_referencia, construir_resumen, contar_muestras, formatear_reporte
 from preparacion_datos.salida import construir_conjunto, construir_metadata, publicar, serializar_metadata
+from preparacion_datos.verificacion import ErrorFuga, verificar_particion
 
 
 def _crear_parser() -> argparse.ArgumentParser:
@@ -52,6 +53,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         simulaciones = cargar_simulaciones(argumentos.origen)
         paso_medido = simulaciones[0].paso_segundos
         particion = repartir(simulaciones, argumentos.semilla)
+        verificar_particion(particion)
         crudos = {conjunto: construir_conjunto(particion[conjunto]) for conjunto in CONJUNTOS}
         escalador = ajustar_escalador(crudos["train"][0])
         archivos = {}
@@ -74,7 +76,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
         archivos["metadata.json"] = serializar_metadata(construir_metadata(resumen))
         publicar(argumentos.salida, archivos)
-    except ErrorDatos as error:
+    except (ErrorDatos, ErrorFuga) as error:
         print(error, file=sys.stderr)
         return 1
     except OSError as error:
