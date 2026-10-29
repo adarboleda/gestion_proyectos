@@ -3,7 +3,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -49,6 +49,7 @@ class Corrida:
     estado: str = "pendiente"  # pendiente -> usable | corta; o descartada | ood
     filas: Optional[int] = None
     serie: Optional[np.ndarray] = None  # (300, 33): 26 entradas y 7 márgenes
+    paso_segundos: Optional[Union[int, float]] = None
 
     @property
     def etiqueta(self) -> Optional[int]:

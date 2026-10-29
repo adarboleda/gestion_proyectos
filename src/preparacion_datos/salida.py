@@ -10,7 +10,6 @@ import numpy as np
 
 from preparacion_datos.config import (
     CLASES,
-    PASO_SEGUNDOS,
     PASOS,
     PROPORCION_TEST,
     PROPORCION_TRAIN,
@@ -97,7 +96,8 @@ def construir_metadata(resumen) -> dict:
         "semilla": resumen.semilla,
         "proporciones": {"train": PROPORCION_TRAIN, "val": PROPORCION_VAL, "test": PROPORCION_TEST},
         "pasos_por_muestra": PASOS,
-        "paso_segundos": PASO_SEGUNDOS,
+        "paso_segundos": resumen.paso_segundos,
+        "duracion_muestra_segundos": resumen.duracion_muestra_segundos,
         "clases": dict(CLASES),
         "variables_planta": list(VARIABLES_PLANTA),
         "variables_margen": list(VARIABLES_MARGEN),

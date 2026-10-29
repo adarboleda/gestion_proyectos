@@ -1,7 +1,7 @@
-"""Lectura y validación del archivo completo de cada corrida PWR 3L (CSV o libro xlsx)."""
+"""Lectura, validación del archivo completo y medición del paso de muestreo de cada corrida PWR 3L."""
 import math
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ from preparacion_pwr3l.config import PASOS, VARIABLE_TIEMPO, VARIABLES
 from preparacion_pwr3l.descubrimiento import Corrida, ErrorDatos, descubrir_corridas
 
 COLUMNAS = [VARIABLE_TIEMPO] + VARIABLES
+TOLERANCIA_RELATIVA_PASO = 1e-6
 
 
 def _leer_tabla(ruta: Path, relativo: str) -> pd.DataFrame:
@@ -62,22 +63,61 @@ def _convertir_columna(valores, relativo: str, variable: str) -> np.ndarray:
     return resultado
 
 
+def _normalizar_paso(paso: float) -> Union[int, float]:
+    entero = round(paso)
+    if abs(paso - entero) <= TOLERANCIA_RELATIVA_PASO * max(1.0, abs(paso)):
+        return int(entero)
+    return float(paso)
+
+
+def _medir_paso_tiempo(tiempo: np.ndarray, relativo: str) -> Union[int, float]:
+    """Comprueba inicio en 0 s y que el paso de muestreo sea positivo y constante en todo el archivo."""
+    if len(tiempo) < 2:
+        raise ErrorDatos(relativo, "menos de 2 filas para calcular el paso de muestreo", VARIABLE_TIEMPO)
+    if tiempo[0] != 0.0:
+        inicio = _normalizar_paso(float(tiempo[0]))
+        raise ErrorDatos(
+            relativo,
+            f"el tiempo debe iniciar en 0 s (inicia en {inicio:g} s)",
+            VARIABLE_TIEMPO,
+        )
+    diferencias = np.diff(tiempo)
+    no_avanza = np.flatnonzero(diferencias <= 0)
+    if no_avanza.size:
+        i = int(no_avanza[0])
+        paso_malo = _normalizar_paso(float(diferencias[i]))
+        raise ErrorDatos(
+            relativo,
+            f"el tiempo no avanza en la fila de datos {i + 2} (paso {paso_malo:g} s)",
+            VARIABLE_TIEMPO,
+        )
+    paso_base = float(diferencias[0])
+    desviados = np.flatnonzero(np.abs(diferencias - paso_base) > TOLERANCIA_RELATIVA_PASO * paso_base)
+    if desviados.size:
+        i = int(desviados[0])
+        esperado = _normalizar_paso(paso_base)
+        encontrado = _normalizar_paso(float(diferencias[i]))
+        raise ErrorDatos(
+            relativo,
+            f"paso de muestreo no constante en la fila de datos {i + 2} "
+            f"(esperado {esperado:g} s, encontrado {encontrado:g} s)",
+            VARIABLE_TIEMPO,
+        )
+    return _normalizar_paso(paso_base)
+
+
 def leer_corrida(origen, corrida: Corrida) -> Corrida:
-    """Valida el archivo completo de `corrida` y fija `filas`, `estado` y `serie`.
+    """Valida el archivo completo de `corrida` y fija `filas`, `paso_segundos`, `estado` y `serie`.
 
     Cualquier defecto en cualquier fila lanza ``ErrorDatos``. Sin defectos, una corrida con menos
-    de 300 filas queda como «corta» (sin serie, no se rellena nada); si no, la serie son las filas
-    0 a 299 de las 26 entradas y los 7 márgenes.
+    de 300 filas queda como «corta» (sin serie, no se rellena nada, pero con su paso medido); si no,
+    la serie son las filas 0 a 299 de las 26 entradas y los 7 márgenes.
     """
     relativo = corrida.archivo
     tabla = _leer_tabla(Path(origen) / relativo, relativo)
     columnas = {v: _convertir_columna(tabla[v].tolist(), relativo, v) for v in COLUMNAS}
     tiempo = columnas[VARIABLE_TIEMPO]
-    distintos = np.flatnonzero(tiempo != np.arange(len(tiempo)))
-    if distintos.size:
-        raise ErrorDatos(
-            relativo, f"el tiempo no avanza de 1 s en 1 s desde 0 (fila de datos {distintos[0] + 1})", VARIABLE_TIEMPO
-        )
+    corrida.paso_segundos = _medir_paso_tiempo(tiempo, relativo)
     corrida.filas = len(tiempo)
     if corrida.filas < PASOS:
         corrida.estado = "corta"
@@ -88,10 +128,33 @@ def leer_corrida(origen, corrida: Corrida) -> Corrida:
     return corrida
 
 
+def obtener_paso_comun(corridas: List[Corrida]) -> Union[int, float]:
+    """Verifica que todas las corridas leídas compartan el mismo paso de muestreo y lo devuelve."""
+    referencia: Optional[Corrida] = None
+    for corrida in corridas:
+        if corrida.paso_segundos is None:
+            continue
+        if referencia is None:
+            referencia = corrida
+        elif abs(float(corrida.paso_segundos) - float(referencia.paso_segundos)) > (
+            TOLERANCIA_RELATIVA_PASO * float(referencia.paso_segundos)
+        ):
+            raise ErrorDatos(
+                corrida.archivo,
+                f"paso de muestreo ({corrida.paso_segundos:g} s) distinto al del resto del dataset "
+                f"({referencia.paso_segundos:g} s en {referencia.archivo})",
+                VARIABLE_TIEMPO,
+            )
+    if referencia is None:
+        raise ValueError("No hay corridas leídas con paso de muestreo medido.")
+    return referencia.paso_segundos
+
+
 def cargar_corridas(origen) -> List[Corrida]:
-    """Descubre todas las corridas y lee las de las cinco clases; se detiene en el primer defecto."""
+    """Descubre todas las corridas, lee las de las cinco clases y verifica que tengan el mismo paso."""
     corridas = descubrir_corridas(origen)
     for corrida in corridas:
         if corrida.estado == "pendiente":
             leer_corrida(origen, corrida)
+    obtener_paso_comun(corridas)
     return corridas

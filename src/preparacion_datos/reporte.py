@@ -2,7 +2,7 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from preparacion_datos.config import CLASES, CLASES_POR_CARPETA, CONJUNTOS, PASOS
 
@@ -23,6 +23,8 @@ LIMITACIONES = [
 class Resumen:
     origen: str
     semilla: int
+    paso_segundos: Union[int, float]
+    duracion_muestra_segundos: Union[int, float]
     conteos_archivos: Dict[str, int]
     conteos_muestras: Dict[str, Dict[str, int]]
     totales: Dict[str, int]
@@ -89,11 +91,32 @@ def comparar_referencia(ruta: Optional[Path], conteos: Dict[str, Dict[str, int]]
     return resultado
 
 
-def construir_resumen(origen, semilla, particion, escalador, referencia: Optional[dict]) -> Resumen:
+def _obtener_paso_particion(particion) -> Union[int, float]:
+    for conjunto in CONJUNTOS:
+        for simulacion in particion[conjunto]:
+            if simulacion.paso_segundos is not None:
+                return simulacion.paso_segundos
+    raise ValueError("No se encontró paso_segundos medido en las simulaciones de la partición.")
+
+
+def construir_resumen(
+    origen,
+    semilla,
+    particion,
+    escalador,
+    referencia: Optional[dict],
+    paso_segundos: Optional[Union[int, float]] = None,
+) -> Resumen:
     conteos = contar_muestras(particion)
+    paso = paso_segundos if paso_segundos is not None else _obtener_paso_particion(particion)
+    duracion = PASOS * paso
+    if isinstance(duracion, float) and duracion.is_integer():
+        duracion = int(duracion)
     return Resumen(
         origen=str(origen),
         semilla=semilla,
+        paso_segundos=paso,
+        duracion_muestra_segundos=duracion,
         conteos_archivos={clase: sum(por_conjunto.values()) for clase, por_conjunto in conteos.items()},
         conteos_muestras=conteos,
         totales={conjunto: len(particion[conjunto]) for conjunto in CONJUNTOS},
@@ -137,7 +160,9 @@ def formatear_reporte(resumen: Resumen, artefactos: List[str]) -> str:
     lineas += [_titulo("1. Origen y configuración")]
     lineas += [
         f"Origen: {resumen.origen}",
-        f"Semilla: {resumen.semilla} | Reparto 70/15/15 por simulación completa | {PASOS} pasos por muestra",
+        f"Semilla: {resumen.semilla} | Reparto 70/15/15 por simulación completa | "
+        f"{PASOS} pasos por muestra (paso medido de TIME: {resumen.paso_segundos:g} s, "
+        f"duración: {resumen.duracion_muestra_segundos:g} s)",
     ]
     lineas += [_titulo("2. Muestras por clase y conjunto")] + _tabla(resumen)
     lineas += [_titulo("3. Simulaciones por conjunto")]

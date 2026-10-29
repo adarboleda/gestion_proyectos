@@ -50,6 +50,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     argumentos = _crear_parser().parse_args(argv)
     try:
         simulaciones = cargar_simulaciones(argumentos.origen)
+        paso_medido = simulaciones[0].paso_segundos
         particion = repartir(simulaciones, argumentos.semilla)
         crudos = {conjunto: construir_conjunto(particion[conjunto]) for conjunto in CONJUNTOS}
         escalador = ajustar_escalador(crudos["train"][0])
@@ -63,7 +64,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         archivos["scaler_std.npy"] = escalador.escala
         ruta_referencia = None if argumentos.sin_referencia else Path(argumentos.referencia)
         referencia = comparar_referencia(ruta_referencia, contar_muestras(particion))
-        resumen = construir_resumen(argumentos.origen, argumentos.semilla, particion, escalador, referencia)
+        resumen = construir_resumen(
+            argumentos.origen,
+            argumentos.semilla,
+            particion,
+            escalador,
+            referencia,
+            paso_segundos=paso_medido,
+        )
         archivos["metadata.json"] = serializar_metadata(construir_metadata(resumen))
         publicar(argumentos.salida, archivos)
     except ErrorDatos as error:
