@@ -26,8 +26,8 @@
 
 **Purpose**: Rutas de los datasets reales y carpeta de pruebas de integración PWR 3L
 
-- [ ] T001 Crear `tests/datos_reales.py` con `raiz_ianuclear()` (variable de entorno `IANUCLEAR_DATOS`; si no está, `../IA-Nuclear` respecto de la raíz del repositorio), `ruta_pwr3l()` (`<raíz>/PWR 3L`) y `ruta_nppad()` (`<raíz>/NuclearPowerPlantAccidentData/Operation_csv_data`), sin depender de que existan (research.md decisión 6)
-- [ ] T002 [P] Crear la carpeta `tests/pwr3l/integration/` y comprobar que `python -m pytest --collect-only -q` sigue sin errores
+- [X] T001 Crear `tests/datos_reales.py` con `raiz_ianuclear()` (variable de entorno `IANUCLEAR_DATOS`; si no está, `../IA-Nuclear` respecto de la raíz del repositorio), `ruta_pwr3l()` (`<raíz>/PWR 3L`) y `ruta_nppad()` (`<raíz>/NuclearPowerPlantAccidentData/Operation_csv_data`), sin depender de que existan (research.md decisión 6)
+- [X] T002 [P] Crear la carpeta `tests/pwr3l/integration/` y comprobar que `python -m pytest --collect-only -q` sigue sin errores
 
 ---
 
@@ -37,7 +37,7 @@
 
 **CRITICAL**: Ninguna historia puede empezar hasta terminar esta fase
 
-- [ ] T003 Añadir a `tests/pwr3l/conftest.py` una fixture `fabricar` que crea objetos `preparacion_pwr3l.descubrimiento.Corrida` en memoria con `id`, `clase`, `estado` (por defecto `usable`), `area` y `gemela` (por defecto la de `config.GEMELAS`), y un ayudante `corridas_variadas()` con NORM, LOCA/LOCAC con áreas repetidas y únicas, gemelas completas, una gemela con pareja corta y corridas corta, descartada y OOD; sin tocar las fixtures existentes de 002
+- [X] T003 Añadir a `tests/pwr3l/conftest.py` una fixture `fabricar` que crea objetos `preparacion_pwr3l.descubrimiento.Corrida` en memoria con `id`, `clase`, `estado` (por defecto `usable`), `area` y `gemela` (por defecto la de `config.GEMELAS`), y un ayudante `corridas_variadas()` con NORM, LOCA/LOCAC con áreas repetidas y únicas, gemelas completas, una gemela con pareja corta y corridas corta, descartada y OOD; sin tocar las fixtures existentes de 002
 
 **Checkpoint**: se pueden escribir las pruebas de las historias
 
@@ -51,13 +51,13 @@
 
 ### Tests for User Story 1 (escribir primero; deben fallar)
 
-- [ ] T004 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_grupos.py` con pruebas de: (a) LOCA y LOCAC de la misma área en un grupo `AREA-<cm2>`, también con repeticiones dentro de una rama; (b) áreas distintas (p. ej. 7700 y 8500) en grupos distintos; (c) ATWS y TRIP_OK gemelas usables en un grupo `GEMELAS-<a>-<b>` con `<a>`/`<b>` en orden natural de identificador; (d) gemela con pareja corta → grupo individual `<Rid>` y la corta en ningún grupo; (e) NORM → grupo individual; (f) corridas corta, descartada y OOD fuera de todos los grupos; (g) cada corrida usable en exactamente un grupo y `familia` correcta (NORM, LOCA, ATWS); (h) mismo resultado con la lista invertida y orden por familia y clave; (i) LOCA usable sin área → `ErrorDatos` que nombra el archivo; (j) ninguna corrida usable → `ValueError`; (k) con el árbol sintético de 002 (`copia_pwr3l` + `cargar_corridas`), las corridas usables quedan todas agrupadas; (l) agrupar no modifica `estado`, `area`, `gemela` ni `serie` de ninguna corrida (FR-014)
-- [ ] T005 [US1] Ejecutar `python -m pytest tests/pwr3l/unit/test_pwr3l_grupos.py` y comprobar que T004 **falla** antes de implementar
+- [X] T004 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_grupos.py` con pruebas de: (a) LOCA y LOCAC de la misma área en un grupo `AREA-<cm2>`, también con repeticiones dentro de una rama; (b) áreas distintas (p. ej. 7700 y 8500) en grupos distintos; (c) ATWS y TRIP_OK gemelas usables en un grupo `GEMELAS-<a>-<b>` con `<a>`/`<b>` en orden natural de identificador; (d) gemela con pareja corta → grupo individual `<Rid>` y la corta en ningún grupo; (e) NORM → grupo individual; (f) corridas corta, descartada y OOD fuera de todos los grupos; (g) cada corrida usable en exactamente un grupo y `familia` correcta (NORM, LOCA, ATWS); (h) mismo resultado con la lista invertida y orden por familia y clave; (i) LOCA usable sin área → `ErrorDatos` que nombra el archivo; (j) ninguna corrida usable → `ValueError`; (k) con el árbol sintético de 002 (`copia_pwr3l` + `cargar_corridas`), las corridas usables quedan todas agrupadas; (l) agrupar no modifica `estado`, `area`, `gemela` ni `serie` de ninguna corrida (FR-014)
+- [X] T005 [US1] Ejecutar `python -m pytest tests/pwr3l/unit/test_pwr3l_grupos.py` y comprobar que T004 **falla** antes de implementar
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Crear `src/preparacion_pwr3l/grupos.py` con la dataclass `Grupo` (`clave`: «`AREA-<cm2>`, `GEMELAS-<a>-<b>` (orden natural de identificador) o `<Rid>`»; `familia`: «NORM, LOCA o ATWS (`config.FAMILIAS` de su primera corrida)»; `corridas`: «1 o más corridas usables, ordenadas con `clave_orden`; todas de la misma familia»; propiedad `tamano`) y `formar_grupos(corridas)` según research.md decisión 1 y contracts/api.md
-- [ ] T007 [US1] Ejecutar `python -m pytest tests/pwr3l/unit/test_pwr3l_grupos.py` y comprobar que pasa
+- [X] T006 [US1] Crear `src/preparacion_pwr3l/grupos.py` con la dataclass `Grupo` (`clave`: «`AREA-<cm2>`, `GEMELAS-<a>-<b>` (orden natural de identificador) o `<Rid>`»; `familia`: «NORM, LOCA o ATWS (`config.FAMILIAS` de su primera corrida)»; `corridas`: «1 o más corridas usables, ordenadas con `clave_orden`; todas de la misma familia»; propiedad `tamano`) y `formar_grupos(corridas)` según research.md decisión 1 y contracts/api.md
+- [X] T007 [US1] Ejecutar `python -m pytest tests/pwr3l/unit/test_pwr3l_grupos.py` y comprobar que pasa
 
 **Checkpoint**: los grupos funcionan solos (MVP de la agrupación)
 
