@@ -6,6 +6,7 @@ metricas/salidas/
 
 # Python y artefactos regenerables de la preparacion de datos
 data_processed/
+data_processed_pwr3l/
 __pycache__/
 *.egg-info/
 .pytest_cache/
