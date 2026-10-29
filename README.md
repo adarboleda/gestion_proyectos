@@ -122,6 +122,33 @@ Normal y ATWS tienen una sola simulación en el dataset: van completas a entrena
 
 ---
 
+## División sin fuga de datos (funcionalidad 004)
+
+Reparte las corridas usables de **PWR 3L** en entrenamiento, validación y prueba por corrida completa, sin fuga de datos:
+
+- Las LOCA y LOCAC con **la misma área de rotura** van al mismo conjunto (división pareada por severidad).
+- Cada ATWS va con su **gemela TRIP_OK**.
+- Los grupos se reparten por familia (NORM; LOCA y LOCAC; ATWS y TRIP_OK) hacia 70/15/15, de mayor a menor tamaño, con semilla 42.
+- Una verificación independiente comprueba que ninguna corrida ni grupo quede en dos conjuntos.
+
+```python
+from preparacion_pwr3l.lectura import cargar_corridas
+from preparacion_pwr3l.grupos import formar_grupos
+from preparacion_pwr3l.particion import repartir
+from preparacion_pwr3l.verificacion import verificar_reparto
+
+corridas = cargar_corridas("../IA-Nuclear/PWR 3L")
+reparto = repartir(formar_grupos(corridas))   # verifica su propio resultado
+verificar_reparto(corridas, reparto)          # con todas las corridas, también las excluidas
+print(reparto.conteos)
+```
+
+`preparar-datos` (NPPAD) también verifica su partición: si encontrara una fuga, termina con código 1 y el mensaje `FUGA DE DATOS` sin publicar nada.
+
+**Pruebas con los datos reales**: si IA-Nuclear no está en `../IA-Nuclear`, indica su ruta con la variable `IANUCLEAR_DATOS` (PowerShell: `$env:IANUCLEAR_DATOS = "C:\ruta\IA-Nuclear"`). Detalle: [specs/004-division-sin-fuga/quickstart.md](specs/004-division-sin-fuga/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.

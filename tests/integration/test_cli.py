@@ -151,3 +151,19 @@ def test_consola_con_codificacion_limitada_no_interrumpe_la_salida(origen_sintet
     texto = buffer.getvalue().decode("ascii")
     assert "REPORTE DE PREPARACI?N DE DATOS NPPAD" in texto
     assert (tmp_path / "salida" / "metadata.json").is_file()
+
+
+def test_particion_con_fuga_detiene_sin_publicar(origen_sintetico, tmp_path, monkeypatch, capsys):
+    import preparacion_datos.cli as cli
+    from preparacion_datos.particion import repartir as repartir_real
+
+    def repartir_con_fuga(simulaciones, semilla):
+        particion = repartir_real(simulaciones, semilla)
+        particion["test"].append(particion["train"][-1])  # la misma simulación en train y en test
+        return particion
+
+    monkeypatch.setattr(cli, "repartir", repartir_con_fuga)
+    salida = tmp_path / "salida"
+    assert ejecutar(origen_sintetico, salida, "--sin-referencia") == 1
+    assert "FUGA DE DATOS" in capsys.readouterr().err
+    assert not salida.exists()

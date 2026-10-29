@@ -169,6 +169,42 @@ def copia_pwr3l(arbol_pwr3l, tmp_path) -> Path:
     return destino
 
 
+def fabricar_corrida(rid: str, clase: str, estado: str = "usable", area=None, gemela="tabla"):
+    """Corrida en memoria (sin archivo) para las pruebas de grupos, reparto y verificación de 004."""
+    from preparacion_pwr3l.descubrimiento import GEMELA_DE, Corrida
+
+    corrida = Corrida(rid, clase, "auto", f"auto/{rid}_{clase}/plotdata.csv", area=area, estado=estado)
+    corrida.gemela = GEMELA_DE.get(rid) if gemela == "tabla" else gemela
+    if estado in ("usable", "corta"):
+        corrida.filas = 301 if estado == "usable" else 295
+    if estado == "usable":
+        corrida.serie = np.zeros((1, 1))
+    return corrida
+
+
+def corridas_variadas():
+    """NORM, LOCA/LOCAC con áreas repetidas y únicas, gemelas completas, una gemela con pareja corta
+    y corridas corta, descartada y OOD."""
+    f = fabricar_corrida
+    return [
+        f("R01", "NORM"), f("R02", "NORM"), f("R31", "NORM"), f("R32", "NORM"),
+        f("R10", "LOCA", area=50), f("R77", "LOCA", area=50), f("R04", "LOCAC", area=50),
+        f("R11", "LOCA", area=200), f("R05", "LOCAC", area=200),
+        f("R09", "LOCA", area=2000), f("R03", "LOCAC", area=2000), f("R15", "LOCAC", area=2000),
+        f("R80", "LOCA", area=3000), f("R08", "LOCAC", area=7700), f("R14", "LOCA", area=8500),
+        f("R21", "ATWS"), f("R59", "TRIP_OK"), f("R22", "ATWS"), f("R60", "TRIP_OK"),
+        f("R29", "ATWS"), f("R63", "TRIP_OK", estado="corta"),
+        f("R41", "LOCA", estado="corta", area=5),
+        f("R07", "LOCAC", estado="descartada", gemela=None),
+        f("R20", "OOD", estado="ood", gemela=None),
+    ]
+
+
+@pytest.fixture
+def fabricar():
+    return SimpleNamespace(corrida=fabricar_corrida, variadas=corridas_variadas)
+
+
 @pytest.fixture
 def ayudantes():
     return SimpleNamespace(
