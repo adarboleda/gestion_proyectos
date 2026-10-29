@@ -1,0 +1,2637 @@
+\documentclass[12pt,a4paper]{article}
+
+% =========================
+% PAQUETES
+% =========================
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{calc}
+\usepackage{adjustbox}
+\usepackage[table]{xcolor}
+\usepackage{fvextra}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{xurl}
+
+\geometry{margin=2.54cm}
+\setstretch{1.5}
+\setlength{\headheight}{15pt}
+\setlength{\emergencystretch}{3em}
+
+% Rutas de archivos; escribir \slash en lugar de / para permitir el corte de línea ahí
+\newcommand{\ruta}[1]{\texttt{#1}}
+% Columna de ancho fijo alineada a la izquierda
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Gestión de Proyectos}
+\lhead{ESPE}
+\rfoot{\thepage}
+
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue!60!black}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\titleformat{\paragraph}[hang]{\normalfont\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\paragraph}{0pt}{2ex}{0.8ex}
+
+% Caracteres de los documentos de Spec Kit que pdfLaTeX no trae definidos
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{2500}{-}
+\DeclareUnicodeCharacter{2502}{|}
+\DeclareUnicodeCharacter{2514}{+}
+\DeclareUnicodeCharacter{251C}{+}
+
+% Macros que usa pandoc en las listas y tablas convertidas
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcounter{none} % las tablas sin título usan \def\LTcaptype{none}
+
+% =========================
+% DOCUMENTOS GENERADOS POR SPEC KIT
+% =========================
+% #1: comando de Spec Kit, #2: ruta del archivo en el repositorio.
+% El recuadro (\bannerdoc) aparece debajo del título de cada documento.
+\newenvironment{documentogenerado}[2]{%
+  \def\doccomando{#1}\def\docruta{#2}%
+  \par\begingroup\small\setstretch{1.15}\sloppy%
+}{\endgroup\par\medskip}
+\newcommand{\bannerdoc}{%
+  \par\smallskip\noindent
+  \fcolorbox{gray!60}{gray!8}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{\small
+    \textbf{Documento generado con:} \texttt{\doccomando}\\
+    \textbf{Archivo en el repositorio:} \ruta{\docruta}\\
+    \textit{Se reproduce sin cambios. Los títulos en inglés vienen de las plantillas de Spec Kit.}}}%
+  \par\medskip}
+
+% =========================
+% CAPTURAS DE PANTALLA
+% =========================
+% #1: nombre de la imagen (en la raíz del proyecto), #2: pie de figura, #3: instrucciones.
+% Si la imagen existe se muestra; si no, aparece un recuadro rojo con lo que hay que capturar.
+\newcommand{\captura}[3]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#1}{%
+      \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio]{#1}%
+    }{%
+      \fcolorbox{red!70!black}{red!4}{\parbox{0.92\linewidth}{\setstretch{1.1}\centering\vspace{5mm}
+        {\large\bfseries\color{red!70!black} CAPTURA PENDIENTE}\\[2mm]
+        Subir la imagen a Overleaf con el nombre \texttt{#1}\\[3mm]
+        \raggedright\small #3\par\vspace{5mm}}}%
+    }
+    \caption{#2}
+  \end{figure}}
+
+% =========================
+% CÓDIGO PYTHON
+% =========================
+\lstdefinestyle{python}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize\setstretch{1},
+  keywordstyle=\color{blue!60!black}\bfseries,
+  commentstyle=\color{green!40!black}\itshape,
+  stringstyle=\color{red!55!black},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt,
+  frame=single, rulecolor=\color{gray!50},
+  breaklines=true, breakatwhitespace=false,
+  showstringspaces=false, columns=fullflexible, keepspaces=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {·}{{\textperiodcentered}}1
+           {−}{{-}}1 {→}{{$\rightarrow$}}1 {«}{{\guillemotleft}}1 {»}{{\guillemotright}}1
+}
+\lstset{style=python}
+
+\begin{document}
+
+% =========================
+% PORTADA
+% =========================
+\begin{titlepage}
+\begin{center}
+\IfFileExists{Imagen1.png}{\includegraphics[width=5cm]{Imagen1.png}}{\fbox{\parbox[c][1.8cm][c]{5cm}{\centering\small Logo ESPE\\(subir \texttt{Imagen1.png})}}}
+\hfill
+\IfFileExists{Imagen2.png}{\includegraphics[width=1.75cm]{Imagen2.png}}{\fbox{\parbox[c][1.8cm][c]{2.4cm}{\centering\footnotesize Logo\\(subir\\ \texttt{Imagen2.png})}}}
+
+\vspace{1cm}
+
+{\large \textbf{INGENIERÍA EN SOFTWARE}}\\[1cm]
+
+{\large \textbf{GESTIÓN DE PROYECTOS}}\\[2cm]
+
+{\Large \textbf{TALLER 1 -- UNIDAD 1}}\\[1cm]
+
+{\large \textbf{Título del Trabajo:}}\\
+Desarrollo Guiado por Especificaciones (SDD) con GitHub Spec Kit:\\
+primera iteración del proyecto IANuclear\\
+(\texttt{001-preparacion-datos})\\[2cm]
+
+\textbf{Nombre de los estudiantes:} \\
+Christian Marcelo Acuña Gamboa \\
+Abner David Arboleda Roman \\
+Christian Mateo Bonifaz Vásquez \\[0.5cm]
+
+\textbf{Docente:} Jorge Raura\\
+\textbf{Fecha:} \today\\[0.5cm]
+
+\textbf{Repositorio:} \url{https://github.com/adarboleda/gestion_proyectos}
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+\listoffigures
+
+\newpage
+
+% =========================
+% ACTIVIDAD
+% =========================
+\section{Actividad}
+Aplicar las fases del modelo de Desarrollo Guiado por Especificaciones (SDD) en una primera iteración del proyecto de desarrollo de software y presentar la siguiente documentación:
+
+\begin{enumerate}
+  \item Documento de constitución (\texttt{speckit-constitution}).
+  \item Documento de especificación (\texttt{speckit-specify}).
+  \item Documento de planificación (\texttt{speckit-plan}).
+  \item Documento de tareas (\texttt{speckit-tasks}).
+  \item Implementación de una iteración (\texttt{speckit-implement}).
+  \item Documento de auditoría (\texttt{speckit-coverage}).
+\end{enumerate}
+
+% =========================
+% OBJETIVOS
+% =========================
+\section{Objetivos}
+
+\subsection{Objetivo general}
+Aplicar el ciclo completo de Desarrollo Guiado por Especificaciones con GitHub Spec Kit en una iteración real del proyecto IANuclear, desde la definición de los principios hasta la implementación auditada, dejando evidencia verificable de cada fase.
+
+\subsection{Objetivos específicos}
+\begin{itemize}
+  \item Establecer los principios no negociables del proyecto en una constitución versionada.
+  \item Especificar la funcionalidad en términos de valor para el usuario, sin decisiones técnicas, y resolver sus ambigüedades antes de diseñar.
+  \item Traducir la especificación en un plan técnico que respete la constitución y en una lista de tareas ordenada por dependencias.
+  \item Implementar la iteración escribiendo primero las pruebas automáticas y verificar el resultado con el dataset real.
+  \item Auditar la coherencia entre especificación, plan, tareas y código, y registrar con honestidad los hallazgos y su resolución.
+\end{itemize}
+
+% =========================
+% MARCO TEÓRICO
+% =========================
+\section{Marco teórico}
+
+\subsection{Desarrollo Guiado por Especificaciones (SDD)}
+El Desarrollo Guiado por Especificaciones (\textit{Spec-Driven Development}, SDD) es un enfoque en el que la especificación deja de ser un documento que se escribe y se olvida: pasa a ser el artefacto central del que se derivan el plan, las tareas y el código. La regla básica es \textbf{primero se define qué se quiere y por qué, después cómo, y al final se programa}. Cada fase produce un documento que alimenta a la siguiente, de modo que cualquier decisión del código puede rastrearse hasta un requisito y cualquier requisito hasta una tarea y una prueba.
+
+Este enfoque encaja con el trabajo asistido por agentes de inteligencia artificial: en lugar de pedirle código directamente al agente, se le entrega una especificación precisa y un conjunto de reglas (la constitución), y el agente genera el plan, las tareas y la implementación dentro de esos límites.
+
+\subsection{GitHub Spec Kit}
+GitHub Spec Kit es un conjunto de herramientas de código abierto que implementa SDD. Se compone de la herramienta de línea de órdenes \texttt{specify}, que prepara el proyecto, y de un conjunto de comandos para el agente de IA (en este trabajo, Claude Code). Cada comando ejecuta una fase del ciclo y escribe su documento a partir de una plantilla:
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{tabular}{@{}P{4.4cm}P{5.8cm}P{4.8cm}@{}}
+\toprule
+\textbf{Comando} & \textbf{Qué hace} & \textbf{Documento que genera} \\
+\midrule
+\texttt{/speckit-constitution} & Fija los principios y reglas del proyecto & \texttt{constitution.md} \\
+\texttt{/speckit-specify} & Describe qué se quiere y por qué, sin tecnología & \texttt{spec.md} \\
+\texttt{/speckit-clarify} & Hace preguntas para resolver ambigüedades & Actualiza \texttt{spec.md} \\
+\texttt{/speckit-plan} & Define el cómo: tecnología, diseño, contratos & \texttt{plan.md} y anexos \\
+\texttt{/speckit-tasks} & Divide el plan en tareas ordenadas & \texttt{tasks.md} \\
+\texttt{/speckit-analyze} & Revisa la coherencia entre spec, plan y tareas & Informe de análisis \\
+\texttt{/speckit-implement} & Ejecuta las tareas y escribe el código & Código y pruebas \\
+\texttt{/speckit-converge} & Compara el código con la spec y añade lo que falta & Nuevas tareas en \texttt{tasks.md} \\
+\bottomrule
+\end{tabular}
+\caption{Comandos de Spec Kit usados en la iteración}
+\end{table}
+
+\subsection{Correspondencia con los entregables}
+La Tabla~\ref{tab:entregables} relaciona cada entregable pedido con el comando que lo produce y el archivo donde quedó.
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{tabular}{@{}P{3.2cm}P{4.6cm}P{7.2cm}@{}}
+\toprule
+\textbf{Entregable} & \textbf{Comando} & \textbf{Archivo} \\
+\midrule
+1. Constitución & \texttt{/speckit-constitution} & \ruta{.specify\slash memory\slash constitution.md} \\
+2. Especificación & \texttt{/speckit-specify} y \texttt{/speckit-clarify} & \ruta{specs\slash 001-preparacion-datos\slash spec.md} \\
+3. Planificación & \texttt{/speckit-plan} & \ruta{specs\slash 001-preparacion-datos\slash plan.md} \\
+4. Tareas & \texttt{/speckit-tasks} & \ruta{specs\slash 001-preparacion-datos\slash tasks.md} \\
+5. Implementación & \texttt{/speckit-implement} & \ruta{src\slash preparacion\_datos\slash} y \ruta{tests\slash} \\
+6. Auditoría & \texttt{/speckit-analyze} y \texttt{/speckit-converge} & \ruta{specs\slash 001-preparacion-datos\slash analisis-inicial.md} y \ruta{auditoria.md} \\
+\bottomrule
+\end{tabular}
+\caption{Entregables, comandos y archivos}
+\label{tab:entregables}
+\end{table}
+
+\textbf{Nota sobre el sexto entregable.} El enunciado lo llama \textit{speckit-coverage}, pero Spec Kit no tiene un comando con ese nombre. La cobertura se audita con dos comandos: \texttt{/speckit-analyze}, que antes de implementar comprueba que cada requisito tenga al menos una tarea, y \texttt{/speckit-converge}, que después de implementar comprueba que el código cubra toda la especificación. El documento de auditoría de este informe reúne los resultados de ambos.
+
+\captura{01-comandos-speckit.png}{Comandos de Spec Kit disponibles en Claude Code}{%
+\textbf{(Recomendada)} Abrir Claude Code en la carpeta del proyecto y escribir \texttt{/speckit} en el chat, sin pulsar Enter, para que aparezca la lista de comandos (\texttt{speckit-constitution}, \texttt{speckit-specify}, \texttt{speckit-plan}, etc.). Capturar esa lista.}
+
+% =========================
+% PROYECTO E ITERACIÓN
+% =========================
+\section{Descripción del proyecto y de la iteración}
+
+\subsection{El proyecto IANuclear}
+IANuclear es un sistema consultivo de apoyo al operador para detectar accidentes de pérdida de refrigerante (LOCA) y de transitorio previsto sin parada del reactor (ATWS) en reactores de agua a presión (PWR), usando datos simulados. El sistema solo aconseja: no actúa sobre la planta ni sustituye la protección existente.
+
+Los datos provienen del dataset público NPPAD (\textit{Nuclear Power Plant Accident Data}) de la Universidad Tsinghua, generado con el simulador PCTRAN. Cada archivo CSV es una simulación completa con una fila cada 10 segundos.
+
+\subsection{La iteración documentada: \texttt{001-preparacion-datos}}
+Antes de entrenar cualquier clasificador hay que preparar los datos sin \textbf{fuga de información}: si una misma simulación aparece en entrenamiento y en prueba, o si el escalado se calcula con datos de prueba, las métricas posteriores salen infladas. Esta primera iteración construye esa preparación:
+
+\begin{itemize}
+  \item Lee las 202 simulaciones de las cuatro clases (1 de operación normal, 100 de LOCA de rama caliente, 100 de LOCA de rama fría y 1 de ATWS) sin modificar el dataset original.
+  \item Toma los primeros 150 pasos (1500 s) de cada simulación como una muestra.
+  \item Reparte las simulaciones completas entre entrenamiento, validación y prueba (70/15/15) sin que ninguna aparezca en dos conjuntos.
+  \item Escala las 12 variables de planta usando solo el conjunto de entrenamiento y conserva aparte, sin escalar, las 7 variables de margen térmico.
+  \item Emite un reporte con los conteos por clase y conjunto y las limitaciones de los datos.
+\end{itemize}
+
+\subsection{Herramientas utilizadas}
+\begin{itemize}
+  \item \textbf{GitHub Spec Kit} (\texttt{specify-cli} 1.2.1) con la integración para Claude Code.
+  \item \textbf{Claude Code} como agente de IA que ejecuta los comandos de Spec Kit.
+  \item \textbf{Extensión \texttt{speckit-metricas}} para registrar el tiempo y el código de cada fase.
+  \item \textbf{Python 3.11+}, pandas, NumPy, scikit-learn y pytest para la implementación.
+  \item \textbf{Git y GitHub} para el control de versiones: \url{https://github.com/adarboleda/gestion_proyectos}.
+\end{itemize}
+
+\captura{02-estructura-repositorio.png}{Estructura del repositorio con los artefactos de Spec Kit}{%
+\textbf{(Recomendada)} En VS Code, abrir el explorador de archivos con las carpetas \texttt{.specify/memory/}, \texttt{specs/001-preparacion-datos/}, \texttt{src/preparacion\_datos/} y \texttt{tests/} desplegadas. Capturar el panel del explorador.}
+
+% =========================
+% 1. CONSTITUCIÓN
+% =========================
+\newpage
+\section{Documento de constitución}
+
+\subsection{Descripción del entregable}
+La constitución reúne las \textbf{reglas permanentes del proyecto}. No describe una funcionalidad concreta: fija los principios que toda especificación, plan y tarea debe respetar, y es la autoridad más alta del proceso. Si una tarea la contradice, el análisis la marca como crítica.
+
+Se generó con \texttt{/speckit-constitution} a partir de la plantilla vacía de Spec Kit. Quedó en la versión 2.0.0, con cinco principios:
+
+\begin{itemize}
+  \item \textbf{I. IA estrictamente consultiva} (no negociable): la IA solo recomienda; el operador decide.
+  \item \textbf{II. Cero fuga de datos} (no negociable): particiones por simulación completa y escalado ajustado solo con entrenamiento.
+  \item \textbf{III. Honestidad y reproducibilidad}: se reportan también los resultados negativos y todo resultado se regenera con un comando.
+  \item \textbf{IV. Procedencia de datos}: el dataset original no se modifica y no se mezclan plantas distintas.
+  \item \textbf{V. Alcance acotado a LOCA y ATWS}.
+\end{itemize}
+
+Además fija restricciones (Python, código en \texttt{src/}, pruebas en \texttt{tests/}, documentación en español), el flujo de desarrollo (ciclo Spec Kit completo, pruebas antes de cerrar una tarea, formato de commits) y las reglas de gobierno (versionado semántico de las enmiendas y verificación en cada \texttt{plan.md}).
+
+\begin{documentogenerado}{/speckit-constitution}{.specify\slash memory\slash constitution.md}
+\subsection{IANuclear Constitution}
+\bannerdoc
+
+\subsubsection{Core Principles}
+
+\paragraph{I. IA estrictamente consultiva (NON-NEGOTIABLE)}
+
+La IA solo aconseja: MUST NOT actuar sobre la planta, sustituir la lógica de protección existente ni
+tener autoridad de control. El operador valida y ejecuta cualquier acción. Toda salida del sistema
+(diagnóstico, procedimiento, alerta) MUST presentarse como recomendación, y toda interfaz o reporte
+MUST decirlo de forma visible.
+
+\paragraph{II. Cero fuga de datos (NON-NEGOTIABLE)}
+
+Las particiones entrenamiento/\hspace{0pt}validación/\hspace{0pt}prueba MUST hacerse por simulación completa, nunca por fila;
+las simulaciones emparejadas (mismo escenario con y sin accidente, o de igual severidad) MUST ir al
+mismo grupo. Los escaladores y cualquier transformación aprendida MUST ajustarse solo con
+entrenamiento. Una predicción en el instante \texttt{t} MUST NOT usar información posterior a \texttt{t}.
+
+\paragraph{III. Honestidad y reproducibilidad}
+
+Se MUST reportar lo que salió, incluidos los resultados negativos, las metas no cumplidas y las
+limitaciones. Toda meta MUST enunciarse con su definición exacta (qué se mide, sobre qué conjunto).
+Todo resultado MUST poder regenerarse con un comando documentado; los artefactos generados MUST NOT
+editarse a mano.
+
+\paragraph{IV. Procedencia de datos}
+
+El dataset original MUST conservarse sin modificar; todo dato derivado se genera aparte y de forma
+reproducible. Datos de plantas o configuraciones distintas (p. ej. NPPAD y PWR 3L) MUST NOT mezclarse:
+cada modelo se entrena y evalúa con datos de una sola planta.
+
+\paragraph{V. Alcance acotado a LOCA y ATWS}
+
+El alcance es la detección de accidentes LOCA y ATWS en reactores PWR con datos simulados. Otros
+accidentes, ciberataques y datos de planta real quedan fuera; cualquier ampliación MUST pasar por
+una enmienda de esta constitución. Las estimaciones del sistema MUST NOT presentarse como reemplazo
+del cálculo termohidráulico del simulador.
+
+\subsubsection{Restricciones Adicionales}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Lenguaje}: Python.
+\item
+  \textbf{Estructura}: el código MUST vivir en \texttt{src/} y las pruebas en \texttt{tests/}.
+\item
+  \textbf{Idioma}: la documentación MUST estar en español.
+\end{itemize}
+
+\subsubsection{Flujo de Desarrollo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Spec Kit completo}: cada funcionalidad MUST seguir \texttt{specify\ →\ clarify\ →\ plan\ →\ tasks\ →\ analyze\ →\ implement} y vivir en \texttt{specs/\allowbreak{}\hspace{0pt}NNN-\allowbreak{}nombre/\allowbreak{}\hspace{0pt}}.
+\item
+  \textbf{Pruebas}: todo comportamiento crítico MUST tener pruebas automáticas en \texttt{tests/}, escritas antes
+  de dar la tarea por terminada.
+\item
+  \textbf{Commits}: el mensaje MUST tener la forma \texttt{feat(NNN):\ descripción}, donde \texttt{NNN} es el número de la
+  funcionalidad (p. ej. \texttt{feat(001):\ descripción}). Cuando el commit elimine o reescriba código
+  existente MUST incluir el trailer \texttt{Causa:\ requisito\textbar{}defecto\textbar{}refactor}, con exactamente uno de esos
+  tres valores. El historial publicado MUST NOT reescribirse.
+\item
+  \textbf{Métricas SDD}: cada fase Spec Kit MUST registrarse como sesión con la extensión \texttt{metricas}
+  (se abre por hook; se cierra con \texttt{/\allowbreak{}speckit-\allowbreak{}metricas-\allowbreak{}cerrar}); el trailer \texttt{Causa:} alimenta la
+  clasificación del código eliminado.
+\end{itemize}
+
+\subsubsection{Governance}
+
+Esta constitución prevalece sobre cualquier otra práctica del proyecto. Una enmienda requiere:
+descripción del cambio, motivo, impacto sobre las especificaciones existentes y actualización de
+\texttt{Version}/\texttt{Last\ Amended}. El versionado es semántico: MAJOR por eliminar o redefinir un principio de
+forma incompatible, MINOR por añadir un principio o sección o ampliar materialmente su guía, PATCH por
+aclaraciones de redacción. Los principios I y II no admiten excepciones. Toda revisión de
+especificación, plan o tarea MUST verificar el cumplimiento de estos principios (sección
+\emph{Constitution Check} de cada \texttt{plan.\allowbreak{}md}); cualquier desviación MUST justificarse en \emph{Complexity
+Tracking}. La guía operativa diaria está en \texttt{README.\allowbreak{}md}.
+
+\textbf{Version}: 2.0.0 \textbar{} \textbf{Ratified}: 2026-10-20 \textbar{} \textbf{Last Amended}: 2026-10-20
+\end{documentogenerado}
+
+% =========================
+% 2. ESPECIFICACIÓN
+% =========================
+\newpage
+\section{Documento de especificación}
+
+\subsection{Descripción del entregable}
+La especificación describe \textbf{qué} debe hacer la funcionalidad y \textbf{por qué}, sin mencionar tecnología. Está escrita para que la entienda alguien que no programa y es el contrato contra el que se mide todo lo demás.
+
+Se produjo en dos pasos:
+\begin{enumerate}
+  \item \texttt{/speckit-specify} generó la especificación desde una descripción en lenguaje natural de la necesidad del analista. Quedó un único punto marcado como \texttt{[NEEDS CLARIFICATION]}, en el requisito FR-007.
+  \item \texttt{/speckit-clarify} hizo tres preguntas: qué hacer con las clases que tienen una sola simulación, cómo extraer las muestras de 150 pasos y qué hacer ante un archivo defectuoso. Las respuestas quedaron registradas en la sección \textit{Clarifications} y se incorporaron a los requisitos.
+\end{enumerate}
+
+\textbf{Contenido principal:}
+\begin{itemize}
+  \item 3 historias de usuario priorizadas (P1: conjuntos sin fuga; P2: márgenes térmicos sin escalar; P2: reporte de conteos y limitaciones), con 9 escenarios de aceptación en formato \textit{Given / When / Then}.
+  \item 7 casos límite.
+  \item 13 requisitos funcionales (FR-001 a FR-013) y 8 criterios de éxito medibles (SC-001 a SC-008).
+  \item Entidades clave y supuestos.
+\end{itemize}
+
+\textbf{Observaciones.} El campo \texttt{Status: Draft} es el valor que pone la plantilla de Spec Kit y no se cambió al terminar. En la lista de verificación, la nota «Pendiente: FR-007» se escribió antes de \texttt{/speckit-clarify}; esa aclaración resolvió FR-007, como consta en la sección \textit{Clarifications} de la especificación.
+
+\begin{documentogenerado}{/speckit-specify + /speckit-clarify}{specs\slash 001-preparacion-datos\slash spec.md}
+\subsection{Feature Specification: Preparación de datos NPPAD sin fuga de información}
+\bannerdoc
+
+\textbf{Feature Branch}: \texttt{001-\allowbreak{}preparacion-\allowbreak{}datos}
+
+\textbf{Created}: 2026-10-20
+
+\textbf{Status}: Draft
+
+\textbf{Input}: User description: "Un analista necesita preparar los datos de simulación de accidentes del dataset NPPAD (Universidad Tsinghua, simulador PCTRAN, carpeta Operation\_csv\_data) para entrenar y evaluar después un clasificador de accidentes de reactor PWR. Las clases son operación normal, LOCA rama caliente, LOCA rama fría (LOCAC) y ATWS. Debe obtener conjuntos de entrenamiento, validación y prueba sin fuga de información: una simulación nunca puede estar en dos conjuntos. Debe trabajar con 12 variables de planta escaladas usando solo datos de entrenamiento, y conservar aparte, sin escalar, 7 variables de margen térmico. Cada muestra es una secuencia de 150 pasos de 10 s. Operación normal y ATWS tienen una sola simulación en el dataset: el sistema debe manejarlo y advertirlo, no ocultarlo. El analista debe recibir un reporte con el número de muestras por clase y por conjunto y las limitaciones conocidas."
+
+\subsubsection{Clarifications}
+
+\paragraph{Session 2026-10-20}
+
+\begin{itemize}
+\tightlist
+\item
+  Q: ¿Cómo se tratan las clases con una sola simulación (operación normal y ATWS)? → A: Se asigna la simulación completa a entrenamiento; esas clases quedan sin muestras de validación ni de prueba y el reporte lo advierte.
+\item
+  Q: ¿Cómo se extraen las muestras de 150 pasos dentro de cada simulación? → A: Una sola muestra por simulación, tomada de los primeros 150 pasos (desde el inicio).
+\item
+  Q: Ante un archivo de simulación defectuoso (variable ausente, valores no numéricos o faltantes, menos de 150 pasos), ¿se detiene la preparación o se excluye la simulación? → A: Se detiene con un error que nombra el archivo y la causa; no se escribe ningún conjunto.
+\end{itemize}
+
+\subsubsection{\texorpdfstring{User Scenarios \& Testing \emph{(mandatory)}}{User Scenarios \& Testing (mandatory)}}
+
+\paragraph{User Story 1 - Conjuntos de entrenamiento, validación y prueba sin fuga (Priority: P1)}
+
+Un analista toma las simulaciones de las cuatro clases (operación normal, LOCA de rama caliente, LOCA de rama fría y ATWS) y obtiene conjuntos de entrenamiento, validación y prueba en los que ninguna simulación aparece en más de un conjunto, con las 12 variables de planta escaladas usando únicamente datos de entrenamiento. Cada muestra es una secuencia de 150 pasos de 10 s (1500 s), tomada del inicio de su simulación; hay una muestra por simulación.
+
+\textbf{Why this priority}: Es el núcleo de la funcionalidad. Si las simulaciones se mezclan entre conjuntos o el escalado usa datos de validación o prueba, todas las métricas posteriores se inflan y el diagnóstico parecería mejor de lo que es.
+
+\textbf{Independent Test}: Ejecutar la preparación y comprobar automáticamente que (a) la intersección entre los identificadores de simulación de dos conjuntos cualesquiera es vacía, y (b) los parámetros de escala coinciden con los calculados solo sobre el conjunto de entrenamiento.
+
+\textbf{Acceptance Scenarios}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Given} las simulaciones de LOCA y LOCAC del dataset, \textbf{When} se preparan los conjuntos, \textbf{Then} cada simulación completa cae en un solo conjunto y su muestra va con ella.
+\item
+  \textbf{Given} una simulación de LOCA y la simulación de LOCAC de igual severidad, \textbf{When} se asignan a los conjuntos, \textbf{Then} ambas van al mismo conjunto.
+\item
+  \textbf{Given} los conjuntos ya formados, \textbf{When} se escalan las 12 variables de planta, \textbf{Then} los parámetros de escala se calculan solo con el conjunto de entrenamiento y se guardan para aplicarlos sin recalcular a validación, prueba o datos nuevos.
+\item
+  \textbf{Given} la misma configuración y los mismos datos de origen, \textbf{When} el analista repite la preparación, \textbf{Then} obtiene exactamente la misma asignación de simulaciones a conjuntos y los mismos valores.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\paragraph{User Story 2 - Márgenes térmicos conservados aparte y sin escalar (Priority: P2)}
+
+Para cada muestra, el analista dispone de las 7 variables de margen térmico (relación de salida de ebullición nucleada DNBR, temperatura pico de vaina, márgenes de subenfriamiento, temperatura de saturación y fracciones de daño) en sus unidades físicas originales, alineadas paso a paso con las 12 variables de planta de esa misma muestra.
+
+\textbf{Why this priority}: Estas variables sirven de referencia para evaluar después el margen térmico, no como entrada del clasificador. Deben quedar intactas y correctamente emparejadas, pero la preparación de las muestras puede probarse sin ellas.
+
+\textbf{Independent Test}: Para una muestra elegida, comparar sus 7 variables de margen con las del archivo de origen en las mismas filas y comprobar que son idénticas y que no pasaron por ningún escalado.
+
+\textbf{Acceptance Scenarios}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Given} una muestra de 150 pasos, \textbf{When} se consultan sus márgenes térmicos, \textbf{Then} hay 7 valores por paso, en las mismas posiciones temporales que las variables de planta, sin escalar.
+\item
+  \textbf{Given} los conjuntos escalados, \textbf{When} se revisan las 7 variables de margen, \textbf{Then} ninguna forma parte de las variables escaladas ni de los parámetros de escala.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\paragraph{User Story 3 - Reporte de conteos y limitaciones (Priority: P2)}
+
+El analista recibe un reporte que indica cuántas muestras hay por clase y por conjunto, qué simulaciones originaron cada conjunto y cuáles son las limitaciones conocidas de los datos, entre ellas que operación normal y ATWS tienen una sola simulación en el dataset.
+
+\textbf{Why this priority}: Sin el reporte no se puede juzgar qué tan confiables serán las métricas posteriores; la honestidad sobre los límites de los datos es un requisito del proyecto.
+
+\textbf{Independent Test}: Generar el reporte y verificar que la suma de muestras por conjunto coincide con el total, que cada clase aparece en la tabla (incluso con cero muestras en un conjunto) y que las clases de una sola simulación llevan una advertencia visible.
+
+\textbf{Acceptance Scenarios}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Given} los conjuntos formados, \textbf{When} se genera el reporte, \textbf{Then} muestra una tabla de muestras por clase y por conjunto cuyos totales coinciden con el número de muestras producidas.
+\item
+  \textbf{Given} las clases de operación normal y ATWS con una sola simulación, \textbf{When} se genera el reporte, \textbf{Then} cada una lleva una advertencia explícita de que se asignó completa a entrenamiento y no tiene muestras de validación ni de prueba.
+\item
+  \textbf{Given} una clase sin muestras en algún conjunto, \textbf{When} se genera el reporte, \textbf{Then} esa celda aparece con cero y una nota, no se omite.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\paragraph{Edge Cases}
+
+\begin{itemize}
+\tightlist
+\item
+  Operación normal y ATWS tienen una sola simulación cada una: van completas a entrenamiento (FR-007), quedan sin muestras de validación y prueba, y el reporte lo advierte.
+\item
+  Una simulación con menos de 150 pasos no puede producir su muestra: la preparación se detiene con un error que nombra el archivo.
+\item
+  Un archivo de origen con alguna de las 19 variables requeridas ausente, con valores no numéricos o faltantes: la preparación se detiene con un error que nombra el archivo y la causa, y nunca rellena valores en silencio.
+\item
+  Una variable con desviación estándar cero en entrenamiento: no puede escalarse por división; se informa en vez de producir valores no válidos.
+\item
+  Las simulaciones de LOCA y LOCAC no están en el mismo número ni tienen las mismas severidades: las que no tengan pareja se asignan sin romper la regla de no compartir conjunto.
+\item
+  Como cada simulación aporta una sola muestra, las clases quedan con tantas muestras como simulaciones: operación normal y ATWS tendrán una cada una, frente a unas 100 de LOCA y de LOCAC; el reporte hace visible ese desbalance.
+\item
+  Se vuelve a ejecutar la preparación sobre una salida previa: debe producir el mismo resultado y no mezclar restos de ejecuciones anteriores.
+\end{itemize}
+
+\subsubsection{\texorpdfstring{Requirements \emph{(mandatory)}}{Requirements (mandatory)}}
+
+\paragraph{Functional Requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FR-001}: El sistema MUST leer las simulaciones de operación normal, LOCA (rama caliente), LOCAC (rama fría) y ATWS del dataset NPPAD, y MUST NOT modificar los archivos de origen.
+\item
+  \textbf{FR-002}: El sistema MUST producir exactamente una muestra por simulación, formada por sus primeros 150 pasos consecutivos de 10 s, con una etiqueta de clase y el identificador de la simulación de origen.
+\item
+  \textbf{FR-003}: El sistema MUST asignar cada simulación completa a exactamente uno de los conjuntos de entrenamiento, validación o prueba, de modo que ninguna simulación comparta muestras entre dos conjuntos.
+\item
+  \textbf{FR-004}: El sistema MUST asignar al mismo conjunto la simulación de LOCA y la de LOCAC de igual severidad.
+\item
+  \textbf{FR-005}: El sistema MUST usar las 12 variables de planta como entrada de cada muestra: presión, temperaturas, caudales de lazo, niveles, flujo neutrónico, potencia, inyección de emergencia y caudal de fuga.
+\item
+  \textbf{FR-006}: El sistema MUST calcular los parámetros de escala de las 12 variables solo con el conjunto de entrenamiento, aplicarlos a los tres conjuntos y persistirlos para su reutilización.
+\item
+  \textbf{FR-007}: Para las clases con una sola simulación (operación normal y ATWS), el sistema MUST asignar la simulación completa al conjunto de entrenamiento, MUST NOT partirla entre conjuntos, y MUST declarar en el reporte que esas clases no tienen muestras de validación ni de prueba.
+\item
+  \textbf{FR-008}: El sistema MUST conservar para cada muestra las 7 variables de margen térmico (DNBR, temperatura pico de vaina, dos márgenes de subenfriamiento, temperatura de saturación y dos fracciones de daño) en sus unidades originales, sin escalar y alineadas paso a paso con las 12 variables de planta.
+\item
+  \textbf{FR-009}: El sistema MUST emitir un reporte con el número de muestras por clase y por conjunto, la lista de simulaciones de cada conjunto y las limitaciones conocidas.
+\item
+  \textbf{FR-010}: El reporte MUST advertir de forma visible cada clase con una sola simulación y toda clase sin muestras en un conjunto.
+\item
+  \textbf{FR-011}: El sistema MUST producir el mismo resultado al repetir la preparación con los mismos datos de origen y la misma configuración.
+\item
+  \textbf{FR-012}: El sistema MUST detener la preparación con un error que nombre el archivo y la causa, sin escribir ningún conjunto, cuando falten variables requeridas, haya valores no numéricos o faltantes, o la simulación tenga menos de 150 pasos; MUST NOT excluir simulaciones ni rellenar valores en silencio.
+\item
+  \textbf{FR-013}: El sistema MUST regenerar todos los resultados con una sola ejecución documentada; los artefactos generados MUST NOT editarse a mano.
+\end{itemize}
+
+\paragraph{Key Entities}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Simulación}: una corrida completa del simulador, con una clase (operación normal, LOCA, LOCAC o ATWS), una severidad cuando aplica (LOCA y LOCAC) y una serie temporal con una fila cada 10 s.
+\item
+  \textbf{Muestra}: secuencia de los primeros 150 pasos (1500 s) de una simulación, una por simulación, con las 12 variables de planta escaladas, los márgenes térmicos asociados, la etiqueta de clase y el identificador de su simulación de origen.
+\item
+  \textbf{Variables de planta}: las 12 entradas del clasificador (P, TAVG, THA, TCA, WRCA, WRCB, LVPZ, LVCR, PWNT, PWR, WECS, WLR).
+\item
+  \textbf{Márgenes térmicos}: 7 variables de referencia en unidades físicas (DNBR, TPCT, SCMA, SCMB, TSAT, FRCL, FRZR), no escaladas y no usadas como entrada.
+\item
+  \textbf{Conjunto}: entrenamiento, validación o prueba; contiene simulaciones completas, sin intersección con los otros.
+\item
+  \textbf{Parámetros de escala}: valores calculados con entrenamiento para cada una de las 12 variables y guardados para aplicar el mismo escalado después.
+\item
+  \textbf{Reporte de preparación}: conteos de muestras por clase y conjunto, simulaciones por conjunto, advertencias y limitaciones conocidas.
+\end{itemize}
+
+\subsubsection{\texorpdfstring{Success Criteria \emph{(mandatory)}}{Success Criteria (mandatory)}}
+
+\paragraph{Measurable Outcomes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SC-001}: El 100 \% de las simulaciones aparece en exactamente un conjunto, y la verificación automática de intersección entre conjuntos da cero coincidencias.
+\item
+  \textbf{SC-002}: Los parámetros de escala coinciden exactamente con los calculados solo sobre entrenamiento, y cambiar los datos de validación o prueba no altera ni un valor de esos parámetros.
+\item
+  \textbf{SC-003}: Las 7 variables de margen térmico de una muestra coinciden en el 100 \% de los valores con las del archivo de origen, sin ningún escalado.
+\item
+  \textbf{SC-004}: En el reporte, la suma de muestras por clase y por conjunto es igual al total de muestras producidas, y las 4 clases aparecen en los 3 conjuntos, incluso con cero muestras.
+\item
+  \textbf{SC-005}: El 100 \% de las clases con una sola simulación y de las celdas con cero muestras lleva una advertencia visible en el reporte.
+\item
+  \textbf{SC-006}: Dos ejecuciones con los mismos datos y configuración producen conjuntos y reporte idénticos en el 100 \% de los casos.
+\item
+  \textbf{SC-007}: Los archivos del dataset original quedan sin cambios tras la preparación, comprobado comparando su contenido antes y después.
+\item
+  \textbf{SC-008}: El analista obtiene los conjuntos y el reporte con una sola ejecución documentada, sin pasos manuales intermedios.
+\end{itemize}
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+\tightlist
+\item
+  El dataset NPPAD está disponible localmente, con las clases en carpetas separadas dentro de \texttt{Operation\_\allowbreak{}csv\_\allowbreak{}data} (operación normal, LOCA, LOCAC y ATWS); cada archivo es una simulación con una fila cada 10 s.
+\item
+  El dataset contiene una simulación de operación normal (unas 300 filas), una de ATWS, y 100 de LOCA y 100 de LOCAC con severidades de 1 a 100; las demás carpetas del dataset (otros accidentes) quedan fuera del alcance.
+\item
+  Se propone un reparto de simulaciones de 70 \% / 15 \% / 15 \% para entrenamiento, validación y prueba, con una semilla fija para que sea reproducible.
+\item
+  Los primeros 150 pasos de cada simulación bastan para el diagnóstico posterior; el resto de las filas de cada archivo no se usa en esta funcionalidad.
+\item
+  Las 12 variables de planta y las 7 de margen térmico son las definidas por el proyecto; los valores originales se consideran correctos y no se corrigen.
+\item
+  Los tres conjuntos se usan solo para entrenar y evaluar un clasificador posterior; construir ese clasificador queda fuera de esta funcionalidad.
+\item
+  Operación normal y ATWS no tendrán métricas sobre datos no vistos, porque provienen de una sola simulación cada una; cualquier conclusión sobre esas clases se considera no verificada.
+\end{itemize}
+\end{documentogenerado}
+
+\begin{documentogenerado}{/speckit-specify}{specs\slash 001-preparacion-datos\slash checklists\slash requirements.md}
+\subsection{Specification Quality Checklist: Preparación de datos NPPAD sin fuga de información}
+\bannerdoc
+
+\textbf{Purpose}: Validate specification completeness and quality before proceeding to planning
+\textbf{Created}: 2026-10-20
+\textbf{Feature}: spec.md
+
+\subsubsection{Content Quality}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  No implementation details (languages, frameworks, APIs)
+\item[$\boxtimes$]
+  Focused on user value and business needs
+\item[$\boxtimes$]
+  Written for non-technical stakeholders
+\item[$\boxtimes$]
+  All mandatory sections completed
+\end{itemize}
+
+\subsubsection{Requirement Completeness}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  No {[}NEEDS CLARIFICATION{]} markers remain
+\item[$\boxtimes$]
+  Requirements are testable and unambiguous
+\item[$\boxtimes$]
+  Success criteria are measurable
+\item[$\boxtimes$]
+  Success criteria are technology-agnostic (no implementation details)
+\item[$\boxtimes$]
+  All acceptance scenarios are defined
+\item[$\boxtimes$]
+  Edge cases are identified
+\item[$\boxtimes$]
+  Scope is clearly bounded
+\item[$\boxtimes$]
+  Dependencies and assumptions identified
+\end{itemize}
+
+\subsubsection{Feature Readiness}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  All functional requirements have clear acceptance criteria
+\item[$\boxtimes$]
+  User scenarios cover primary flows
+\item[$\boxtimes$]
+  Feature meets measurable outcomes defined in Success Criteria
+\item[$\boxtimes$]
+  No implementation details leak into specification
+\end{itemize}
+
+\subsubsection{Notes}
+
+\begin{itemize}
+\tightlist
+\item
+  Pendiente: FR-007 (tratamiento de las clases con una sola simulación) contiene un marcador {[}NEEDS CLARIFICATION{]}; se resuelve con la respuesta del usuario y se vuelve a validar.
+\item
+  Los nombres de variables (P, TAVG, DNBR, \ldots) son términos del dominio del dataset, no detalles de implementación.
+\end{itemize}
+\end{documentogenerado}
+
+% =========================
+% 3. PLANIFICACIÓN
+% =========================
+\newpage
+\section{Documento de planificación}
+
+\subsection{Descripción del entregable}
+El plan define \textbf{cómo} se construirá lo especificado: tecnología, estructura del código y decisiones de diseño. Se generó con \texttt{/speckit-plan}.
+
+\textbf{Contenido principal:}
+\begin{itemize}
+  \item \textbf{Resumen y contexto técnico}: un comando de línea de órdenes en Python (pandas, NumPy y el \texttt{StandardScaler} de scikit-learn) que valida todo en memoria antes de escribir nada.
+  \item \textbf{Constitution Check}: evalúa cada principio de la constitución contra el diseño. Todos dan «cumple»; el principio I «no aplica» porque esta funcionalidad no emite diagnósticos.
+  \item \textbf{Estructura del proyecto}: un módulo por responsabilidad (\texttt{lectura}, \texttt{particion}, \texttt{escalado}, \texttt{salida}, \texttt{reporte}, \texttt{cli}) y sus pruebas.
+  \item \textbf{Nota de diseño}: la petición inicial de repartir LOCA y LOCAC por separado chocaba con la regla de mantener juntas las simulaciones de igual severidad. Se resolvió repartiendo las severidades una sola vez y aplicando la misma asignación a ambas clases.
+\end{itemize}
+
+\textbf{Documentos de apoyo del plan.} \texttt{/speckit-plan} generó además estos archivos, que están en el repositorio y no se reproducen aquí por extensión:
+\begin{itemize}
+  \item \texttt{research.md}: 12 decisiones técnicas justificadas (reparto por severidad, validación de archivos, escalado, escritura sin conjuntos parciales, etc.).
+  \item \texttt{data-model.md}: entidades y forma de los arreglos.
+  \item \texttt{contracts/cli.md} y \texttt{contracts/salidas.md}: contrato de la línea de órdenes y de los archivos de salida.
+  \item \texttt{quickstart.md}: guía de ejecución y siete validaciones manuales.
+\end{itemize}
+
+\begin{documentogenerado}{/speckit-plan}{specs\slash 001-preparacion-datos\slash plan.md}
+\subsection{Implementation Plan: Preparación de datos NPPAD sin fuga de información}
+\bannerdoc
+
+\textbf{Branch}: \texttt{001-\allowbreak{}preparacion-\allowbreak{}datos} \textbar{} \textbf{Date}: 2026-10-20 \textbar{} \textbf{Spec}: spec.md
+
+\textbf{Input}: Feature specification from \texttt{/\allowbreak{}specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}spec.\allowbreak{}md}
+
+\subsubsection{Summary}
+
+Un comando de línea de órdenes lee las 202 simulaciones NPPAD de las carpetas \texttt{Normal}, \texttt{LOCA}, \texttt{LOCAC} y \texttt{ATWS}, toma los primeros 150 pasos de cada una como una muestra, reparte las simulaciones completas en entrenamiento, validación y prueba (70/\hspace{0pt}15/\hspace{0pt}15, semilla 42), escala las 12 variables de planta con un escalador ajustado solo con entrenamiento, conserva sin escalar las 7 variables de margen térmico y escribe los arreglos, el escalador y un \texttt{metadata.\allowbreak{}json} en \texttt{data\_\allowbreak{}processed/}. Imprime un reporte con los conteos por clase y conjunto y las limitaciones. Enfoque técnico: paquete Python \texttt{preparacion\_\allowbreak{}datos} en \texttt{src/} (pandas/\hspace{0pt}numpy para leer y transformar, scikit-learn \texttt{StandardScaler} para escalar), con toda la validación hecha en memoria antes de escribir nada, de modo que un archivo defectuoso detenga la ejecución sin dejar conjuntos parciales.
+
+\subsubsection{Technical Context}
+
+\textbf{Language/\hspace{0pt}Version}: Python 3.11 o superior (entorno de desarrollo: 3.13.7)
+
+\textbf{Primary Dependencies}: pandas (3.0), numpy (2.3), scikit-learn (1.8, \texttt{StandardScaler})
+
+\textbf{Storage}: archivos locales; entrada en CSV de solo lectura, salida en \texttt{.\allowbreak{}npy} y \texttt{.\allowbreak{}json} dentro de \texttt{data\_\allowbreak{}processed/}
+
+\textbf{Testing}: pytest 9; pruebas unitarias con datos sintéticos y una prueba de integración de extremo a extremo contra el dataset real (se omite si la ruta no existe)
+
+\textbf{Target Platform}: línea de órdenes en Windows 11 (desarrollo), sin dependencias específicas del sistema
+
+\textbf{Project Type}: biblioteca Python con una interfaz de línea de órdenes (\texttt{python\ -\allowbreak{}m\ preparacion\_\allowbreak{}datos} y el guion \texttt{preparar-\allowbreak{}datos})
+
+\textbf{Performance Goals}: sin objetivo cuantitativo; el dataset ocupa decenas de MB y la preparación completa debe terminar en segundos (se lee \texttt{nrows=\allowbreak{}150} por archivo)
+
+\textbf{Constraints}: el dataset original es de solo lectura; ejecución determinista; ningún conjunto se escribe si algún archivo es defectuoso; documentación y mensajes en español
+
+\textbf{Scale/\hspace{0pt}Scope}: 202 simulaciones (1 Normal, 100 LOCA, 100 LOCAC, 1 ATWS) → 202 muestras de forma (150, 12) más márgenes (150, 7); 142 en entrenamiento, 30 en validación y 30 en prueba
+
+\subsubsection{Constitution Check}
+
+\emph{GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.}
+
+Constitución v2.0.0.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.2353}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.1397}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.6250}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Principio / regla
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evaluación
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cómo se cumple
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+I. IA estrictamente consultiva & Cumple (no aplica) & La funcionalidad solo prepara datos; no hay salida hacia la planta ni diagnóstico. \\
+II. Cero fuga de datos & Cumple & Partición por simulación completa; el escalador se ajusta solo con entrenamiento (\texttt{fit} sobre \texttt{X\_\allowbreak{}train}, \texttt{transform} sobre los tres); LOCA y LOCAC de igual severidad van al mismo conjunto (ver nota abajo); no hay información posterior a \texttt{t} porque cada muestra son los primeros 150 pasos. \\
+III. Honestidad y reproducibilidad & Cumple & Semilla fija, orden determinista, un solo comando, \texttt{metadata.\allowbreak{}json} y reporte con las limitaciones (Normal y ATWS sin validación ni prueba, desbalance de clases). \\
+IV. Procedencia de datos & Cumple & El origen se abre solo para lectura y la prueba de integración verifica que no cambia; solo se usan las cuatro carpetas de NPPAD, una sola planta. \\
+V. Alcance acotado a LOCA y ATWS & Cumple & Las demás carpetas del dataset se ignoran; no se usa ningún dato de planta real. \\
+Restricciones & Cumple & Python; código en \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/}; pruebas en \texttt{tests/}; documentación en español. \\
+Flujo de desarrollo & Cumple & Spec Kit completo; pruebas automáticas para partición, escalado, validación de archivos y no modificación del origen; commits \texttt{feat(001):\ descripción} con trailer \texttt{Causa:} cuando se elimine o reescriba código. \\
+\end{longtable}
+}
+
+\textbf{Nota sobre la entrada del plan}: el plan pedido dice que "LOCA y LOCAC se reparten por separado". La spec (FR-004) y la constitución (principio II) exigen que la simulación de LOCA y la de LOCAC de igual severidad vayan al mismo conjunto. Se resuelve repartiendo las 100 severidades una sola vez (70/\hspace{0pt}15/\hspace{0pt}15, semilla 42) y aplicando esa misma asignación a ambas clases: cada clase conserva sus propios conteos 70/\hspace{0pt}15/\hspace{0pt}15 y se respeta la regla. Ver research.md, decisión 1.
+
+\textbf{Resultado de la puerta}: sin violaciones. Se re-evalúa tras el diseño (abajo).
+
+\subsubsection{Project Structure}
+
+\paragraph{Documentation (this feature)}
+
+\begin{Verbatim}[breaklines,breakanywhere]
+specs/001-preparacion-datos/
+├── plan.md              # Este archivo (/speckit-plan)
+├── research.md          # Fase 0
+├── data-model.md        # Fase 1
+├── quickstart.md        # Fase 1
+├── contracts/
+│   ├── cli.md           # Contrato de la línea de órdenes
+│   └── salidas.md       # Contrato de los artefactos de data_processed/
+├── checklists/
+│   └── requirements.md
+└── tasks.md             # Fase 2 (/speckit-tasks; no lo crea este comando)
+\end{Verbatim}
+
+\paragraph{Source Code (repository root)}
+
+\begin{Verbatim}[breaklines,breakanywhere]
+pyproject.toml                       # paquete, dependencias y guion preparar-datos
+src/
+└── preparacion_datos/
+    ├── __init__.py
+    ├── __main__.py                  # python -m preparacion_datos
+    ├── config.py                    # clases, variables, 150 pasos, proporciones, semilla
+    ├── lectura.py                   # descubrir simulaciones, leer y validar CSV
+    ├── particion.py                 # reparto por simulación completa
+    ├── escalado.py                  # StandardScaler ajustado solo con entrenamiento
+    ├── salida.py                    # armar arreglos, escritura atómica, metadata.json
+    ├── reporte.py                   # reporte impreso y comparación con la referencia
+    └── cli.py                       # argumentos, orquestación, códigos de salida
+
+tests/
+├── conftest.py                      # dataset sintético de CSV en un directorio temporal
+├── unit/
+│   ├── test_lectura.py
+│   ├── test_particion.py
+│   ├── test_escalado.py
+│   └── test_reporte.py
+└── integration/
+    ├── test_cli.py                  # extremo a extremo con datos sintéticos
+    ├── test_margenes.py             # márgenes térmicos sin escalar y alineados
+    ├── test_cli_reporte.py          # reporte impreso, metadata.json y referencia
+    └── test_dataset_real.py         # dataset NPPAD real (se omite si no está)
+
+data_processed/                      # generado por el comando; no se edita a mano
+\end{Verbatim}
+
+\textbf{Structure Decision}: proyecto único con diseño \texttt{src/} y un módulo por responsabilidad del flujo (leer, repartir, escalar, escribir, reportar), de modo que cada comportamiento crítico de la constitución (partición, escalado, validación de entrada) tenga su prueba unitaria. \texttt{data\_\allowbreak{}processed/} es salida regenerable con el comando.
+
+\subsubsection{Complexity Tracking}
+
+Sin violaciones de la constitución que justificar.
+
+\subsubsection{Re-evaluación tras el diseño (Fase 1)}
+
+El diseño de data-model.md y contracts/ no añade excepciones: la validación completa precede a toda escritura (principio II y FR-012), la salida se escribe en un directorio temporal y se publica de una vez, y el reporte declara las limitaciones (principio III). La puerta sigue en \textbf{cumple}.
+\end{documentogenerado}
+
+% =========================
+% 4. TAREAS
+% =========================
+\newpage
+\section{Documento de tareas}
+
+\subsection{Descripción del entregable}
+El documento de tareas divide el plan en pasos pequeños, ordenados por dependencias y agrupados por historia de usuario, de modo que cada historia se pueda implementar y probar por separado. Se generó con \texttt{/speckit-tasks}.
+
+\textbf{Contenido principal:}
+\begin{itemize}
+  \item \textbf{34 tareas originales} en seis fases: preparación (T001--T004), base común de lectura y validación (T005--T009), historia 1 (T010--T018), historia 2 (T019--T022), historia 3 (T023--T029) y cierre (T030--T034).
+  \item \textbf{Pruebas primero}: en cada historia, las tareas de pruebas van antes que las de implementación, y hay tareas explícitas para comprobar que las pruebas fallan antes de implementar (T013, T020 y T025).
+  \item Marcas \texttt{[P]} para las tareas que se pueden hacer en paralelo y \texttt{[US1]}, \texttt{[US2]}, \texttt{[US3]} para la historia a la que pertenecen.
+  \item \textbf{5 tareas de convergencia} (T035--T039, fase 7), añadidas después por \texttt{/speckit-converge} (ver la sección de auditoría).
+\end{itemize}
+
+Estado final: \textbf{39 de 39 tareas completadas}.
+
+\begin{documentogenerado}{/speckit-tasks (fase 7: /speckit-converge)}{specs\slash 001-preparacion-datos\slash tasks.md}
+\subsection{Tasks: Preparación de datos NPPAD sin fuga de información}
+\bannerdoc
+
+\textbf{Input}: Documentos de diseño en \texttt{/\allowbreak{}specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/}
+
+\textbf{Prerequisites}: plan.md, spec.md, research.md, data-model.md, contracts/ (\texttt{cli.\allowbreak{}md}, \texttt{salidas.\allowbreak{}md}), quickstart.md
+
+\textbf{Tests}: Solicitados de forma explícita: en cada historia de usuario las pruebas se escriben \textbf{antes} de la implementación y se comprueba que fallan (la constitución exige pruebas automáticas para todo comportamiento crítico).
+
+\textbf{Organization}: Las tareas se agrupan por historia de usuario para poder implementar y probar cada una por separado.
+
+\subsubsection{\texorpdfstring{Format: \texttt{{[}ID{]}\ {[}P?{]}\ {[}Story{]}\ Description}}{Format: {[}ID{]} {[}P?{]} {[}Story{]} Description}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{{[}P{]}}: se puede ejecutar en paralelo (archivos distintos, sin dependencias pendientes)
+\item
+  \textbf{{[}Story{]}}: historia de usuario a la que pertenece (US1, US2, US3)
+\item
+  Todas las rutas son relativas a la raíz del repositorio
+\end{itemize}
+
+\subsubsection{Path Conventions}
+
+\begin{itemize}
+\tightlist
+\item
+  Proyecto único con diseño \texttt{src/}: código en \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/}, pruebas en \texttt{tests/\allowbreak{}unit/} y \texttt{tests/\allowbreak{}integration/}
+\item
+  Salida generada en \texttt{data\_\allowbreak{}processed/} (no se edita a mano)
+\item
+  Commits con la forma \texttt{feat(001):\ descripción}; si un commit elimina o reescribe código, añadir el trailer \texttt{Causa:\ requisito\textbar{}defecto\textbar{}refactor}
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 1: Setup (Shared Infrastructure)}
+
+\textbf{Purpose}: Inicialización del proyecto y estructura básica
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T001 Crear \texttt{pyproject.\allowbreak{}toml} en la raíz: paquete \texttt{preparacion\_\allowbreak{}datos} con diseño \texttt{src/}, \texttt{requires-\allowbreak{}python\ \textgreater{}=\allowbreak{}\ 3.\allowbreak{}11}, dependencias \texttt{pandas}, \texttt{numpy}, \texttt{scikit-\allowbreak{}learn}, extra \texttt{dev} con \texttt{pytest}, guion \texttt{preparar-\allowbreak{}datos\ =\allowbreak{}\ "preparacion\_\allowbreak{}datos.\allowbreak{}cli:main"} y \texttt{{[}tool.\allowbreak{}pytest.\allowbreak{}ini\_\allowbreak{}options{]}\ testpaths\ =\allowbreak{}\ {[}"tests"{]}}
+\item[$\boxtimes$]
+  T002 {[}P{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}\_\allowbreak{}\_\allowbreak{}init\_\allowbreak{}\_\allowbreak{}.\allowbreak{}py} (vacío con docstring en español) y \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}\_\allowbreak{}\_\allowbreak{}main\_\allowbreak{}\_\allowbreak{}.\allowbreak{}py} que llama a \texttt{preparacion\_\allowbreak{}datos.\allowbreak{}cli.\allowbreak{}main()} y termina con su código de salida; crear las carpetas \texttt{tests/\allowbreak{}unit/} y \texttt{tests/\allowbreak{}integration/}
+\item[$\boxtimes$]
+  T003 {[}P{]} Añadir \texttt{data\_\allowbreak{}processed/} al \texttt{.\allowbreak{}gitignore} de la raíz (artefacto regenerable; research.md decisión 11)
+\item[$\boxtimes$]
+  T004 Instalar con \texttt{pip\ install\ -\allowbreak{}e\ ".\allowbreak{}{[}dev{]}"} y comprobar que \texttt{pytest\ -\allowbreak{}\/\allowbreak{}-\allowbreak{}collect-\allowbreak{}only} se ejecuta sin errores de importación del paquete
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 2: Foundational (Blocking Prerequisites)}
+
+\textbf{Purpose}: Lectura y validación de las simulaciones, de las que dependen las tres historias
+
+\textbf{CRITICAL}: Ninguna historia puede empezar hasta terminar esta fase
+
+\paragraph{Tests (escribir primero; deben fallar)}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T005 Crear \texttt{tests/\allowbreak{}conftest.\allowbreak{}py} con una fixture \texttt{origen\_\allowbreak{}sintetico} que construye en un directorio temporal las carpetas \texttt{Normal} (1 archivo), \texttt{LOCA} y \texttt{LOCAC} (100 archivos \texttt{1.\allowbreak{}csv}\ldots{}\texttt{100.\allowbreak{}csv} cada una) y \texttt{ATWS} (1 archivo), con una columna \texttt{TIME} y las 19 variables requeridas (12 de planta + 7 de margen), 160 filas de valores numéricos deterministas y distintos por archivo; incluir helpers para corromper un archivo (quitar una columna, poner texto, dejar un valor vacío, poner \texttt{inf}, truncar a 149 filas) y para calcular el hash de todos los CSV
+\item[$\boxtimes$]
+  T006 Crear \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}lectura.\allowbreak{}py} (usa la fixture de T005) con pruebas de: descubrimiento de las 4 clases con etiquetas 0 = NORM, 1 = LOCA, 2 = LOCAC, 3 = ATWS y severidad numérica tomada del nombre del archivo (\texttt{7.\allowbreak{}csv} → 7, orden numérico y no alfabético); la serie leída tiene forma (150, 19) y solo contiene las primeras 150 filas; \texttt{ErrorDatos} con el archivo relativo y la causa en cada caso: variable ausente, valor no numérico, valor faltante, valor no finito, menos de 150 pasos (\texttt{tiene\ N}) y carpeta de clase inexistente; el mensaje tiene la forma \texttt{ERROR:\ \textless{}archivo\textgreater{}:\ \textless{}causa\textgreater{}\ {[}variable\ \textless{}nombre\textgreater{}{]}}
+\end{itemize}
+
+\paragraph{Implementation}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T007 Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}config.\allowbreak{}py} con las constantes: correspondencia carpeta → clase → etiqueta (\texttt{Normal}→NORM→0, \texttt{LOCA}→1, \texttt{LOCAC}→2, \texttt{ATWS}→3), \texttt{VARIABLES\_\allowbreak{}PLANTA} en el orden \texttt{P,\ TAVG,\ THA,\ TCA,\ WRCA,\ WRCB,\ LVPZ,\ LVCR,\ PWNT,\ PWR,\ WECS,\ WLR}, \texttt{VARIABLES\_\allowbreak{}MARGEN} en el orden \texttt{DNBR,\ TPCT,\ SCMA,\ SCMB,\ TSAT,\ FRCL,\ FRZR}, \texttt{PASOS\ =\allowbreak{}\ 150}, \texttt{PASO\_\allowbreak{}SEGUNDOS\ =\allowbreak{}\ 10}, proporciones 0.70 / 0.15 / 0.15, \texttt{SEMILLA\ =\allowbreak{}\ 42} y las rutas por defecto de \texttt{contracts/\allowbreak{}cli.\allowbreak{}md}
+\item[$\boxtimes$]
+  T008 Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}lectura.\allowbreak{}py} con la excepción \texttt{ErrorDatos}, la dataclass \texttt{Simulacion} (clase, etiqueta, severidad o \texttt{None}, archivo relativo al origen, serie de forma (150, 19) float64 con las 12 variables de planta seguidas de las 7 de margen), \texttt{descubrir\_\allowbreak{}simulaciones(origen)} y \texttt{leer\_\allowbreak{}simulacion(.\allowbreak{}.\allowbreak{}.\allowbreak{})}, que usa \texttt{pandas.\allowbreak{}read\_\allowbreak{}csv(usecols=\allowbreak{}\textless{}19\ variables\textgreater{},\ nrows=\allowbreak{}150)} y lanza \texttt{ErrorDatos} con el formato de T006 ante cualquier defecto; el origen se abre solo para lectura (depende de T007)
+\item[$\boxtimes$]
+  T009 Ejecutar \texttt{pytest\ tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}lectura.\allowbreak{}py} y comprobar que pasa
+\end{itemize}
+
+\textbf{Checkpoint}: la lectura y validación funcionan; se pueden empezar las historias de usuario
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 3: User Story 1 - Conjuntos de entrenamiento, validación y prueba sin fuga (Priority: P1) MVP}
+
+\textbf{Goal}: obtener los conjuntos train/\hspace{0pt}val/\hspace{0pt}test con simulaciones completas sin repetirse entre conjuntos, las 12 variables de planta escaladas solo con entrenamiento y una muestra de los primeros 150 pasos por simulación.
+
+\textbf{Independent Test}: ejecutar \texttt{preparar-\allowbreak{}datos} y comprobar que ninguna simulación aparece en dos conjuntos, que los parámetros de escala salen solo de entrenamiento y que un archivo defectuoso detiene la ejecución sin escribir nada.
+
+\paragraph{Tests for User Story 1 (escribir primero; deben fallar antes de implementar)}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T010 {[}P{]} {[}US1{]} Crear \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}particion.\allowbreak{}py} con pruebas de: (a) \textbf{ninguna simulación aparece en más de un conjunto} y la unión de los tres conjuntos es el total; (b) la simulación de LOCA y la de LOCAC de igual severidad quedan en el mismo conjunto; (c) con 100 severidades se obtiene 70 / 15 / 15 por clase y totales 142 / 30 / 30 con Normal y ATWS; (d) \textbf{Normal y ATWS aparecen solo en entrenamiento}: ninguna está en \texttt{val} ni en \texttt{test} y cada una está exactamente una vez en \texttt{train}; (e) el reparto es determinista con la semilla 42, cambia con otra semilla y no depende del orden en que se listan los archivos; (f) una severidad presente en una sola clase se asigna sin romper la regla; (g) \texttt{n\_\allowbreak{}train\ =\allowbreak{}\ round(0.\allowbreak{}70·n)}, \texttt{n\_\allowbreak{}val\ =\allowbreak{}\ round(0.\allowbreak{}15·n)}, \texttt{n\_\allowbreak{}test\ =\allowbreak{}\ n\ −\ n\_\allowbreak{}train\ −\ n\_\allowbreak{}val}
+\item[$\boxtimes$]
+  T011 {[}P{]} {[}US1{]} Crear \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}escalado.\allowbreak{}py} con pruebas de: (a) \textbf{el escalador se ajusta solo con entrenamiento}: \texttt{scaler\_\allowbreak{}mean} y \texttt{scaler\_\allowbreak{}std} son iguales a la media y desviación de las filas de entrenamiento aplanadas (N\_train·150, 12); (b) cambiar por completo los datos de validación y prueba no altera ni un valor de los parámetros; (c) \texttt{X\_\allowbreak{}train} escalado tiene media cercana a 0 y desviación cercana a 1 por variable; (d) validación y prueba se transforman con los parámetros de entrenamiento, sin recalcular; (e) una variable con desviación cero en entrenamiento queda con escala 1.0 y aparece en \texttt{variables\_\allowbreak{}sin\_\allowbreak{}varianza}; (f) formas y tipos: \texttt{X} (N, 150, 12) float32, parámetros (12,) float64
+\item[$\boxtimes$]
+  T012 {[}P{]} {[}US1{]} Crear \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli.\allowbreak{}py} con pruebas sobre \texttt{origen\_\allowbreak{}sintetico} que ejecutan el comando con \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}origen} y \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}salida} en un directorio temporal: (a) código de salida 0 y escritura de \texttt{X\_\allowbreak{}*.\allowbreak{}npy}, \texttt{y\_\allowbreak{}*.\allowbreak{}npy}, \texttt{scaler\_\allowbreak{}mean.\allowbreak{}npy} y \texttt{scaler\_\allowbreak{}std.\allowbreak{}npy} con las formas y tipos de \texttt{contracts/\allowbreak{}salidas.\allowbreak{}md} (\texttt{y} int64, valores 0--3); (b) \textbf{un archivo defectuoso detiene la preparación con un error que nombra el archivo y la causa, sin escribir ningún conjunto}: caso parametrizado (columna ausente, texto, vacío, \texttt{inf}, 149 filas) con código de salida 1, el archivo y la causa en la salida de error, y la carpeta de salida sin crear; si la salida ya existía, queda byte a byte igual; (c) \textbf{Normal y ATWS aparecen solo en entrenamiento}: \texttt{y\_\allowbreak{}val} y \texttt{y\_\allowbreak{}test} no contienen 0 ni 3 y \texttt{y\_\allowbreak{}train} contiene exactamente un 0 y un 3; (d) dos ejecuciones seguidas producen archivos idénticos; (e) el contenido de los CSV de origen no cambia (hash antes y después)
+\item[$\boxtimes$]
+  T013 {[}US1{]} Ejecutar \texttt{pytest\ tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}particion.\allowbreak{}py\ tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}escalado.\allowbreak{}py\ tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli.\allowbreak{}py} y comprobar que T010--T012 \textbf{fallan} antes de seguir
+\end{itemize}
+
+\paragraph{Implementation for User Story 1}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T014 {[}P{]} {[}US1{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}particion.\allowbreak{}py} con \texttt{repartir(simulaciones,\ semilla)} que devuelve la asignación de cada simulación a \texttt{train}, \texttt{val} o \texttt{test}: reparte las severidades (unión de LOCA y LOCAC, ordenadas numéricamente) con \texttt{numpy.\allowbreak{}random.\allowbreak{}default\_\allowbreak{}rng(semilla)} y la misma asignación para LOCA y LOCAC; \texttt{n\_\allowbreak{}train\ =\allowbreak{}\ round(0.\allowbreak{}70·n)}, \texttt{n\_\allowbreak{}val\ =\allowbreak{}\ round(0.\allowbreak{}15·n)}, \texttt{n\_\allowbreak{}test\ =\allowbreak{}\ n\ −\ n\_\allowbreak{}train\ −\ n\_\allowbreak{}val}; la única simulación de Normal y la de ATWS van completas a \texttt{train}; ordena cada conjunto por etiqueta de clase y luego por severidad numérica (depende de T008)
+\item[$\boxtimes$]
+  T015 {[}P{]} {[}US1{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}escalado.\allowbreak{}py} con \texttt{ajustar\_\allowbreak{}escalador(X\_\allowbreak{}train)} que ajusta un \texttt{StandardScaler} con las filas aplanadas (N\_train·150, 12) y devuelve media (\texttt{mean\_}, (12,) float64), escala (\texttt{scale\_}, (12,) float64; "vale 1.0 para una variable sin varianza en entrenamiento") y \texttt{variables\_\allowbreak{}sin\_\allowbreak{}varianza}, y \texttt{aplicar(escalador,\ X)} que devuelve "X (N, 150, 12) float32" sin reajustar
+\item[$\boxtimes$]
+  T016 {[}US1{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}salida.\allowbreak{}py} con \texttt{construir\_\allowbreak{}conjunto(simulaciones)} (apila las 12 variables de planta de cada serie en un arreglo (N, 150, 12) y las etiquetas en un vector (N,) int64) y \texttt{publicar(salida,\ archivos)}, que escribe \texttt{X\_\allowbreak{}*.\allowbreak{}npy}, \texttt{y\_\allowbreak{}*.\allowbreak{}npy}, \texttt{scaler\_\allowbreak{}mean.\allowbreak{}npy} y \texttt{scaler\_\allowbreak{}std.\allowbreak{}npy} en un directorio temporal junto a la salida y lo reemplaza al final, de modo que un fallo previo deje la salida sin cambios (depende de T014 y T015)
+\item[$\boxtimes$]
+  T017 {[}US1{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}cli.\allowbreak{}py} con \texttt{main(argv=\allowbreak{}None)}: opciones \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}origen}, \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}salida} y \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}semilla} (valores por defecto de \texttt{contracts/\allowbreak{}cli.\allowbreak{}md}); orquesta cargar todas las simulaciones → repartir → ajustar el escalador solo con \texttt{train} → transformar los tres conjuntos → publicar; ante \texttt{ErrorDatos} imprime el mensaje en la salida de error y devuelve 1 sin tocar la salida (depende de T008 y T014--T016)
+\item[$\boxtimes$]
+  T018 {[}US1{]} Ejecutar las pruebas de T010--T012 y comprobar que pasan
+\end{itemize}
+
+\textbf{Checkpoint}: la historia 1 funciona sola; es el MVP (conjuntos sin fuga y escalados)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 4: User Story 2 - Márgenes térmicos conservados aparte y sin escalar (Priority: P2)}
+
+\textbf{Goal}: guardar, alineadas paso a paso con las 12 variables de planta de cada muestra, las 7 variables de margen térmico en unidades originales.
+
+\textbf{Independent Test}: comparar los \texttt{margins\_\allowbreak{}*} de una muestra con las mismas filas del CSV de origen y comprobar que son idénticos y no pasaron por escalado.
+
+\paragraph{Tests for User Story 2 (escribir primero; deben fallar antes de implementar)}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T019 {[}P{]} {[}US2{]} Crear \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}margenes.\allowbreak{}py} con pruebas sobre \texttt{origen\_\allowbreak{}sintetico}: (a) \texttt{margins\_\allowbreak{}train/\allowbreak{}val/\allowbreak{}test.\allowbreak{}npy} tienen forma (N, 150, 7) y tipo float64, con el mismo N y el mismo orden de filas que \texttt{X\_\allowbreak{}*} e \texttt{y\_\allowbreak{}*}; (b) para varias muestras de cada clase, los valores coinciden exactamente con los de \texttt{DNBR,\ TPCT,\ SCMA,\ SCMB,\ TSAT,\ FRCL,\ FRZR} en las primeras 150 filas del CSV leído de forma independiente; (c) no están escalados: no coinciden con \texttt{(valor\ −\ media)\ /\allowbreak{}\ desviación} y no existe ningún parámetro de escala para ellos (\texttt{scaler\_\allowbreak{}mean.\allowbreak{}npy} y \texttt{scaler\_\allowbreak{}std.\allowbreak{}npy} tienen 12 elementos); (d) alineación paso a paso: \texttt{X\ *\ scaler\_\allowbreak{}std\ +\ scaler\_\allowbreak{}mean} reproduce las 12 variables de planta de las mismas filas del CSV (con tolerancia de float32)
+\item[$\boxtimes$]
+  T020 {[}US2{]} Ejecutar \texttt{pytest\ tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}margenes.\allowbreak{}py} y comprobar que T019 \textbf{falla} antes de implementar
+\end{itemize}
+
+\paragraph{Implementation for User Story 2}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T021 {[}US2{]} Ampliar \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}salida.\allowbreak{}py}: \texttt{construir\_\allowbreak{}conjunto} devuelve también los márgenes "margins (150, 7) float64" tomados de las 7 últimas columnas de la serie sin ninguna transformación, y \texttt{publicar} escribe \texttt{margins\_\allowbreak{}train.\allowbreak{}npy}, \texttt{margins\_\allowbreak{}val.\allowbreak{}npy} y \texttt{margins\_\allowbreak{}test.\allowbreak{}npy} en la misma publicación atómica; actualizar \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}cli.\allowbreak{}py} para pasarlos (depende de T016 y T017)
+\item[$\boxtimes$]
+  T022 {[}US2{]} Ejecutar \texttt{pytest\ tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}margenes.\allowbreak{}py\ tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli.\allowbreak{}py} y comprobar que pasan sin romper la historia 1
+\end{itemize}
+
+\textbf{Checkpoint}: las historias 1 y 2 funcionan por separado
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 5: User Story 3 - Reporte de conteos y limitaciones (Priority: P2)}
+
+\textbf{Goal}: imprimir el reporte con las muestras por clase y por conjunto, las advertencias de las clases con una sola simulación y las limitaciones, y guardar el mismo contenido en \texttt{metadata.\allowbreak{}json}.
+
+\textbf{Independent Test}: generar el reporte y comprobar que los totales por conjunto suman el total de muestras, que las 4 clases aparecen en los 3 conjuntos (incluso con cero) y que Normal y ATWS llevan su advertencia.
+
+\paragraph{Tests for User Story 3 (escribir primero; deben fallar antes de implementar)}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T023 {[}P{]} {[}US3{]} Crear \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}reporte.\allowbreak{}py} con pruebas de: (a) la tabla de conteos por clase y conjunto suma los totales de cada conjunto y el total de muestras; (b) las 4 clases aparecen en los 3 conjuntos, y las celdas en cero se muestran como \texttt{0} con una nota; (c) NORM y ATWS llevan la advertencia "una sola simulación: asignada completa a entrenamiento; sin muestras de validación ni de prueba"; (d) las limitaciones conocidas están presentes (Normal y ATWS sin métricas sobre datos no vistos, una muestra por simulación y clases desbalanceadas, simulador único); (e) la comparación con la referencia da \texttt{COINCIDE}, \texttt{DIFIERE} (con las celdas que difieren), \texttt{NO\ DISPONIBLE} si el archivo no existe y \texttt{OMITIDA} con \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}sin-\allowbreak{}referencia}, y compara solo LOCA y LOCAC (ignora NORM y ATWS aunque difieran); (f) el contenido de \texttt{metadata.\allowbreak{}json} cumple los invariantes de \texttt{contracts/\allowbreak{}salidas.\allowbreak{}md}: las listas de \texttt{simulaciones} de dos conjuntos no comparten ningún archivo, \texttt{totales} coincide con la suma de \texttt{conteos\_\allowbreak{}muestras} y con la primera dimensión de \texttt{X\_\allowbreak{}*}, y \texttt{escalador.\allowbreak{}filas\_\allowbreak{}ajuste} es N\_train·150
+\item[$\boxtimes$]
+  T024 {[}P{]} {[}US3{]} Crear \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli\_\allowbreak{}reporte.\allowbreak{}py} con pruebas sobre \texttt{origen\_\allowbreak{}sintetico}: (a) la salida estándar contiene las 8 secciones de \texttt{contracts/\allowbreak{}cli.\allowbreak{}md} en orden; (b) \texttt{metadata.\allowbreak{}json} se escribe con todos los campos de \texttt{contracts/\allowbreak{}salidas.\allowbreak{}md}; (c) código de salida 0 si la referencia coincide, 2 si los conteos de LOCA o LOCAC difieren (con los artefactos ya publicados y la diferencia en el reporte), 0 con la referencia inexistente (\texttt{NO\ DISPONIBLE}) y 0 con \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}sin-\allowbreak{}referencia} (\texttt{OMITIDA})
+\item[$\boxtimes$]
+  T025 {[}US3{]} Ejecutar \texttt{pytest\ tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}reporte.\allowbreak{}py\ tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli\_\allowbreak{}reporte.\allowbreak{}py} y comprobar que T023 y T024 \textbf{fallan} antes de implementar
+\end{itemize}
+
+\paragraph{Implementation for User Story 3}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T026 {[}P{]} {[}US3{]} Crear \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}reporte.\allowbreak{}py} con: el recuento de muestras por clase y conjunto, la generación de advertencias (clases con una sola simulación y celdas en cero), el texto fijo de limitaciones, \texttt{comparar\_\allowbreak{}referencia(ruta,\ conteos)} que lee solo \texttt{sample\_\allowbreak{}counts.\allowbreak{}LOCA} y \texttt{sample\_\allowbreak{}counts.\allowbreak{}LOCAC} de la referencia, y \texttt{formatear\_\allowbreak{}reporte(.\allowbreak{}.\allowbreak{}.\allowbreak{})} con las 8 secciones de \texttt{contracts/\allowbreak{}cli.\allowbreak{}md}
+\item[$\boxtimes$]
+  T027 {[}US3{]} Ampliar \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}salida.\allowbreak{}py} con \texttt{construir\_\allowbreak{}metadata(.\allowbreak{}.\allowbreak{}.\allowbreak{})} según \texttt{contracts/\allowbreak{}salidas.\allowbreak{}md} y escribir \texttt{metadata.\allowbreak{}json} dentro de la misma publicación atómica (depende de T021 y T026)
+\item[$\boxtimes$]
+  T028 {[}US3{]} Ampliar \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}cli.\allowbreak{}py}: opciones \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}referencia} y \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}sin-\allowbreak{}referencia}, impresión del reporte en la salida estándar y código de salida 2 cuando la comparación da \texttt{DIFIERE} (depende de T017, T026 y T027)
+\item[$\boxtimes$]
+  T029 {[}US3{]} Ejecutar \texttt{pytest} completo y comprobar que las tres historias pasan
+\end{itemize}
+
+\textbf{Checkpoint}: las tres historias funcionan de forma independiente
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 6: Polish \& Cross-Cutting Concerns}
+
+\textbf{Purpose}: Mejoras que afectan a varias historias
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T030 {[}P{]} Crear \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}dataset\_\allowbreak{}real.\allowbreak{}py} con una prueba de extremo a extremo sobre \texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}IA-\allowbreak{}Nuclear/\allowbreak{}NuclearPowerPlantAccidentData/\allowbreak{}Operation\_\allowbreak{}csv\_\allowbreak{}data} (se omite con \texttt{pytest.\allowbreak{}skip} si la ruta no existe): código de salida 0, conteos 142 / 30 / 30 (70 LOCA y 70 LOCAC en entrenamiento, 15 y 15 en validación y en prueba, 1 Normal y 1 ATWS en entrenamiento), comparación con la referencia \texttt{COINCIDE} si existe y origen sin cambios
+\item[$\boxtimes$]
+  T031 {[}P{]} Documentar en \texttt{README.\allowbreak{}md} una sección "Preparación de datos" en español con la instalación, el comando \texttt{preparar-\allowbreak{}datos}, los archivos de \texttt{data\_\allowbreak{}processed/} y el enlace a \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}quickstart.\allowbreak{}md}
+\item[$\boxtimes$]
+  T032 Revisar que ningún módulo de \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/} abra el origen en modo escritura ni escriba fuera de \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}salida} (principio IV de la constitución) y que todos los mensajes al usuario estén en español
+\item[$\boxtimes$]
+  T033 Ejecutar las 7 validaciones de \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}quickstart.\allowbreak{}md} con el dataset real y anotar cualquier discrepancia
+\item[$\boxtimes$]
+  T034 Ejecutar \texttt{pytest} completo y comprobar que todas las pruebas pasan
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Dependencies \& Execution Order}
+
+\paragraph{Phase Dependencies}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Setup (Phase 1)}: sin dependencias; empieza de inmediato
+\item
+  \textbf{Foundational (Phase 2)}: depende de Setup; bloquea todas las historias
+\item
+  \textbf{User Stories (Phase 3+)}: dependen de Foundational
+
+  \begin{itemize}
+  \tightlist
+  \item
+    US1 es el MVP y no depende de otras historias
+  \item
+    US2 amplía \texttt{salida.\allowbreak{}py} y \texttt{cli.\allowbreak{}py} de US1 (T021 depende de T016 y T017), pero se prueba por separado
+  \item
+    US3 amplía \texttt{salida.\allowbreak{}py} y \texttt{cli.\allowbreak{}py} de US2 (T027 y T028), pero se prueba por separado
+  \end{itemize}
+\item
+  \textbf{Polish (fase final)}: depende de las historias terminadas
+\end{itemize}
+
+\paragraph{User Story Dependencies}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{US1 (P1)}: tras Foundational; sin dependencias de otras historias
+\item
+  \textbf{US2 (P2)}: tras US1 en el código compartido (\texttt{salida.\allowbreak{}py}, \texttt{cli.\allowbreak{}py}); las pruebas T019 pueden escribirse en paralelo con la implementación de US1
+\item
+  \textbf{US3 (P2)}: tras US2 en el código compartido; \texttt{reporte.\allowbreak{}py} (T026) y las pruebas T023 y T024 pueden prepararse mientras se implementa US2
+\end{itemize}
+
+\paragraph{Within Each User Story}
+
+\begin{itemize}
+\tightlist
+\item
+  Las pruebas se escriben primero y deben fallar antes de implementar (T013, T020, T025)
+\item
+  Dentro de la historia: lectura/\hspace{0pt}partición/\hspace{0pt}escalado → salida → cli
+\item
+  La historia termina cuando sus pruebas pasan (T018, T022, T029)
+\end{itemize}
+
+\paragraph{Parallel Opportunities}
+
+\begin{itemize}
+\tightlist
+\item
+  Setup: T002 y T003
+\item
+  US1, pruebas: T010, T011 y T012 (archivos distintos)
+\item
+  US1, implementación: T014 y T015 (módulos distintos)
+\item
+  US3: T023 y T024 (pruebas), luego T026
+\item
+  Polish: T030 y T031
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Parallel Example: User Story 1}
+
+\begin{Verbatim}[breaklines,breakanywhere]
+# Escribir juntas las pruebas de la historia 1:
+Task: "Pruebas de partición en tests/unit/test_particion.py"
+Task: "Pruebas de escalado en tests/unit/test_escalado.py"
+Task: "Pruebas de la línea de órdenes en tests/integration/test_cli.py"
+
+# Implementar juntos los módulos independientes:
+Task: "Partición por simulación en src/preparacion_datos/particion.py"
+Task: "Escalador en src/preparacion_datos/escalado.py"
+\end{Verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Implementation Strategy}
+
+\paragraph{MVP First (User Story 1 Only)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Completar Phase 1: Setup
+\item
+  Completar Phase 2: Foundational (lectura y validación)
+\item
+  Completar Phase 3: User Story 1
+\item
+  \textbf{Parar y validar}: conjuntos sin fuga, escalado solo con entrenamiento y error ante archivo defectuoso
+\item
+  Pasar a las demás historias
+\end{enumerate}
+
+\paragraph{Incremental Delivery}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Setup + Foundational → lectura lista
+\item
+  US1 → conjuntos y escalador (MVP)
+\item
+  US2 → márgenes térmicos sin escalar
+\item
+  US3 → reporte, \texttt{metadata.\allowbreak{}json} y comparación con la referencia
+\item
+  Polish → prueba con el dataset real, documentación y validación del quickstart
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Notes}
+
+\begin{itemize}
+\tightlist
+\item
+  {[}P{]} = archivos distintos, sin dependencias pendientes
+\item
+  {[}Story{]} vincula cada tarea con su historia de usuario
+\item
+  Verificar que las pruebas fallan antes de implementar
+\item
+  Hacer commit tras cada tarea o grupo lógico, con la forma \texttt{feat(001):\ descripción} (y el trailer \texttt{Causa:} si se elimina o reescribe código)
+\item
+  Evitar tareas vagas, conflictos en un mismo archivo y dependencias entre historias que rompan su independencia
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Phase 7: Convergence}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  T035 Hacer que \texttt{publicar} en \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}salida.\allowbreak{}py} deje la carpeta de salida exactamente como estaba si falla el movimiento de cualquier archivo (guardar copia de los artefactos que va a reemplazar y restaurarlos ante el error) y añadir en \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}salida.\allowbreak{}py} una prueba que fuerce un fallo a mitad de la publicación y compruebe que la salida previa queda byte a byte igual; si se decide relajar el contrato, corregir en su lugar la frase «Se publican todos juntos o ninguno» de \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}contracts/\allowbreak{}salidas.\allowbreak{}md} per plan: contracts/\hspace{0pt}salidas.md (partial)
+\item[$\boxtimes$]
+  T036 Exigir nombre numérico (severidad) solo a los archivos de LOCA y LOCAC en \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}lectura.\allowbreak{}py}, ordenando por nombre los de Normal y ATWS, y añadir en \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}lectura.\allowbreak{}py} una prueba con un CSV de Normal de nombre no numérico que se lea sin error per FR-001 (unrequested)
+\item[$\boxtimes$]
+  T037 Añadir en \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli.\allowbreak{}py} una prueba que ejecute \texttt{python\ -\allowbreak{}m\ preparacion\_\allowbreak{}datos} con \texttt{subprocess} sobre el dataset sintético y compruebe código de salida 0 y los artefactos escritos per plan: Project Type (partial)
+\item[$\boxtimes$]
+  T038 Justificar \texttt{\_\allowbreak{}tolerar\_\allowbreak{}consolas\_\allowbreak{}limitadas} de \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}cli.\allowbreak{}py} en \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}research.\allowbreak{}md} y cubrirla con una prueba en \texttt{tests/\allowbreak{}integration/\allowbreak{}test\_\allowbreak{}cli.\allowbreak{}py}, o eliminarla si no se justifica per plan: sin decisión asociada (unrequested)
+\item[$\boxtimes$]
+  T039 Alinear la validación de FR-012 con la spec: validar los valores no numéricos o faltantes en el archivo completo en \texttt{src/\allowbreak{}preparacion\_\allowbreak{}datos/\allowbreak{}lectura.\allowbreak{}py}, o bien aclarar en \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}spec.\allowbreak{}md} (FR-012) y en \texttt{specs/\allowbreak{}001-\allowbreak{}preparacion-\allowbreak{}datos/\allowbreak{}research.\allowbreak{}md} §4 que solo se validan las primeras 150 filas; ajustar \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}lectura.\allowbreak{}py} en consecuencia (depende de T036) per FR-012 (partial)
+\end{itemize}
+\end{documentogenerado}
+
+% =========================
+% 5. IMPLEMENTACIÓN
+% =========================
+\newpage
+\section{Implementación de una iteración}
+
+\subsection{Descripción del entregable}
+\texttt{/speckit-implement} ejecutó las 34 tareas originales siguiendo el orden de \texttt{tasks.md}: primero las pruebas de cada historia, después el código que las hace pasar. Las 5 tareas de convergencia (T035--T039) se implementaron después de la primera pasada de \texttt{/speckit-converge}.
+
+El resultado es un paquete de Python, \texttt{preparacion\_datos}, con un comando de línea de órdenes, \texttt{preparar-datos} (equivalente a \texttt{python -m preparacion\_datos}), que:
+\begin{enumerate}
+  \item Lee las 202 simulaciones NPPAD en modo de solo lectura y valida cada archivo completo: variables ausentes, valores no numéricos o faltantes y menos de 150 pasos.
+  \item Toma los primeros 150 pasos de cada simulación como una muestra.
+  \item Reparte las simulaciones completas en entrenamiento, validación y prueba (70/15/15, semilla 42), con LOCA y LOCAC de igual severidad en el mismo conjunto y las simulaciones únicas de operación normal y ATWS en entrenamiento.
+  \item Escala las 12 variables de planta con un escalador ajustado solo con entrenamiento y conserva sin escalar las 7 variables de margen térmico.
+  \item Escribe 12 artefactos en \texttt{data\_processed/} (publicación «todos o ninguno») y un \texttt{metadata.json}.
+  \item Imprime un reporte de 8 secciones con conteos, simulaciones por conjunto, advertencias y limitaciones.
+\end{enumerate}
+
+\subsection{Módulos construidos}
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{tabular}{@{}P{3.6cm}P{9.2cm}r@{}}
+\toprule
+\textbf{Módulo} & \textbf{Responsabilidad} & \textbf{Líneas} \\
+\midrule
+\texttt{config.py} & Clases, variables, 150 pasos, proporciones y semilla & 29 \\
+\texttt{lectura.py} & Descubrir las simulaciones, leer y validar los CSV & 120 \\
+\texttt{particion.py} & Reparto por simulación completa & 56 \\
+\texttt{escalado.py} & Escalado ajustado solo con entrenamiento & 40 \\
+\texttt{salida.py} & Armado de los arreglos y publicación de los artefactos & 120 \\
+\texttt{reporte.py} & Reporte impreso y comparación con la referencia & 166 \\
+\texttt{cli.py}, \texttt{\_\_main\_\_.py} & Argumentos, orquestación y códigos de salida & 76 + 7 \\
+\bottomrule
+\end{tabular}
+\caption{Módulos del paquete \texttt{preparacion\_datos}}
+\end{table}
+
+Las pruebas están en \texttt{tests/}: 79 pruebas automáticas repartidas en pruebas unitarias (\texttt{tests/unit/}) e integración de extremo a extremo (\texttt{tests/integration/}), incluida una contra el dataset real que se omite si los datos no están disponibles. El código fuente completo está en el Anexo~\ref{anexo:codigo}.
+
+\subsection{Fragmentos de código clave}
+Los dos fragmentos siguientes muestran cómo el código cumple el principio II de la constitución (cero fuga de datos).
+
+\textbf{Reparto por simulación completa} (\texttt{particion.py}). Las severidades se reparten una sola vez, así que la simulación de LOCA y la de LOCAC de igual severidad caen en el mismo conjunto, y ninguna simulación puede quedar en dos conjuntos:
+\begin{lstlisting}[firstnumber=29]
+def repartir(simulaciones: List[Simulacion], semilla: int) -> Dict[str, List[Simulacion]]:
+    """Asigna cada simulación completa a exactamente un conjunto.
+
+    Las severidades (unión de LOCA y LOCAC, ordenadas numéricamente) se reparten una sola vez con
+    la semilla dada, de modo que la simulación de LOCA y la de LOCAC de igual severidad caen en el
+    mismo conjunto. Las clases sin severidad (Normal y ATWS, una sola simulación) van completas a
+    entrenamiento. El resultado no depende del orden de entrada.
+    """
+    severidades = sorted({s.severidad for s in simulaciones if s.clase not in CLASES_SIN_SEVERIDAD})
+    n_train, n_val, _ = tamanos(len(severidades))
+    orden = np.random.default_rng(semilla).permutation(len(severidades))
+    conjunto_de = {}
+    for posicion, indice in enumerate(orden):
+        if posicion < n_train:
+            conjunto_de[severidades[indice]] = "train"
+        elif posicion < n_train + n_val:
+            conjunto_de[severidades[indice]] = "val"
+        else:
+            conjunto_de[severidades[indice]] = "test"
+    particion = {conjunto: [] for conjunto in CONJUNTOS}
+    for simulacion in simulaciones:
+        if simulacion.clase in CLASES_SIN_SEVERIDAD:
+            particion["train"].append(simulacion)
+        else:
+            particion[conjunto_de[simulacion.severidad]].append(simulacion)
+    for conjunto in CONJUNTOS:
+        particion[conjunto].sort(key=_clave_orden)
+    return particion
+\end{lstlisting}
+
+\textbf{Escalado ajustado solo con entrenamiento} (\texttt{escalado.py}). El escalador se ajusta con las filas de entrenamiento; validación y prueba solo se transforman, sin reajustar:
+\begin{lstlisting}[firstnumber=20]
+def ajustar_escalador(x_train: np.ndarray) -> Escalador:
+    """Ajusta un StandardScaler con las filas de entrenamiento aplanadas (N·150, 12)."""
+    filas = x_train.reshape(-1, x_train.shape[-1]).astype(np.float64, copy=False)
+    scaler = StandardScaler().fit(filas)
+    sin_varianza = [
+        VARIABLES_PLANTA[i] for i in np.flatnonzero(np.ptp(filas, axis=0) == 0)
+    ]
+    return Escalador(
+        scaler=scaler,
+        media=np.asarray(scaler.mean_, dtype=np.float64),
+        escala=np.asarray(scaler.scale_, dtype=np.float64),
+        variables_sin_varianza=sin_varianza,
+        filas_ajuste=filas.shape[0],
+    )
+
+
+def aplicar(escalador: Escalador, x: np.ndarray) -> np.ndarray:
+    """Escala `x` (N, 150, 12) con los parámetros de entrenamiento, sin reajustar; devuelve float32."""
+    forma = x.shape
+    filas = x.reshape(-1, forma[-1]).astype(np.float64)
+    return escalador.scaler.transform(filas).reshape(forma).astype(np.float32)
+\end{lstlisting}
+
+\textbf{Orquestación} (\texttt{cli.py}). El escalador se ajusta con \texttt{crudos["train"]} y se aplica a los tres conjuntos; nada se escribe hasta que todo se validó, y un archivo defectuoso termina con código 1:
+\begin{lstlisting}[firstnumber=48]
+def main(argv: Optional[List[str]] = None) -> int:
+    _tolerar_consolas_limitadas()
+    argumentos = _crear_parser().parse_args(argv)
+    try:
+        simulaciones = cargar_simulaciones(argumentos.origen)
+        particion = repartir(simulaciones, argumentos.semilla)
+        crudos = {conjunto: construir_conjunto(particion[conjunto]) for conjunto in CONJUNTOS}
+        escalador = ajustar_escalador(crudos["train"][0])
+        archivos = {}
+        for conjunto in CONJUNTOS:
+            x, margenes, y = crudos[conjunto]
+            archivos[f"X_{conjunto}.npy"] = aplicar(escalador, x)
+            archivos[f"y_{conjunto}.npy"] = y
+            archivos[f"margins_{conjunto}.npy"] = margenes
+        archivos["scaler_mean.npy"] = escalador.media
+        archivos["scaler_std.npy"] = escalador.escala
+        ruta_referencia = None if argumentos.sin_referencia else Path(argumentos.referencia)
+        referencia = comparar_referencia(ruta_referencia, contar_muestras(particion))
+        resumen = construir_resumen(argumentos.origen, argumentos.semilla, particion, escalador, referencia)
+        archivos["metadata.json"] = serializar_metadata(construir_metadata(resumen))
+        publicar(argumentos.salida, archivos)
+    except ErrorDatos as error:
+        print(error, file=sys.stderr)
+        return 1
+    except OSError as error:
+        print(f"ERROR: no se pudo escribir en {argumentos.salida}: {error}", file=sys.stderr)
+        return 1
+    print(formatear_reporte(resumen, sorted(archivos)), end="")
+    return 2 if referencia["estado"] == "DIFIERE" else 0
+\end{lstlisting}
+
+\subsection{Ejecución y pruebas}
+
+\textbf{Instalación y ejecución.} Desde la raíz del repositorio:
+\begin{Verbatim}[fontsize=\small,frame=single]
+pip install -e ".[dev]"
+python -m pytest -v        # pruebas automáticas
+preparar-datos             # genera data_processed/ e imprime el reporte
+\end{Verbatim}
+
+\captura{03-pruebas-pytest.png}{Ejecución de las pruebas automáticas}{%
+\textbf{(Obligatoria)} En la raíz del repositorio ejecutar \texttt{python -m pytest -v} (o \texttt{python -m uv run -{}-extra dev pytest -v}). Capturar el final de la salida, donde se ve la lista de pruebas en verde y la línea de resumen. Con el dataset NPPAD disponible debe decir \texttt{79 passed}; sin él, \texttt{78 passed, 1 skipped}.}
+
+\textbf{Resultado esperado con el dataset real.} Según \texttt{quickstart.md} y la prueba \texttt{test\_dataset\_real.py}, el comando reparte así las muestras:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Clase} & \textbf{Entrenamiento} & \textbf{Validación} & \textbf{Prueba} & \textbf{Total} \\
+\midrule
+Operación normal (NORM) & 1 & 0 & 0 & 1 \\
+LOCA rama caliente & 70 & 15 & 15 & 100 \\
+LOCA rama fría (LOCAC) & 70 & 15 & 15 & 100 \\
+ATWS & 1 & 0 & 0 & 1 \\
+\midrule
+\textbf{Total} & \textbf{142} & \textbf{30} & \textbf{30} & \textbf{202} \\
+\bottomrule
+\end{tabular}
+\caption{Muestras por clase y conjunto con el dataset NPPAD}
+\end{table}
+
+La comparación con la referencia del proyecto previo da \texttt{COINCIDE} para LOCA y LOCAC, los 202 archivos pasan la validación completa y el dataset original queda sin cambios.
+
+\captura{04-ejecucion-preparar-datos.png}{Ejecución de \texttt{preparar-datos}: configuración y conteos}{%
+\textbf{(Obligatoria; necesita el dataset NPPAD)} Con el dataset en \texttt{../IA-Nuclear/NuclearPowerPlantAccidentData/Operation\_csv\_data} (o indicando su ruta con \texttt{-{}-origen RUTA}), ejecutar \texttt{preparar-datos} (o \texttt{python -m uv run preparar-datos}). Capturar el inicio del reporte: \textit{Origen y configuración} y la tabla \textit{Muestras por clase y conjunto} (142 / 30 / 30).}
+
+\captura{05-reporte-advertencias.png}{Reporte de \texttt{preparar-datos}: advertencias, limitaciones y referencia}{%
+\textbf{(Obligatoria; misma ejecución que la anterior)} Bajar en la terminal y capturar el resto del reporte: \textit{Escalador}, \textit{Advertencias} (NORM y ATWS con una sola simulación), \textit{Limitaciones conocidas}, \textit{Comparación con la referencia} (\texttt{COINCIDE}) y \textit{Artefactos escritos}.}
+
+\captura{06-data-processed.png}{Artefactos generados en \texttt{data\_processed/}}{%
+\textbf{(Opcional)} Después de ejecutar \texttt{preparar-datos}, abrir la carpeta \texttt{data\_processed/} en el explorador de VS Code o de Windows y capturar la lista de archivos: \texttt{X\_train.npy}, \texttt{y\_train.npy}, \texttt{margins\_train.npy}, sus equivalentes de \texttt{val} y \texttt{test}, \texttt{scaler\_mean.npy}, \texttt{scaler\_std.npy} y \texttt{metadata.json}.}
+
+\textbf{Manejo de errores.} Si el origen no existe o un archivo es defectuoso, el comando termina con código 1, nombra el archivo y la causa, y no escribe ningún conjunto. Salida real con una carpeta de origen inexistente:
+\begin{Verbatim}[fontsize=\small,frame=single]
+> preparar-datos --origen no_existe
+ERROR: no_existe: no existe la carpeta de origen
+> echo $LASTEXITCODE
+1
+\end{Verbatim}
+
+\captura{07-manejo-de-errores.png}{Manejo de errores: origen inexistente}{%
+\textbf{(Recomendada; no necesita el dataset)} En PowerShell, en la raíz del repositorio, ejecutar \texttt{preparar-datos -{}-origen no\_existe} (o \texttt{python -m uv run preparar-datos -{}-origen no\_existe}) y luego \texttt{echo \$LASTEXITCODE}. Capturar el mensaje \texttt{ERROR: ...} y el código de salida \texttt{1}.}
+
+\subsection{Historial de cambios}
+La constitución exige commits con la forma \texttt{feat(NNN): descripción} y el trailer \texttt{Causa:} cuando se elimina o reescribe código. El historial de la iteración muestra el orden del ciclo: primero los documentos, después el código.
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{tabular}{@{}P{3.8cm}P{11.2cm}@{}}
+\toprule
+\textbf{Commit} & \textbf{Contenido} \\
+\midrule
+\texttt{4fee101} & \texttt{docs(001)}: constitución, spec, plan, tareas, análisis y configuración de métricas \\
+\texttt{1b67f1e} & \texttt{feat(001)}: lectura y validación de las simulaciones \\
+\texttt{c20d17a} & \texttt{feat(001)}: partición por simulación y escalado solo con entrenamiento \\
+\texttt{5ef3383} & \texttt{feat(001)}: salida, reporte y comando \texttt{preparar-datos} \\
+\texttt{96ca897}, \texttt{ec7ae0c}, \texttt{23e6580} & \texttt{feat(001)}: tareas de convergencia (publicación todos o ninguno, nombres libres para Normal y ATWS, validación del archivo completo), con \texttt{Causa: defecto} \\
+\texttt{1620545}, \texttt{eaf0627} & \texttt{test(001)}: prueba de \texttt{python -m} y salida tolerante a consolas limitadas \\
+\texttt{5a828a3}, \texttt{1ea8c82}, \texttt{28d41d8}, \texttt{42e1baa} & \texttt{docs(001)}: registros de sesión, tareas completadas y auditoría \\
+\texttt{c587174} & Fusión del \textit{pull request} \#1 de la rama \texttt{001-preparacion-datos} en \texttt{main} \\
+\bottomrule
+\end{tabular}
+\caption{Commits de la iteración}
+\end{table}
+
+\captura{08-historial-commits.png}{Historial de commits en GitHub}{%
+\textbf{(Obligatoria)} Abrir \url{https://github.com/adarboleda/gestion_proyectos/commits/main} y capturar la lista de commits, de \texttt{Instalacion de spec kit} hasta \texttt{Merge pull request \#1}. Otra opción: ejecutar \texttt{git log -{}-oneline -{}-graph} en la terminal y capturar la salida.}
+
+\captura{09-pull-request.png}{\textit{Pull request} \#1 fusionado en \texttt{main}}{%
+\textbf{(Opcional)} Abrir \url{https://github.com/adarboleda/gestion_proyectos/pull/1} y capturar la cabecera del \textit{pull request} con el estado \textit{Merged}.}
+
+\subsection{Métricas de la iteración}
+La extensión \texttt{speckit-metricas} registró una sesión por fase con las horas, el modelo de IA y las líneas de código.
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{minipage}[t]{0.56\linewidth}
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Medida} & \textbf{Valor} \\
+\midrule
+Esfuerzo total & 2.75 h \\
+Calendario & 3 días \\
+Código agregado / eliminado & 629 / 14 líneas \\
+Código que sobrevive & 615 líneas \\
+Pruebas agregadas & 1005 líneas \\
+Tasa de desperdicio & 2.23 \% \\
+Puntos de tarea & 96 (82 + 14) \\
+Modelo de IA & \texttt{claude-sonnet-5-5} \\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.38\linewidth}
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Fase} & \textbf{Horas} \\
+\midrule
+Constitución & 0.50 \\
+Especificar & 0.25 \\
+Aclarar & 0.25 \\
+Planificar & 0.25 \\
+Tareas & 0.25 \\
+Analizar & 0.50 \\
+Implementar & 0.75 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\caption{Esfuerzo y tamaño registrados por \texttt{speckit-metricas}}
+\end{table}
+
+Las horas son estimaciones automáticas de la extensión, no un cronómetro. El desperdicio son las líneas eliminadas por defectos: las 14 líneas eliminadas se clasificaron como \texttt{Causa: defecto}. Esta tasa probablemente es optimista, porque los defectos corregidos antes del primer commit no quedaron registrados.
+
+% =========================
+% 6. AUDITORÍA
+% =========================
+\newpage
+\section{Documento de auditoría}
+
+\subsection{Descripción del entregable}
+La auditoría comprueba que especificación, plan, tareas y código digan lo mismo, y que todo requisito esté cubierto por al menos una tarea y una prueba. Como se explicó en la sección de marco teórico, el comando \textit{speckit-coverage} del enunciado no existe en Spec Kit; la auditoría se hizo en dos momentos:
+
+\begin{enumerate}
+  \item \textbf{Antes de implementar}, con \texttt{/speckit-analyze}: análisis de solo lectura de \texttt{spec.md}, \texttt{plan.md} y \texttt{tasks.md} contra la constitución. Encontró \textbf{9 hallazgos} (0 críticos, 3 medios y 6 bajos), con cobertura del 100~\% de los requisitos y sin conflictos con la constitución.
+  \item \textbf{Después de implementar}, con \texttt{/speckit-converge}: la primera pasada encontró \textbf{5 hallazgos} (1 medio y 4 bajos) y añadió las tareas T035--T039, que se implementaron. La segunda pasada dio \textbf{«converged»}: 0 hallazgos y \texttt{tasks.md} sin cambios.
+\end{enumerate}
+
+El documento \texttt{auditoria.md} reúne ambos resultados: la cobertura final de cada requisito con sus tareas y pruebas, la resolución de cada hallazgo y el estado final (39/39 tareas, 79 pruebas en verde). También registra lo que no salió limpio: varias correcciones del análisis se aplicaron durante la implementación sin aprobación explícita, y dos de ellas (I1 y C1) se resolvieron de forma distinta a la propuesta.
+
+\begin{documentogenerado}{/speckit-analyze}{specs\slash 001-preparacion-datos\slash analisis-inicial.md}
+\subsection{Informe de análisis de especificación (inicial)}
+\bannerdoc
+
+\textbf{Funcionalidad}: \texttt{001-\allowbreak{}preparacion-\allowbreak{}datos}
+
+\textbf{Fecha}: 2026-10-20
+
+\textbf{Alcance}: \texttt{spec.\allowbreak{}md}, \texttt{plan.\allowbreak{}md} y \texttt{tasks.\allowbreak{}md} contrastados con la constitución v2.0.0, antes de \texttt{/\allowbreak{}speckit-\allowbreak{}implement}. Análisis de solo lectura: no se modificó ningún archivo.
+
+\subsubsection{Hallazgos}
+
+{\def\LTcaptype{none} % do not increment counter
+{\footnotesize
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.0662}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1838}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1544}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1691}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.2059}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.2206}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+ID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Categoría
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Severidad
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ubicación
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Resumen
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Recomendación
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+U1 & Subespecificación & MEDIUM & research.md §8, tasks T016, T012(b), spec Edge Cases (re-ejecución) & "Escribir en un directorio temporal y reemplazar el destino" no funciona si \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}salida} ya existe y tiene contenido: \texttt{os.\allowbreak{}replace} de un directorio sobre uno no vacío falla en Windows y en POSIX. La alternativa (borrar y recrear) destruiría archivos ajenos si alguien usa \texttt{-\allowbreak{}\/\allowbreak{}-\allowbreak{}salida\ .}. Tampoco hay prueba de "no mezclar restos de ejecuciones anteriores". & Definir que se reemplazan solo los 12 artefactos conocidos, archivo por archivo, desde el directorio temporal, sin tocar otros archivos. Añadir a T012 una prueba con una salida previa que tenga un archivo ajeno y otro obsoleto, y corregir research §8 y T016. \\
+I1 & Inconsistencia & MEDIUM & tasks T008 y T019(b); spec SC-003 & SC-003 exige coincidencia del 100 \% de los valores de margen. El lector CSV de pandas por defecto puede diferir 1 ulp de \texttt{float()} de Python, así que T019(b) ("leído de forma independiente") podría fallar sin que haya ningún defecto real. & En T008 fijar \texttt{float\_\allowbreak{}precision=\allowbreak{}"round\_\allowbreak{}trip"}, y que T019(b) compare contra una lectura con \texttt{csv} y \texttt{float()}. \\
+C1 & Hueco de cobertura & MEDIUM & spec FR-009; contracts/\hspace{0pt}cli.md (secciones del reporte); T023, T026 & FR-009 pide que el reporte incluya "la lista de simulaciones de cada conjunto", pero las 7 secciones del reporte impreso no la tienen: solo está en \texttt{metadata.\allowbreak{}json}. & O añadir la lista al reporte impreso, o precisar en FR-009 que \texttt{metadata.\allowbreak{}json} es la forma persistente del reporte. Añadir la comprobación a T023. \\
+C2 & Hueco de cobertura & LOW & spec Edge Cases (desviación cero); T011(e), T023 & Se prueba que \texttt{variables\_\allowbreak{}sin\_\allowbreak{}varianza} se calcula (T011), pero ninguna tarea prueba que el reporte impreso y \texttt{metadata.\allowbreak{}json} la muestren (\texttt{cli.\allowbreak{}md} §3). & Añadir ese caso a T023. \\
+C3 & Hueco de cobertura & LOW & spec (sin FR/\hspace{0pt}SC); T023(e), T024(c), T026, T028 & La comparación con \texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}IA-\allowbreak{}Nuclear/\allowbreak{}data\_\allowbreak{}processed/\allowbreak{}metadata.\allowbreak{}json} y el código de salida 2 vienen de la entrada del plan y no tienen requisito ni criterio en la spec. & Añadir un FR o una nota en Assumptions que lo recoja. No bloquea. \\
+A1 & Ambigüedad & LOW & T011(c), T019(d), quickstart validación 3 & "Media cercana a 0, desviación cercana a 1" y "tolerancia de float32" no tienen valor numérico. & Fijar tolerancias, por ejemplo \texttt{abs(media)\ \textless{}\ 1e-\allowbreak{}5}, \texttt{abs(std\ −\ 1)\ \textless{}\ 1e-\allowbreak{}5} y \texttt{rtol\ 1e-\allowbreak{}5} en la reconstrucción. \\
+I2 & Inconsistencia & LOW & plan.md (árbol de \texttt{tests/}) frente a tasks T019, T024, T030 & Las tareas crean \texttt{test\_\allowbreak{}margenes.\allowbreak{}py}, \texttt{test\_\allowbreak{}cli\_\allowbreak{}reporte.\allowbreak{}py} y \texttt{test\_\allowbreak{}dataset\_\allowbreak{}real.\allowbreak{}py}, que el plan no lista. & Añadirlos al árbol del plan. \\
+I3 & Terminología & LOW & spec ("operación normal") frente a plan, tasks y contracts ("Normal"/\hspace{0pt}"NORM") & Un mismo concepto con tres nombres. & Anotar una vez en la spec: carpeta \texttt{Normal} = clase operación normal = etiqueta \texttt{NORM}. \\
+U2 & Subespecificación & LOW & T005 & La fixture crea 202 CSV y el ayudante de corrupción los modifica. No se indica el alcance ni si cada prueba usa una copia. & Fixture de sesión de solo lectura, con copia por prueba para los casos defectuosos. \\
+\end{longtable}
+}
+}
+
+\subsubsection{Cobertura de requisitos}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.4318}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.1136}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.3712}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.0833}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Requisito
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+¿Tarea?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tareas
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notas
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FR-001 leer sin modificar & Sí & T008, T012(e), T032 & \\
+FR-002 una muestra de 150 pasos & Sí & T008, T016, T012(a) & \\
+FR-003 sin repetirse entre conjuntos & Sí & T010(a), T014 & \\
+FR-004 LOCA/\hspace{0pt}LOCAC igual severidad & Sí & T010(b), T014 & \\
+FR-005 12 variables de planta & Sí & T007, T016 & \\
+FR-006 escalado solo con entrenamiento & Sí & T011, T015, T017 & \\
+FR-007 Normal y ATWS en entrenamiento & Sí & T010(d), T012(c), T014, T023(c) & \\
+FR-008 márgenes sin escalar & Sí & T019, T021 & Véase I1 \\
+FR-009 reporte & Parcial & T023, T026, T028 & Véase C1 \\
+FR-010 advertencias visibles & Sí & T023(b,c), T026 & \\
+FR-011 reproducibilidad & Sí & T012(d) & \\
+FR-012 archivo defectuoso detiene & Sí & T006, T008, T012(b) & \\
+FR-013 una ejecución documentada & Sí & T017, T031 & \\
+SC-001 a SC-008 & Sí & SC-001: T010, T012; SC-002: T011; SC-003: T019; SC-004/\hspace{0pt}005: T023; SC-006: T012(d); SC-007: T012(e), T030; SC-008: T031, T033 & \\
+\end{longtable}
+}
+
+\subsubsection{Alineación con la constitución}
+
+Sin conflictos.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Principio I}: no aplica, porque la funcionalidad no emite diagnósticos.
+\item
+  \textbf{Principio II}: la partición es por simulación completa, el escalado se ajusta solo con entrenamiento y LOCA/\hspace{0pt}LOCAC van emparejados.
+\item
+  \textbf{Principio III}: hay semilla, un comando y un reporte con limitaciones.
+\item
+  \textbf{Principio IV}: el origen se abre solo para lectura y se usa una sola planta.
+\item
+  \textbf{Principio V}: solo se leen las cuatro carpetas.
+\item
+  \textbf{Flujo de desarrollo}: pruebas primero, \texttt{src/}, \texttt{tests/}, español y commits \texttt{feat(001):} están cubiertos en las tareas.
+\end{itemize}
+
+\subsubsection{Tareas sin requisito directo (esperado)}
+
+\begin{itemize}
+\tightlist
+\item
+  Las de infraestructura y ejecución de pruebas: T001--T004, T009, T013, T018, T020, T022, T025, T029, T034.
+\item
+  T032, que apunta al principio IV.
+\item
+  Las de comparación con la referencia (véase C3).
+\end{itemize}
+
+\subsubsection{Métricas}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Requisitos}: 21 (13 FR y 8 SC).
+\item
+  \textbf{Tareas}: 34.
+\item
+  \textbf{Cobertura}: 100 \% con al menos una tarea; FR-009 es parcial.
+\item
+  \textbf{Ambigüedades}: 1.
+\item
+  \textbf{Duplicaciones}: 0.
+\item
+  \textbf{Problemas críticos}: 0 (3 MEDIUM, 6 LOW).
+\end{itemize}
+
+\subsubsection{Próximas acciones}
+
+No hay problemas CRITICAL, así que se puede pasar a \texttt{/\allowbreak{}speckit-\allowbreak{}implement}. Antes conviene resolver U1 e I1, porque cambian el diseño de \texttt{salida.\allowbreak{}py} y de la lectura. Con C1 hay que decidir primero si la lista va en el reporte impreso o si basta con \texttt{metadata.\allowbreak{}json}. El resto son ajustes de redacción que se pueden hacer a mano en \texttt{tasks.\allowbreak{}md}, \texttt{plan.\allowbreak{}md} y \texttt{spec.\allowbreak{}md}.
+\end{documentogenerado}
+
+\begin{documentogenerado}{/speckit-analyze + /speckit-converge}{specs\slash 001-preparacion-datos\slash auditoria.md}
+\subsection{Auditoría de la funcionalidad 001-preparacion-datos}
+\bannerdoc
+
+\textbf{Fecha}: 2026-10-20
+
+\textbf{Rama}: \texttt{001-\allowbreak{}preparacion-\allowbreak{}datos}
+
+\textbf{Fuentes}: analisis-inicial.md (\texttt{/\allowbreak{}speckit-\allowbreak{}analyze}), dos pasadas de \texttt{/\allowbreak{}speckit-\allowbreak{}converge}, el código y las pruebas del repositorio. No se ejecutó un segundo \texttt{/\allowbreak{}speckit-\allowbreak{}analyze}; la verificación posterior a la implementación la hicieron las dos pasadas de converge.
+
+\subsubsection{1. Resumen}
+
+\begin{itemize}
+\tightlist
+\item
+  El análisis inicial (antes de implementar) encontró \textbf{9 hallazgos}: 0 críticos, 3 MEDIUM y 6 LOW, con cobertura del 100 \% de los requisitos (FR-009 parcial).
+\item
+  Durante la implementación se aplicaron \textbf{sin aprobación explícita} las correcciones U1, I1, C1, C2 y A1 (más I2 y U2, ver §4). Nadie respondió a la oferta de remediación del análisis; la implementación siguió adelante y resolvió esos puntos sobre la marcha. \textbf{I1 y C1 se resolvieron de forma distinta a la propuesta} (ver §4.1).
+\item
+  La primera pasada de \texttt{/\allowbreak{}speckit-\allowbreak{}converge} encontró \textbf{5 hallazgos} (1 MEDIUM, 4 LOW) y anexó \textbf{5 tareas} (T035--T039), que se implementaron. La segunda pasada dio \textbf{«converged»} con 0 hallazgos y sin tocar \texttt{tasks.\allowbreak{}md}.
+\item
+  Estado final: \textbf{39 de 39 tareas completadas}, \textbf{79 pruebas verdes} (incluida una con el dataset NPPAD real), y 11 commits de esta funcionalidad sobre la base del proyecto (el árbol de trabajo estaba limpio antes de crear este documento).
+\item
+  Quedan \textbf{2 hallazgos aceptados sin cambio} (C3 e I3) y algunas diferencias menores de redacción (§8).
+\end{itemize}
+
+\subsubsection{2. Cobertura de requisitos (estado final)}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.2847}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.2482}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 4\tabcolsep) * \real{0.4672}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Requisito
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tareas
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pruebas que lo verifican
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FR-001 leer sin modificar el origen & T008, T012, T032 & \texttt{test\_\allowbreak{}lectura} (descubrimiento), \texttt{test\_\allowbreak{}cli::test\_\allowbreak{}los\_\allowbreak{}csv\_\allowbreak{}de\_\allowbreak{}origen\_\allowbreak{}no\_\allowbreak{}cambian}, \texttt{test\_\allowbreak{}dataset\_\allowbreak{}real} \\
+FR-002 una muestra de 150 pasos por simulación & T008, T016 & \texttt{test\_\allowbreak{}lectura} (serie 150×19), \texttt{test\_\allowbreak{}cli} (formas y tipos), \texttt{test\_\allowbreak{}cli\_\allowbreak{}reporte} (metadata) \\
+FR-003 simulaciones completas, sin repetirse & T010, T014 & \texttt{test\_\allowbreak{}particion::test\_\allowbreak{}ninguna\_\allowbreak{}simulacion\_\allowbreak{}aparece\_\allowbreak{}en\_\allowbreak{}mas\_\allowbreak{}de\_\allowbreak{}un\_\allowbreak{}conjunto} \\
+FR-004 LOCA/\hspace{0pt}LOCAC de igual severidad juntas & T010, T014 & \texttt{test\_\allowbreak{}particion} (emparejamiento y severidad en una sola clase) \\
+FR-005 12 variables de planta & T007, T016 & \texttt{test\_\allowbreak{}cli} (forma \texttt{(N,150,12)}), \texttt{test\_\allowbreak{}margenes} (alineación) \\
+FR-006 escalado solo con entrenamiento & T011, T015 & \texttt{test\_\allowbreak{}escalado} (parámetros de entrenamiento, invariancia ante validación/\hspace{0pt}prueba) \\
+FR-007 Normal y ATWS completas a entrenamiento & T010, T012, T014 & \texttt{test\_\allowbreak{}particion}, \texttt{test\_\allowbreak{}cli::test\_\allowbreak{}normal\_\allowbreak{}y\_\allowbreak{}atws\_\allowbreak{}aparecen\_\allowbreak{}solo\_\allowbreak{}en\_\allowbreak{}entrenamiento} \\
+FR-008 márgenes sin escalar y alineados & T019, T021 & \texttt{test\_\allowbreak{}margenes} (4 pruebas, comparación exacta con el CSV) \\
+FR-009 reporte con conteos, simulaciones y limitaciones & T023, T026--T028 & \texttt{test\_\allowbreak{}reporte}, \texttt{test\_\allowbreak{}cli\_\allowbreak{}reporte} \\
+FR-010 advertencias de clases con una simulación y celdas en cero & T023, T026 & \texttt{test\_\allowbreak{}reporte} (advertencias, \texttt{0*}) \\
+FR-011 reproducibilidad & T012 & \texttt{test\_\allowbreak{}cli::test\_\allowbreak{}dos\_\allowbreak{}ejecuciones\_\allowbreak{}producen\_\allowbreak{}archivos\_\allowbreak{}identicos}, \texttt{test\_\allowbreak{}particion} (semilla) \\
+FR-012 archivo defectuoso detiene sin escribir & T006, T008, T012, T039 & \texttt{test\_\allowbreak{}lectura} (defectos en cualquier fila), \texttt{test\_\allowbreak{}cli} (defectuoso, salida previa intacta), \texttt{test\_\allowbreak{}salida} \\
+FR-013 una ejecución documentada & T017, T031, T037 & \texttt{test\_\allowbreak{}cli::test\_\allowbreak{}python\_\allowbreak{}m…}, README y quickstart \\
+SC-001 0 simulaciones en dos conjuntos & T010, T012 & \texttt{test\_\allowbreak{}particion}, validación 2 del quickstart \\
+SC-002 parámetros de escala solo de entrenamiento & T011 & \texttt{test\_\allowbreak{}escalado}, validación 3 del quickstart \\
+SC-003 márgenes idénticos al CSV & T019 & \texttt{test\_\allowbreak{}margenes}, validación 4 \\
+SC-004 suma de conteos = total; 4 clases × 3 conjuntos & T023 & \texttt{test\_\allowbreak{}reporte} \\
+SC-005 100 \% de clases de una simulación y celdas en cero con advertencia & T023, T026 & \texttt{test\_\allowbreak{}reporte} \\
+SC-006 ejecuciones idénticas & T012 & \texttt{test\_\allowbreak{}cli} \\
+SC-007 origen sin cambios & T012, T030 & \texttt{test\_\allowbreak{}cli}, \texttt{test\_\allowbreak{}dataset\_\allowbreak{}real} \\
+SC-008 una ejecución sin pasos manuales & T017, T031 & README, quickstart, \texttt{test\_\allowbreak{}dataset\_\allowbreak{}real} \\
+\end{longtable}
+}
+
+Pruebas por archivo (79 en total): \texttt{test\_\allowbreak{}lectura} 15, \texttt{test\_\allowbreak{}particion} 12, \texttt{test\_\allowbreak{}escalado} 6, \texttt{test\_\allowbreak{}reporte} 11, \texttt{test\_\allowbreak{}salida} 11, \texttt{test\_\allowbreak{}cli} 13, \texttt{test\_\allowbreak{}cli\_\allowbreak{}reporte} 6, \texttt{test\_\allowbreak{}margenes} 4, \texttt{test\_\allowbreak{}dataset\_\allowbreak{}real} 1.
+
+Resultado con el dataset real: 142 muestras de entrenamiento (70 LOCA, 70 LOCAC, 1 Normal, 1 ATWS), 30 de validación y 30 de prueba; la comparación con la referencia del proyecto previo da \texttt{COINCIDE} para LOCA y LOCAC; los 202 archivos pasan la validación completa.
+
+\subsubsection{3. Hallazgos del análisis inicial y su resolución}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.0682}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.2727}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.4924}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+ID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sev.
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hallazgo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Resolución
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+U1 & MEDIUM & Publicación sobre una salida existente: el reemplazo de la carpeta completa no es posible si no está vacía y destruiría archivos ajenos. & \textbf{Aplicado en la implementación sin aprobación.} \texttt{publicar} reemplaza solo los artefactos publicados, archivo por archivo, sin tocar otros. Prueba: \texttt{test\_\allowbreak{}cli::test\_\allowbreak{}salida\_\allowbreak{}previa\_\allowbreak{}se\_\allowbreak{}reemplaza\_\allowbreak{}sin\_\allowbreak{}tocar\_\allowbreak{}archivos\_\allowbreak{}ajenos}. \texttt{research.\allowbreak{}md} §8 se reescribió. Esta solución dejó abierta la brecha de «todos o ninguno», cerrada después por converge (F1 → T035). \\
+I1 & MEDIUM & SC-003 exige igualdad exacta; el lector de pandas puede diferir 1 ulp de \texttt{float()}. & \textbf{Aplicado sin aprobación y de forma distinta a la propuesta} (ver §4.1). \\
+C1 & MEDIUM & FR-009 pide la lista de simulaciones por conjunto, ausente del reporte impreso. & \textbf{Aplicado sin aprobación y de forma distinta a la propuesta} (ver §4.1). \\
+C2 & LOW & Faltaba probar que las variables sin varianza se informan en el reporte y en \texttt{metadata.\allowbreak{}json}. & \textbf{Aplicado sin aprobación.} Prueba \texttt{test\_\allowbreak{}reporte::test\_\allowbreak{}variables\_\allowbreak{}sin\_\allowbreak{}varianza\_\allowbreak{}se\_\allowbreak{}informan\_\allowbreak{}en\_\allowbreak{}reporte\_\allowbreak{}y\_\allowbreak{}metadata}. El texto de T023 en \texttt{tasks.\allowbreak{}md} no se editó. \\
+A1 & LOW & «Cercana a 0/\hspace{0pt}1» y «tolerancia de float32» sin valores. & \textbf{Aplicado sin aprobación.} Las pruebas usan tolerancia absoluta de 1e-5 para media y desviación, y \texttt{rtol=\allowbreak{}1e-\allowbreak{}5} con \texttt{atol=\allowbreak{}1e-\allowbreak{}5} en la reconstrucción. Con \texttt{rtol} solo la prueba de alineación falló en un valor casi cero (diferencia de 1e-7), por lo que se añadió \texttt{atol}. El texto de T011, T019 y del quickstart conserva «cercana a». \\
+C3 & LOW & La comparación con la referencia no tiene FR/\hspace{0pt}SC en la spec. & \textbf{Aceptado, sin cambio.} La comparación está implementada porque la pide el plan; la spec no se modificó. \\
+I2 & LOW & El árbol de pruebas del plan omitía tres archivos de pruebas. & \textbf{Aplicado sin aprobación} (no figuraba entre los cinco listados): \texttt{plan.\allowbreak{}md} actualizado. Después se añadió \texttt{test\_\allowbreak{}salida.\allowbreak{}py} y el árbol no se volvió a actualizar (§8). \\
+I3 & LOW & Normal / NORM / operación normal para el mismo concepto. & \textbf{Aceptado, sin cambio.} La spec no se modificó; el mapeo carpeta → clase → etiqueta está en \texttt{config.\allowbreak{}py} y \texttt{data-\allowbreak{}model.\allowbreak{}md}. \\
+U2 & LOW & Alcance de la fixture del dataset sintético. & \textbf{Aplicado sin aprobación} (tampoco figuraba entre los cinco): \texttt{conftest.\allowbreak{}py} crea el dataset una vez por sesión y entrega una copia por prueba. \\
+\end{longtable}
+}
+
+\subsubsection{4. Decisiones tomadas sin aprobación explícita}
+
+La oferta de remediación del análisis («¿quieres que proponga las ediciones para U1, I1 y C1?») no tuvo respuesta; la siguiente orden fue \texttt{/\allowbreak{}speckit-\allowbreak{}implement}, y las correcciones se aplicaron dentro de esa implementación. Esto es lo que se decidió sin consultar:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{U1, I1, C1, C2 y A1}, como se describe en §3.
+\item
+  \textbf{I2 y U2}, también aplicados.
+\item
+  \textbf{C1 y los textos del plan:} además de cambiar el código se reescribió \texttt{contracts/\allowbreak{}cli.\allowbreak{}md} y se cambió «7 secciones» por «8 secciones» en T024 y T026.
+\item
+  \textbf{U1 y \texttt{research.\allowbreak{}md}:} se reescribió §8 y se añadió §12.
+\item
+  \textbf{T039:} la tarea ofrecía dos caminos (validar el archivo completo, o aclarar la spec). Se eligió validar el archivo completo, sin consultar, y se actualizaron \texttt{research.\allowbreak{}md} §4 y \texttt{data-\allowbreak{}model.\allowbreak{}md}.
+\item
+  \textbf{T038:} la tarea ofrecía justificar o eliminar la tolerancia de consola. Se eligió conservarla y justificarla.
+\end{itemize}
+
+\paragraph{4.1 I1 y C1: qué se propuso y qué se hizo}
+
+\textbf{I1.} Propuesta: fijar \texttt{float\_\allowbreak{}precision=\allowbreak{}"round\_\allowbreak{}trip"} en la lectura de pandas (T008) y que la prueba de márgenes (T019b) compare contra una lectura con \texttt{csv} y \texttt{float()}.
+Aplicado: la lectura no usa el parámetro de pandas; lee todo como texto (\texttt{dtype=\allowbreak{}str}) y convierte cada valor con \texttt{float()} de Python, de modo que la conversión es la misma que la de la lectura independiente de la prueba. La prueba sí compara contra \texttt{csv} + \texttt{float()}, como se proponía. El resultado es una igualdad exacta en los 202 archivos reales.
+
+\textbf{C1.} Propuesta: dos alternativas excluyentes, «añadir la lista al reporte impreso» o «precisar en FR-009 que \texttt{metadata.\allowbreak{}json} es la forma persistente del reporte», dejando la decisión al usuario.
+Aplicado: se eligió la primera, añadiendo la sección «Simulaciones por conjunto» (el reporte pasó de 7 a 8 secciones, con las simulaciones agrupadas por clase), y se extendió más allá de lo propuesto al reescribir \texttt{contracts/\allowbreak{}cli.\allowbreak{}md} y los textos de T024 y T026. La spec no se modificó. La lista sigue también en \texttt{metadata.\allowbreak{}json}.
+
+\subsubsection{\texorpdfstring{5. Hallazgos de \texttt{/\allowbreak{}speckit-\allowbreak{}converge}}{5. Hallazgos de /speckit-converge}}
+
+\textbf{Primera pasada} (después de implementar T001--T034):
+
+{\def\LTcaptype{none} % do not increment counter
+{\footnotesize
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.0662}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1324}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1618}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.3529}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1176}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 10\tabcolsep) * \real{0.1691}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+ID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tipo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sev.
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hallazgo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tarea
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Commit
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+F1 & partial & MEDIUM & \texttt{publicar} mueve archivo por archivo: un fallo a mitad dejaba la salida mezclada, contra el contrato «todos juntos o ninguno». & T035 & \texttt{96ca897} \\
+F2 & unrequested & LOW & La lectura exigía nombre numérico también a Normal y ATWS. & T036 & \texttt{ec7ae0c} \\
+F3 & partial & LOW & \texttt{python\ -\allowbreak{}m\ preparacion\_\allowbreak{}datos} sin prueba automática. & T037 & \texttt{1620545} \\
+F4 & unrequested & LOW & \texttt{\_\allowbreak{}tolerar\_\allowbreak{}consolas\_\allowbreak{}limitadas} sin justificación ni prueba. & T038 & \texttt{eaf0627} \\
+F5 & partial & LOW & FR-012 pide detener ante valores defectuosos en el archivo; solo se validaban las primeras 150 filas. & T039 & \texttt{23e6580} \\
+\end{longtable}
+}
+}
+
+\textbf{Segunda pasada} (después de T035--T039): \textbf{converged}, 0 hallazgos; \texttt{tasks.\allowbreak{}md} quedó sin cambios.
+
+\subsubsection{6. Cómo se resolvió cada tarea de convergencia}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{T035:} \texttt{publicar} respalda los archivos que va a reemplazar y, si algo falla, restaura los previos, quita los nuevos y elimina la carpeta si la había creado. 11 pruebas en \texttt{test\_\allowbreak{}salida.\allowbreak{}py} fuerzan el fallo en cada movimiento posible. Commit con \texttt{Causa:\ defecto}.
+\item
+  \textbf{T036:} solo LOCA y LOCAC requieren nombre numérico; Normal y ATWS se ordenan por nombre. Commit con \texttt{Causa:\ defecto}.
+\item
+  \textbf{T037:} prueba con \texttt{subprocess} de \texttt{python\ -\allowbreak{}m\ preparacion\_\allowbreak{}datos}.
+\item
+  \textbf{T038:} se conservó la tolerancia de consola, se documentó en \texttt{research.\allowbreak{}md} §12 y se probó con una salida ASCII.
+\item
+  \textbf{T039:} se validan todas las filas de las 19 variables y solo los primeros 150 pasos entran en la muestra; la spec no cambió. Commit con \texttt{Causa:\ defecto}.
+\end{itemize}
+
+\subsubsection{7. Estado final de las tareas}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.2424}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.2879}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.2197}}
+  >{\raggedright\arraybackslash\hspace{0pt}}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Fase
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tareas
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Estado
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Commit principal
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Phase 1: Setup & T001--T004 & 4/\hspace{0pt}4 completadas & \texttt{1b67f1e} \\
+Phase 2: Foundational & T005--T009 & 5/\hspace{0pt}5 completadas & \texttt{1b67f1e} \\
+Phase 3: US1 (MVP) & T010--T018 & 9/\hspace{0pt}9 completadas & \texttt{c20d17a}, \texttt{5ef3383} \\
+Phase 4: US2 & T019--T022 & 4/\hspace{0pt}4 completadas & \texttt{5ef3383} \\
+Phase 5: US3 & T023--T029 & 7/\hspace{0pt}7 completadas & \texttt{5ef3383} \\
+Phase 6: Polish & T030--T034 & 5/\hspace{0pt}5 completadas & \texttt{5ef3383}, \texttt{4fee101} \\
+Phase 7: Convergence & T035--T039 & 5/\hspace{0pt}5 completadas & \texttt{96ca897} \ldots{} \texttt{23e6580} \\
+\textbf{Total} & \textbf{39} & \textbf{39/\hspace{0pt}39} & \\
+\end{longtable}
+}
+
+\subsubsection{8. Pendientes y aceptados}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C3 e I3} quedan aceptados sin cambio en la spec (§3).
+\item
+  \textbf{Redacción residual de las tareas y el quickstart.} T011, T019 y la validación 3 del quickstart siguen diciendo «cercana a 0/\hspace{0pt}1» (A1). T016 conserva la frase «lo reemplaza al final», anterior al diseño de \texttt{publicar} por archivo. T023 no menciona la prueba de variables sin varianza (C2).
+\item
+  \textbf{Documentos no actualizados.} \texttt{plan.\allowbreak{}md} no lista \texttt{tests/\allowbreak{}unit/\allowbreak{}test\_\allowbreak{}salida.\allowbreak{}py}. \texttt{contracts/\allowbreak{}cli.\allowbreak{}md} enumera menos causas de error que las que produce el código (por ejemplo «archivo ilegible», «nombre sin severidad»).
+\item
+  \textbf{Métricas.} La línea base de puntos de tarea es 82 PTS; las 5 tareas de convergencia no se han registrado en \texttt{puntos-\allowbreak{}tarea.\allowbreak{}csv}. La sesión de métricas de implementación sigue abierta.
+\item
+  \textbf{Rendimiento.} La ejecución completa con el dataset real tarda unos 12 s y la suite unos 2 min 30 s; el plan no fija un objetivo cuantitativo.
+\end{itemize}
+\end{documentogenerado}
+
+% =========================
+% RESULTADOS
+% =========================
+\newpage
+\section{Estado de los entregables}
+
+\begin{table}[H]
+\centering
+\small
+\setstretch{1.15}
+\begin{tabular}{@{}P{3.3cm}P{2.6cm}P{9.1cm}@{}}
+\toprule
+\textbf{Entregable} & \textbf{Estado} & \textbf{Evidencia} \\
+\midrule
+Constitución & Completo & Versión 2.0.0, 5 principios, sin marcadores pendientes \\
+Especificación & Completo & 3 historias, 13 requisitos funcionales, 8 criterios de éxito, 3 aclaraciones, lista de verificación 16/16 \\
+Planificación & Completo & \texttt{plan.md}, \texttt{research.md} (12 decisiones), \texttt{data-model.md}, 2 contratos, \texttt{quickstart.md} \\
+Tareas & Completo & 39/39 tareas completadas, pruebas primero \\
+Implementación & Completo & Comando funcional, 79 pruebas en verde, dataset real validado \\
+Auditoría & Completo, con observaciones & \texttt{/speckit-analyze} y dos pasadas de \texttt{/speckit-converge}; quedan observaciones menores de redacción \\
+\bottomrule
+\end{tabular}
+\caption{Estado final de los entregables}
+\end{table}
+
+\textbf{Observaciones pendientes que no cambian el resultado:}
+\begin{itemize}
+  \item Algunos textos de \texttt{tasks.md} y del \textit{quickstart} siguen diciendo «cercana a 0/1», aunque las pruebas usan una tolerancia numérica explícita (\(10^{-5}\)).
+  \item \texttt{plan.md} no lista \texttt{tests/unit/test\_salida.py}, y \texttt{contracts/cli.md} enumera menos causas de error de las que produce el código.
+  \item La sección 8 de \texttt{auditoria.md} indica que la sesión de métricas de implementación seguía abierta; se cerró después de escribir la auditoría.
+\end{itemize}
+
+\textbf{Limitaciones del producto} (declaradas en la propia especificación y en el reporte):
+\begin{itemize}
+  \item Operación normal y ATWS tienen una sola simulación cada una y van a entrenamiento, así que no tendrán métricas sobre datos no vistos. Cualquier conclusión sobre esas clases queda sin verificar.
+  \item Esta iteración solo prepara los datos; no entrena ningún clasificador. El diagnóstico, el margen térmico y la recomendación de procedimientos quedan para iteraciones siguientes.
+\end{itemize}
+
+% =========================
+% CONCLUSIONES
+% =========================
+\section{Conclusiones}
+\begin{itemize}
+  \item El ciclo SDD obliga a decidir el qué antes que el cómo. En esta iteración eso evitó un error de diseño concreto: la petición inicial de repartir LOCA y LOCAC por separado contradecía la regla de cero fuga de datos, y el conflicto se detectó en el plan, antes de escribir código.
+  \item La constitución funcionó como un filtro permanente. Los principios de cero fuga de datos y de honestidad se verificaron en el plan (\textit{Constitution Check}), en el análisis y en la auditoría, y se tradujeron en pruebas automáticas concretas.
+  \item Escribir las pruebas antes del código dio una evidencia objetiva del cumplimiento: cada requisito funcional y cada criterio de éxito tiene al menos una prueba que lo verifica, y las 79 pruebas pasan.
+  \item La auditoría en dos momentos fue útil. \texttt{/speckit-analyze} encontró huecos en los documentos antes de implementar, y \texttt{/speckit-converge} encontró cinco diferencias entre el código y la especificación que de otro modo habrían pasado inadvertidas, como la validación incompleta de los archivos.
+  \item Trabajar con un agente de IA exige revisar lo que hace: la auditoría registra que algunas correcciones se aplicaron sin aprobación explícita. El proceso SDD lo hace visible porque cada decisión queda escrita y versionada.
+\end{itemize}
+
+% =========================
+% BIBLIOGRAFÍA
+% =========================
+\section{Bibliografía}
+\begin{itemize}
+  \item GitHub. (2025). \textit{Spec Kit: Toolkit to help you get started with Spec-Driven Development} [Repositorio de software]. \url{https://github.com/github/spec-kit}
+  \item Delimarsky, D. (2025). \textit{Spec-driven development with AI: Get started with a new open source toolkit}. The GitHub Blog. \url{https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/}
+  \item Anthropic. (2026). \textit{Claude Code documentation}. \url{https://docs.claude.com/en/docs/claude-code/overview}
+  \item Qi, B., Xiao, X., Liang, J., Po, L. C., Zhang, L. y Tong, J. (2022). An open time-series simulated dataset covering various accidents for nuclear power plants. \textit{Scientific Data}, 9, 766.
+  \item Pedregosa, F. et al. (2011). Scikit-learn: Machine Learning in Python. \textit{Journal of Machine Learning Research}, 12, 2825--2830.
+\end{itemize}
+
+% =========================
+% ANEXO: CÓDIGO FUENTE
+% =========================
+\newpage
+\appendix
+\section{Código fuente de la implementación}
+\label{anexo:codigo}
+Código completo del paquete \texttt{src/preparacion\_datos/}, tal como está en el repositorio.
+
+\subsection*{\texttt{config.py}}
+\begin{lstlisting}
+"""Constantes de la preparación de datos NPPAD."""
+
+# Carpeta de origen -> (clase, etiqueta numérica)
+CLASES_POR_CARPETA = {
+    "Normal": ("NORM", 0),
+    "LOCA": ("LOCA", 1),
+    "LOCAC": ("LOCAC", 2),
+    "ATWS": ("ATWS", 3),
+}
+CLASES = {clase: etiqueta for clase, etiqueta in CLASES_POR_CARPETA.values()}
+# Clases cuyas simulaciones no tienen severidad (una sola corrida en el dataset)
+CLASES_SIN_SEVERIDAD = ("NORM", "ATWS")
+
+VARIABLES_PLANTA = ["P", "TAVG", "THA", "TCA", "WRCA", "WRCB", "LVPZ", "LVCR", "PWNT", "PWR", "WECS", "WLR"]
+VARIABLES_MARGEN = ["DNBR", "TPCT", "SCMA", "SCMB", "TSAT", "FRCL", "FRZR"]
+VARIABLES = VARIABLES_PLANTA + VARIABLES_MARGEN
+
+PASOS = 150
+PASO_SEGUNDOS = 10
+
+CONJUNTOS = ("train", "val", "test")
+PROPORCION_TRAIN = 0.70
+PROPORCION_VAL = 0.15
+PROPORCION_TEST = 0.15
+SEMILLA = 42
+
+ORIGEN_POR_DEFECTO = "../IA-Nuclear/NuclearPowerPlantAccidentData/Operation_csv_data"
+SALIDA_POR_DEFECTO = "data_processed"
+REFERENCIA_POR_DEFECTO = "../IA-Nuclear/data_processed/metadata.json"
+\end{lstlisting}
+\subsection*{\texttt{lectura.py}}
+\begin{lstlisting}
+"""Descubrimiento, lectura y validación de las simulaciones de NPPAD (solo lectura)."""
+import math
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional
+
+import numpy as np
+import pandas as pd
+
+from preparacion_datos.config import CLASES_POR_CARPETA, CLASES_SIN_SEVERIDAD, PASOS, VARIABLES
+
+
+class ErrorDatos(Exception):
+    """Archivo de origen defectuoso: nombra el archivo y la causa."""
+
+    def __init__(self, archivo: str, causa: str, variable: Optional[str] = None):
+        self.archivo = archivo
+        self.causa = causa
+        self.variable = variable
+        mensaje = f"ERROR: {archivo}: {causa}"
+        if variable:
+            mensaje += f" [variable {variable}]"
+        super().__init__(mensaje)
+
+
+@dataclass(eq=False)
+class Simulacion:
+    clase: str
+    etiqueta: int
+    severidad: Optional[int]
+    archivo: str  # ruta relativa al origen, p. ej. "LOCA/7.csv"
+    serie: Optional[np.ndarray] = None  # (150, 19) float64: 12 de planta + 7 de margen
+
+
+def _clave_archivo(ruta: Path, relativo: str) -> int:
+    if not ruta.stem.isdigit():
+        raise ErrorDatos(relativo, "el nombre del archivo no es un número de severidad")
+    return int(ruta.stem)
+
+
+def descubrir_simulaciones(origen) -> List[Simulacion]:
+    """Lista las simulaciones de las cuatro clases, sin leer su contenido.
+
+    Orden: por clase (NORM, LOCA, LOCAC, ATWS) y luego por severidad numérica.
+    """
+    origen = Path(origen)
+    if not origen.is_dir():
+        raise ErrorDatos(str(origen), "no existe la carpeta de origen")
+    simulaciones: List[Simulacion] = []
+    for carpeta, (clase, etiqueta) in CLASES_POR_CARPETA.items():
+        directorio = origen / carpeta
+        if not directorio.is_dir():
+            raise ErrorDatos(carpeta, "no existe la carpeta de clase")
+        if clase in CLASES_SIN_SEVERIDAD:
+            archivos = sorted(directorio.glob("*.csv"), key=lambda r: r.name)
+        else:
+            archivos = sorted(
+                directorio.glob("*.csv"), key=lambda r: _clave_archivo(r, f"{carpeta}/{r.name}")
+            )
+        if not archivos:
+            raise ErrorDatos(carpeta, "la carpeta de clase no contiene simulaciones (.csv)")
+        for ruta in archivos:
+            severidad = None if clase in CLASES_SIN_SEVERIDAD else int(ruta.stem)
+            simulaciones.append(Simulacion(clase, etiqueta, severidad, f"{carpeta}/{ruta.name}"))
+    return simulaciones
+
+
+def _convertir_columna(valores, relativo: str, variable: str) -> np.ndarray:
+    resultado = np.empty(len(valores), dtype=np.float64)
+    for i, texto in enumerate(valores):
+        if texto.strip() == "":
+            raise ErrorDatos(relativo, "valor faltante", variable)
+        try:
+            numero = float(texto)
+        except ValueError:
+            raise ErrorDatos(relativo, "valor no numérico", variable) from None
+        if math.isnan(numero):
+            raise ErrorDatos(relativo, "valor faltante", variable)
+        if math.isinf(numero):
+            raise ErrorDatos(relativo, "valor no finito", variable)
+        resultado[i] = numero
+    return resultado
+
+
+def leer_simulacion(origen, carpeta: str, nombre: str) -> Simulacion:
+    """Valida el archivo completo y devuelve sus primeros 150 pasos de las 19 variables requeridas.
+
+    Los valores se convierten con ``float()`` de Python (conversión exacta del texto). Cualquier
+    defecto en cualquier fila del archivo (variable ausente, valor no numérico, faltante o no
+    finito, o menos de 150 pasos) lanza ``ErrorDatos``; solo los primeros 150 pasos entran en la
+    muestra.
+    """
+    origen = Path(origen)
+    relativo = f"{carpeta}/{nombre}"
+    ruta = origen / carpeta / nombre
+    clase, etiqueta = CLASES_POR_CARPETA[carpeta]
+    try:
+        cabecera = pd.read_csv(ruta, nrows=0).columns
+        for variable in VARIABLES:
+            if variable not in cabecera:
+                raise ErrorDatos(relativo, "falta la variable", variable)
+        datos = pd.read_csv(ruta, usecols=VARIABLES, dtype=str, keep_default_na=False, na_filter=False)
+    except FileNotFoundError:
+        raise ErrorDatos(relativo, "el archivo no existe") from None
+    except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError) as error:
+        raise ErrorDatos(relativo, f"archivo ilegible ({error.__class__.__name__})") from None
+    if len(datos) < PASOS:
+        raise ErrorDatos(relativo, f"menos de {PASOS} pasos (tiene {len(datos)})")
+    serie = np.column_stack(
+        [_convertir_columna(datos[variable].tolist(), relativo, variable) for variable in VARIABLES]
+    )[:PASOS]
+    severidad = None if clase in CLASES_SIN_SEVERIDAD else int(Path(nombre).stem)
+    return Simulacion(clase, etiqueta, severidad, relativo, serie)
+
+
+def cargar_simulaciones(origen) -> List[Simulacion]:
+    """Lee y valida todas las simulaciones; se detiene en el primer archivo defectuoso."""
+    return [
+        leer_simulacion(origen, *Path(s.archivo).parts) for s in descubrir_simulaciones(origen)
+    ]
+\end{lstlisting}
+\subsection*{\texttt{particion.py}}
+\begin{lstlisting}
+"""Reparto de las simulaciones completas entre entrenamiento, validación y prueba."""
+from typing import Dict, List, Tuple
+
+import numpy as np
+
+from preparacion_datos.config import (
+    CLASES_SIN_SEVERIDAD,
+    CONJUNTOS,
+    PROPORCION_TRAIN,
+    PROPORCION_VAL,
+)
+from preparacion_datos.lectura import Simulacion
+
+
+def tamanos(n: int) -> Tuple[int, int, int]:
+    """Tamaños de train, val y test para `n` severidades.
+
+    n_train = round(0.70·n), n_val = round(0.15·n), n_test = n − n_train − n_val.
+    """
+    n_train = int(round(PROPORCION_TRAIN * n))
+    n_val = int(round(PROPORCION_VAL * n))
+    return n_train, n_val, n - n_train - n_val
+
+
+def _clave_orden(simulacion: Simulacion):
+    return (simulacion.etiqueta, simulacion.severidad or 0, simulacion.archivo)
+
+
+def repartir(simulaciones: List[Simulacion], semilla: int) -> Dict[str, List[Simulacion]]:
+    """Asigna cada simulación completa a exactamente un conjunto.
+
+    Las severidades (unión de LOCA y LOCAC, ordenadas numéricamente) se reparten una sola vez con
+    la semilla dada, de modo que la simulación de LOCA y la de LOCAC de igual severidad caen en el
+    mismo conjunto. Las clases sin severidad (Normal y ATWS, una sola simulación) van completas a
+    entrenamiento. El resultado no depende del orden de entrada.
+    """
+    severidades = sorted({s.severidad for s in simulaciones if s.clase not in CLASES_SIN_SEVERIDAD})
+    n_train, n_val, _ = tamanos(len(severidades))
+    orden = np.random.default_rng(semilla).permutation(len(severidades))
+    conjunto_de = {}
+    for posicion, indice in enumerate(orden):
+        if posicion < n_train:
+            conjunto_de[severidades[indice]] = "train"
+        elif posicion < n_train + n_val:
+            conjunto_de[severidades[indice]] = "val"
+        else:
+            conjunto_de[severidades[indice]] = "test"
+    particion = {conjunto: [] for conjunto in CONJUNTOS}
+    for simulacion in simulaciones:
+        if simulacion.clase in CLASES_SIN_SEVERIDAD:
+            particion["train"].append(simulacion)
+        else:
+            particion[conjunto_de[simulacion.severidad]].append(simulacion)
+    for conjunto in CONJUNTOS:
+        particion[conjunto].sort(key=_clave_orden)
+    return particion
+\end{lstlisting}
+\subsection*{\texttt{escalado.py}}
+\begin{lstlisting}
+"""Escalado de las variables de planta, ajustado solo con entrenamiento."""
+from dataclasses import dataclass
+from typing import List
+
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+
+from preparacion_datos.config import VARIABLES_PLANTA
+
+
+@dataclass(eq=False)
+class Escalador:
+    scaler: StandardScaler
+    media: np.ndarray  # (12,) float64
+    escala: np.ndarray  # (12,) float64; vale 1.0 para una variable sin varianza
+    variables_sin_varianza: List[str]
+    filas_ajuste: int
+
+
+def ajustar_escalador(x_train: np.ndarray) -> Escalador:
+    """Ajusta un StandardScaler con las filas de entrenamiento aplanadas (N·150, 12)."""
+    filas = x_train.reshape(-1, x_train.shape[-1]).astype(np.float64, copy=False)
+    scaler = StandardScaler().fit(filas)
+    sin_varianza = [
+        VARIABLES_PLANTA[i] for i in np.flatnonzero(np.ptp(filas, axis=0) == 0)
+    ]
+    return Escalador(
+        scaler=scaler,
+        media=np.asarray(scaler.mean_, dtype=np.float64),
+        escala=np.asarray(scaler.scale_, dtype=np.float64),
+        variables_sin_varianza=sin_varianza,
+        filas_ajuste=filas.shape[0],
+    )
+
+
+def aplicar(escalador: Escalador, x: np.ndarray) -> np.ndarray:
+    """Escala `x` (N, 150, 12) con los parámetros de entrenamiento, sin reajustar; devuelve float32."""
+    forma = x.shape
+    filas = x.reshape(-1, forma[-1]).astype(np.float64)
+    return escalador.scaler.transform(filas).reshape(forma).astype(np.float32)
+\end{lstlisting}
+\subsection*{\texttt{salida.py}}
+\begin{lstlisting}
+"""Armado de los conjuntos y publicación de los artefactos en la carpeta de salida."""
+import json
+import os
+import shutil
+import uuid
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+import numpy as np
+
+from preparacion_datos.config import (
+    CLASES,
+    PASO_SEGUNDOS,
+    PASOS,
+    PROPORCION_TEST,
+    PROPORCION_TRAIN,
+    PROPORCION_VAL,
+    VARIABLES_MARGEN,
+    VARIABLES_PLANTA,
+)
+from preparacion_datos.lectura import Simulacion
+
+
+def construir_conjunto(simulaciones: List[Simulacion]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Apila las muestras de un conjunto, en el mismo orden que `simulaciones`.
+
+    Devuelve las 12 variables de planta sin escalar (N, 150, 12) float64, los márgenes térmicos
+    (N, 150, 7) float64 en sus unidades originales, sin ninguna transformación, y las etiquetas
+    (N,) int64.
+    """
+    n = len(simulaciones)
+    planta = len(VARIABLES_PLANTA)
+    x = np.empty((n, PASOS, planta), dtype=np.float64)
+    margenes = np.empty((n, PASOS, len(VARIABLES_MARGEN)), dtype=np.float64)
+    y = np.empty(n, dtype=np.int64)
+    for i, simulacion in enumerate(simulaciones):
+        x[i] = simulacion.serie[:, :planta]
+        margenes[i] = simulacion.serie[:, planta:]
+        y[i] = simulacion.etiqueta
+    return x, margenes, y
+
+
+def publicar(salida, archivos: Dict[str, object]) -> None:
+    """Escribe todos los archivos en un directorio temporal y luego los mueve a `salida`.
+
+    Todos juntos o ninguno: si falla la escritura o el movimiento de cualquier archivo, `salida`
+    queda exactamente como estaba (se restauran los archivos reemplazados y se quitan los nuevos).
+    Solo se reemplazan los archivos publicados: cualquier otro archivo que ya estuviera en `salida`
+    no se toca. `archivos` asocia nombre -> arreglo de numpy (se guarda como .npy) o texto/bytes.
+    """
+    salida = Path(salida)
+    salida.parent.mkdir(parents=True, exist_ok=True)
+    temporal = salida.parent / f".{salida.name}.tmp-{uuid.uuid4().hex[:8]}"
+    respaldo = temporal / "_respaldo"
+    respaldo.mkdir(parents=True)
+    salida_existia = salida.exists()
+    movidos: List[Tuple[str, bool]] = []  # (nombre, tenía una versión previa)
+    try:
+        for nombre, contenido in archivos.items():
+            destino = temporal / nombre
+            if isinstance(contenido, np.ndarray):
+                np.save(destino, contenido)
+            elif isinstance(contenido, bytes):
+                destino.write_bytes(contenido)
+            else:
+                destino.write_text(contenido, encoding="utf-8")
+        salida.mkdir(exist_ok=True)
+        for nombre in archivos:
+            destino = salida / nombre
+            previo = destino.exists()
+            if previo:
+                os.replace(destino, respaldo / nombre)
+            movidos.append((nombre, previo))
+            os.replace(temporal / nombre, destino)
+    except BaseException:
+        for nombre, previo in reversed(movidos):
+            destino = salida / nombre
+            if previo:
+                os.replace(respaldo / nombre, destino)
+            else:
+                destino.unlink(missing_ok=True)
+        if not salida_existia:
+            try:
+                salida.rmdir()
+            except OSError:
+                pass
+        raise
+    finally:
+        shutil.rmtree(temporal, ignore_errors=True)
+
+
+def construir_metadata(resumen) -> dict:
+    """Contenido de metadata.json (ver contracts/salidas.md)."""
+    return {
+        "version_formato": 1,
+        "origen": resumen.origen,
+        "semilla": resumen.semilla,
+        "proporciones": {"train": PROPORCION_TRAIN, "val": PROPORCION_VAL, "test": PROPORCION_TEST},
+        "pasos_por_muestra": PASOS,
+        "paso_segundos": PASO_SEGUNDOS,
+        "clases": dict(CLASES),
+        "variables_planta": list(VARIABLES_PLANTA),
+        "variables_margen": list(VARIABLES_MARGEN),
+        "conteos_archivos": dict(resumen.conteos_archivos),
+        "conteos_muestras": {clase: dict(c) for clase, c in resumen.conteos_muestras.items()},
+        "totales": dict(resumen.totales),
+        "simulaciones": {conjunto: list(archivos) for conjunto, archivos in resumen.simulaciones.items()},
+        "escalador": {
+            "ajustado_con": "train",
+            "filas_ajuste": resumen.filas_ajuste,
+            "variables_sin_varianza": list(resumen.variables_sin_varianza),
+        },
+        "referencia": dict(resumen.referencia),
+        "advertencias": list(resumen.advertencias),
+        "limitaciones": list(resumen.limitaciones),
+    }
+
+
+def serializar_metadata(metadata: dict) -> str:
+    return json.dumps(metadata, indent=2, ensure_ascii=False) + "\n"
+\end{lstlisting}
+\subsection*{\texttt{reporte.py}}
+\begin{lstlisting}
+"""Reporte de la preparación: conteos, advertencias, limitaciones y comparación con la referencia."""
+import json
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Dict, List, Optional
+
+from preparacion_datos.config import CLASES, CLASES_POR_CARPETA, CONJUNTOS, PASOS
+
+NOMBRES_CONJUNTO = {"train": "entrenamiento", "val": "validación", "test": "prueba"}
+CLASES_COMPARADAS = ("LOCA", "LOCAC")  # Normal y ATWS no son comparables con la referencia
+
+LIMITACIONES = [
+    "Normal y ATWS provienen de una sola simulación cada una y no tienen muestras de validación ni de "
+    "prueba: no habrá métricas sobre datos no vistos para esas clases.",
+    "Hay una muestra por simulación (primeros 150 pasos): las clases quedan muy desbalanceadas "
+    "(1 / unas 100 / unas 100 / 1).",
+    "Los datos provienen de un único simulador (PCTRAN) y de una única configuración de planta; "
+    "no hay datos de planta real.",
+]
+
+
+@dataclass
+class Resumen:
+    origen: str
+    semilla: int
+    conteos_archivos: Dict[str, int]
+    conteos_muestras: Dict[str, Dict[str, int]]
+    totales: Dict[str, int]
+    simulaciones: Dict[str, List[str]]  # conjunto -> archivos, en el orden de las filas
+    filas_ajuste: int
+    variables_sin_varianza: List[str]
+    advertencias: List[str]
+    limitaciones: List[str] = field(default_factory=lambda: list(LIMITACIONES))
+    referencia: Dict[str, object] = field(default_factory=dict)
+
+
+def contar_muestras(particion) -> Dict[str, Dict[str, int]]:
+    """Muestras por clase y conjunto; todas las clases aparecen, incluso con cero."""
+    conteos = {clase: {conjunto: 0 for conjunto in CONJUNTOS} for clase in CLASES}
+    for conjunto in CONJUNTOS:
+        for simulacion in particion[conjunto]:
+            conteos[simulacion.clase][conjunto] += 1
+    return conteos
+
+
+def generar_advertencias(conteos: Dict[str, Dict[str, int]]) -> List[str]:
+    advertencias = []
+    for clase, por_conjunto in conteos.items():
+        total = sum(por_conjunto.values())
+        if total == 1:
+            advertencias.append(
+                f"{clase} tiene una sola simulación: asignada completa a entrenamiento; "
+                "no tiene muestras de validación ni de prueba."
+            )
+    for clase, por_conjunto in conteos.items():
+        if sum(por_conjunto.values()) == 1:
+            continue
+        for conjunto in CONJUNTOS:
+            if por_conjunto[conjunto] == 0:
+                advertencias.append(f"{clase}: sin muestras de {NOMBRES_CONJUNTO[conjunto]}.")
+    return advertencias
+
+
+def comparar_referencia(ruta: Optional[Path], conteos: Dict[str, Dict[str, int]]) -> Dict[str, object]:
+    """Compara solo los conteos de LOCA y LOCAC con `sample_counts` de la referencia."""
+    if ruta is None:
+        return {"archivo": None, "estado": "OMITIDA", "diferencias": []}
+    ruta = Path(ruta)
+    resultado = {"archivo": str(ruta), "estado": "NO DISPONIBLE", "diferencias": []}
+    try:
+        referencia = json.loads(ruta.read_text(encoding="utf-8"))["sample_counts"]
+        diferencias = []
+        for clase in CLASES_COMPARADAS:
+            for conjunto in CONJUNTOS:
+                esperado = int(referencia[clase][conjunto])
+                if esperado != conteos[clase][conjunto]:
+                    diferencias.append(
+                        {
+                            "clase": clase,
+                            "conjunto": conjunto,
+                            "obtenido": conteos[clase][conjunto],
+                            "referencia": esperado,
+                        }
+                    )
+    except (OSError, ValueError, KeyError, TypeError):
+        return resultado
+    resultado["estado"] = "DIFIERE" if diferencias else "COINCIDE"
+    resultado["diferencias"] = diferencias
+    return resultado
+
+
+def construir_resumen(origen, semilla, particion, escalador, referencia: Optional[dict]) -> Resumen:
+    conteos = contar_muestras(particion)
+    return Resumen(
+        origen=str(origen),
+        semilla=semilla,
+        conteos_archivos={clase: sum(por_conjunto.values()) for clase, por_conjunto in conteos.items()},
+        conteos_muestras=conteos,
+        totales={conjunto: len(particion[conjunto]) for conjunto in CONJUNTOS},
+        simulaciones={conjunto: [s.archivo for s in particion[conjunto]] for conjunto in CONJUNTOS},
+        filas_ajuste=escalador.filas_ajuste,
+        variables_sin_varianza=list(escalador.variables_sin_varianza),
+        advertencias=generar_advertencias(conteos),
+        referencia=referencia
+        if referencia is not None
+        else {"archivo": None, "estado": "OMITIDA", "diferencias": []},
+    )
+
+
+def _titulo(texto: str) -> str:
+    return f"\n== {texto} =="
+
+
+def _tabla(resumen: Resumen) -> List[str]:
+    lineas = [f"{'Clase':<8}{'train':>8}{'val':>8}{'test':>8}{'Total':>8}"]
+    for clase, por_conjunto in resumen.conteos_muestras.items():
+        celdas = [f"{por_conjunto[c]}{'*' if por_conjunto[c] == 0 else ''}" for c in CONJUNTOS]
+        lineas.append(f"{clase:<8}" + "".join(f"{celda:>8}" for celda in celdas) + f"{sum(por_conjunto.values()):>8}")
+    totales = [str(resumen.totales[c]) for c in CONJUNTOS]
+    lineas.append(f"{'Total':<8}" + "".join(f"{t:>8}" for t in totales) + f"{sum(resumen.totales.values()):>8}")
+    if any(v == 0 for por_conjunto in resumen.conteos_muestras.values() for v in por_conjunto.values()):
+        lineas.append("* sin muestras: ver las advertencias.")
+    return lineas
+
+
+def _numeros_por_clase(archivos: List[str]) -> Dict[str, List[str]]:
+    clase_de = {carpeta: clase for carpeta, (clase, _) in CLASES_POR_CARPETA.items()}
+    agrupado: Dict[str, List[str]] = {}
+    for archivo in archivos:
+        carpeta, nombre = archivo.split("/")
+        agrupado.setdefault(clase_de[carpeta], []).append(Path(nombre).stem)
+    return agrupado
+
+
+def formatear_reporte(resumen: Resumen, artefactos: List[str]) -> str:
+    lineas = ["REPORTE DE PREPARACIÓN DE DATOS NPPAD"]
+    lineas += [_titulo("1. Origen y configuración")]
+    lineas += [
+        f"Origen: {resumen.origen}",
+        f"Semilla: {resumen.semilla} | Reparto 70/15/15 por simulación completa | {PASOS} pasos por muestra",
+    ]
+    lineas += [_titulo("2. Muestras por clase y conjunto")] + _tabla(resumen)
+    lineas += [_titulo("3. Simulaciones por conjunto")]
+    for conjunto in CONJUNTOS:
+        lineas.append(f"{conjunto} ({len(resumen.simulaciones[conjunto])})")
+        for clase, numeros in _numeros_por_clase(resumen.simulaciones[conjunto]).items():
+            lineas.append(f"  {clase}: {' '.join(numeros)}")
+    lineas += [_titulo("4. Escalador")]
+    lineas.append(f"Ajustado solo con entrenamiento ({resumen.filas_ajuste} filas).")
+    lineas.append(
+        "Variables sin varianza: "
+        + (", ".join(resumen.variables_sin_varianza) if resumen.variables_sin_varianza else "ninguna")
+    )
+    lineas += [_titulo("5. Advertencias")]
+    lineas += [f"- {a}" for a in resumen.advertencias] or ["Ninguna."]
+    lineas += [_titulo("6. Limitaciones conocidas")]
+    lineas += [f"- {limitacion}" for limitacion in resumen.limitaciones]
+    lineas += [_titulo("7. Comparación con la referencia")]
+    lineas.append(f"Estado: {resumen.referencia['estado']} (solo LOCA y LOCAC)")
+    if resumen.referencia.get("archivo"):
+        lineas.append(f"Archivo: {resumen.referencia['archivo']}")
+    for d in resumen.referencia.get("diferencias", []):
+        lineas.append(f"  {d['clase']}/{d['conjunto']}: obtenido {d['obtenido']}, referencia {d['referencia']}")
+    lineas += [_titulo("8. Artefactos escritos")]
+    lineas += [f"- {nombre}" for nombre in artefactos]
+    return "\n".join(lineas) + "\n"
+\end{lstlisting}
+\subsection*{\texttt{cli.py}}
+\begin{lstlisting}
+"""Línea de órdenes: prepara los conjuntos de entrenamiento, validación y prueba de NPPAD."""
+import argparse
+import sys
+from pathlib import Path
+from typing import List, Optional
+
+from preparacion_datos.config import (
+    CONJUNTOS,
+    ORIGEN_POR_DEFECTO,
+    REFERENCIA_POR_DEFECTO,
+    SALIDA_POR_DEFECTO,
+    SEMILLA,
+)
+from preparacion_datos.escalado import ajustar_escalador, aplicar
+from preparacion_datos.lectura import ErrorDatos, cargar_simulaciones
+from preparacion_datos.particion import repartir
+from preparacion_datos.reporte import comparar_referencia, construir_resumen, contar_muestras, formatear_reporte
+from preparacion_datos.salida import construir_conjunto, construir_metadata, publicar, serializar_metadata
+
+
+def _crear_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="preparar-datos",
+        description="Prepara los datos de simulación NPPAD sin fuga de información.",
+    )
+    parser.add_argument("--origen", default=ORIGEN_POR_DEFECTO, help="carpeta Operation_csv_data (solo lectura)")
+    parser.add_argument("--salida", default=SALIDA_POR_DEFECTO, help="carpeta donde se publican los artefactos")
+    parser.add_argument("--semilla", type=int, default=SEMILLA, help="semilla del reparto por severidad")
+    grupo = parser.add_mutually_exclusive_group()
+    grupo.add_argument(
+        "--referencia",
+        default=REFERENCIA_POR_DEFECTO,
+        help="metadata.json del proyecto previo para comparar los conteos de LOCA y LOCAC",
+    )
+    grupo.add_argument("--sin-referencia", action="store_true", help="omite la comparación con la referencia")
+    return parser
+
+
+def _tolerar_consolas_limitadas() -> None:
+    """Evita que un carácter no representable en la consola interrumpa la salida."""
+    for flujo in (sys.stdout, sys.stderr):
+        try:
+            flujo.reconfigure(errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    _tolerar_consolas_limitadas()
+    argumentos = _crear_parser().parse_args(argv)
+    try:
+        simulaciones = cargar_simulaciones(argumentos.origen)
+        particion = repartir(simulaciones, argumentos.semilla)
+        crudos = {conjunto: construir_conjunto(particion[conjunto]) for conjunto in CONJUNTOS}
+        escalador = ajustar_escalador(crudos["train"][0])
+        archivos = {}
+        for conjunto in CONJUNTOS:
+            x, margenes, y = crudos[conjunto]
+            archivos[f"X_{conjunto}.npy"] = aplicar(escalador, x)
+            archivos[f"y_{conjunto}.npy"] = y
+            archivos[f"margins_{conjunto}.npy"] = margenes
+        archivos["scaler_mean.npy"] = escalador.media
+        archivos["scaler_std.npy"] = escalador.escala
+        ruta_referencia = None if argumentos.sin_referencia else Path(argumentos.referencia)
+        referencia = comparar_referencia(ruta_referencia, contar_muestras(particion))
+        resumen = construir_resumen(argumentos.origen, argumentos.semilla, particion, escalador, referencia)
+        archivos["metadata.json"] = serializar_metadata(construir_metadata(resumen))
+        publicar(argumentos.salida, archivos)
+    except ErrorDatos as error:
+        print(error, file=sys.stderr)
+        return 1
+    except OSError as error:
+        print(f"ERROR: no se pudo escribir en {argumentos.salida}: {error}", file=sys.stderr)
+        return 1
+    print(formatear_reporte(resumen, sorted(archivos)), end="")
+    return 2 if referencia["estado"] == "DIFIERE" else 0
+\end{lstlisting}
+\subsection*{\texttt{\_\_main\_\_.py} y \texttt{\_\_init\_\_.py}}
+\begin{lstlisting}
+"""Permite ejecutar el paquete con `python -m preparacion_datos`."""
+import sys
+
+from preparacion_datos.cli import main
+
+if __name__ == "__main__":
+    sys.exit(main())
+\end{lstlisting}
+\begin{lstlisting}
+"""Preparación de los datos de simulación NPPAD sin fuga de información."""
+\end{lstlisting}
+
+\end{document}
