@@ -8,6 +8,13 @@
 
 **Input**: User description: "División en entrenamiento, validación y prueba sin fuga de datos para las corridas PWR 3L (tarea de Jira asignada a Abner Arboleda). El analista necesita repartir las corridas usables de PWR 3L (NORM, LOCA rama caliente, LOCAC rama fría, ATWS y TRIP_OK) en entrenamiento, validación y prueba dividiendo por corrida completa, nunca por fila. En LOCA y LOCAC, el mismo tamaño de rotura (área en cm²) debe caer en el mismo conjunto para ambas ramas: división pareada por severidad. Además, cada ATWS y su gemela TRIP_OK (mismo escenario con y sin fallo del disparo) deben ir al mismo conjunto. El reparto debe acercarse a 70/15/15 sin partir ningún grupo, ser reproducible con una semilla, y verificarse automáticamente que no hay fuga (ninguna corrida ni grupo en dos conjuntos). Las corridas cortas, descartadas y OOD no entran en ningún conjunto. Esta funcionalidad completa las tareas de agrupación y partición pendientes de la funcionalidad 002 (grupos.py y particion.py) y no construye la salida, el reporte ni el comando, que son de otra tarea."
 
+## Clarifications
+
+### Session 2026-10-28
+
+- Q: ¿La verificación automática de fuga debe aplicarse también al reparto NPPAD de la iteración 001, o solo a PWR 3L? → A: A PWR 3L y también al reparto NPPAD de 001, con la misma comprobación y sin cambiar cómo se reparte NPPAD.
+- Q: Cuando hay grupos de tamaño muy distinto, ¿en qué orden se reparten los grupos? → A: De mayor a menor tamaño; los empates se ordenan por sorteo con la semilla.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Agrupar las corridas que no pueden separarse (Priority: P1)
@@ -60,6 +67,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 3. **Given** un reparto donde dos corridas LOCA/LOCAC de la misma área están en conjuntos distintos, **When** se verifica, **Then** la verificación lo detecta y nombra el área, las corridas y los conjuntos.
 4. **Given** un reparto donde un ATWS y su gemela TRIP_OK están en conjuntos distintos, **When** se verifica, **Then** la verificación lo detecta y nombra la pareja.
 5. **Given** un reparto que incluye una corrida corta, descartada u OOD, **When** se verifica, **Then** la verificación lo detecta y nombra la corrida.
+6. **Given** el reparto NPPAD de la funcionalidad 001, **When** se verifica, **Then** la verificación confirma que cada simulación está en un solo conjunto y que la LOCA y la LOCAC de igual severidad comparten conjunto, o nombra la simulación y la severidad que lo incumplen.
 
 ---
 
@@ -84,7 +92,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 - **FR-004**: El sistema MUST formar un grupo propio con cada corrida usable no cubierta por FR-002 ni FR-003.
 - **FR-005**: Cada corrida usable MUST pertenecer a exactamente un grupo, y cada grupo MUST tener un identificador que indique su origen (área de rotura, pareja de gemelas o corrida individual).
 - **FR-006**: El sistema MUST asignar cada grupo completo a exactamente uno de los conjuntos de entrenamiento, validación o prueba; ningún grupo MUST quedar repartido entre dos conjuntos.
-- **FR-007**: El sistema MUST repartir los grupos por familia (NORM; LOCA y LOCAC; ATWS y TRIP_OK) con metas de 70 %, 15 % y 15 % de las corridas usables de cada familia.
+- **FR-007**: El sistema MUST repartir los grupos por familia (NORM; LOCA y LOCAC; ATWS y TRIP_OK) con metas de 70 %, 15 % y 15 % de las corridas usables de cada familia. Dentro de cada familia, los grupos MUST repartirse de mayor a menor tamaño, con los empates ordenados por sorteo con la semilla.
 - **FR-008**: Para cada familia y conjunto, la diferencia entre el número de corridas asignadas y su meta MUST ser menor que el tamaño del grupo más grande de esa familia.
 - **FR-009**: El sistema MUST producir la misma asignación con las mismas corridas y la misma semilla, sin depender del orden en que lleguen las corridas.
 - **FR-010**: La semilla MUST poder elegirse; si no se indica, MUST usarse 42.
@@ -92,7 +100,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 - **FR-012**: El sistema MUST entregar, para uso de la tarea de salida y reporte, el conjunto asignado a cada grupo y a cada corrida, la lista ordenada de corridas de cada conjunto y los conteos de corridas por clase y conjunto, con las cinco clases presentes en los tres conjuntos aunque tengan cero.
 - **FR-013**: El sistema MUST detenerse con un error que nombre la corrida cuando una corrida LOCA o LOCAC usable no tenga área de rotura, y con un error cuando no haya ninguna corrida usable.
 - **FR-014**: La división MUST trabajar sobre las corridas ya leídas y MUST NOT modificar sus datos ni los archivos de origen.
-- **FR-015**: [NEEDS CLARIFICATION: ¿La verificación automática de fuga debe aplicarse también al reparto NPPAD de la funcionalidad 001 (LOCA y LOCAC de igual severidad), o solo a PWR 3L?]
+- **FR-015**: El sistema MUST aplicar también una verificación automática de fuga al reparto NPPAD de la funcionalidad 001, sin cambiar cómo se reparte: cada simulación MUST estar en exactamente un conjunto y la LOCA y la LOCAC de igual severidad MUST compartir conjunto. Ante una violación MUST detenerse con un error que nombre la simulación o la severidad y los conjuntos. La verificación NPPAD y la de PWR 3L MUST NOT mezclar datos de las dos plantas.
 
 ### Key Entities
 
@@ -114,6 +122,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 - **SC-004**: La verificación detecta el 100 % de las fugas introducidas a propósito en las pruebas (corrida repetida, área partida, gemelas separadas, corrida excluida incluida).
 - **SC-005**: 0 corridas cortas, descartadas u OOD aparecen en algún conjunto.
 - **SC-006**: Con las corridas reales, cada una de las tres familias tiene al menos una corrida en cada conjunto.
+- **SC-007**: Con el dataset NPPAD real, la verificación del reparto de 001 informa 0 simulaciones en dos conjuntos y el 100 % de las severidades LOCA/LOCAC en un solo conjunto.
 
 ## Assumptions
 
@@ -121,6 +130,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 - «Mismo tamaño de rotura» significa exactamente la misma área en cm², tomada del nombre de la carpeta o de la descripción de la corrida. Áreas distintas, aunque cercanas (por ejemplo, 7700 y 8500 cm²), son grupos distintos.
 - La tabla de gemelas ATWS/TRIP_OK es la del proyecto (19 parejas) y no se modifica.
 - Cada corrida aporta una sola muestra, así que las proporciones 70/15/15 se cuentan en corridas.
-- Con grupos de tamaño desigual no se puede cortar exactamente 70/15/15; se acepta el desvío acotado de FR-008 y se procura que los grupos grandes no desequilibren validación y prueba.
+- Con grupos de tamaño desigual no se puede cortar exactamente 70/15/15; se acepta el desvío acotado de FR-008, y repartir primero los grupos grandes (FR-007) evita que desequilibren validación y prueba.
+- El reparto NPPAD de 001 ya empareja LOCA y LOCAC por severidad; aquí solo se verifica, no se modifica.
 - Construir los arreglos de salida, el escalado aplicado a los conjuntos, el reporte impreso, los metadatos y el comando de PWR 3L queda fuera: pertenecen a la tarea KAN-18 (funcionalidad 002). Esta funcionalidad entrega el reparto y su verificación para que esa tarea los use.
 - El proyecto de referencia agrupa solo las gemelas ATWS/TRIP_OK y deja cada LOCA y LOCAC como grupo propio; esta funcionalidad corrige esa fuga potencial entre ramas con la misma rotura.
