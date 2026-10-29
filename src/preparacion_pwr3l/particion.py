@@ -7,6 +7,7 @@ import numpy as np
 from preparacion_pwr3l.config import CLASES, CONJUNTOS, PROPORCIONES, SEMILLA
 from preparacion_pwr3l.descubrimiento import Corrida, clave_orden
 from preparacion_pwr3l.grupos import ORDEN_FAMILIAS, Grupo
+from preparacion_pwr3l.verificacion import verificar_reparto
 
 
 @dataclass(eq=False)
@@ -45,6 +46,8 @@ def repartir(grupos: List[Grupo], semilla: int = SEMILLA) -> Reparto:
     """Reparte los grupos completos por familia hacia 70/15/15.
 
     Determinista: el resultado depende solo de los grupos y de la semilla, no del orden de la lista.
+    Antes de devolverlo, verifica que el reparto no tenga fuga (``ErrorFuga``). Solo conoce las
+    corridas de los grupos: quien tenga todas las corridas debe verificar también con ellas.
     """
     claves = [g.clave for g in grupos]
     if len(set(claves)) != len(claves):
@@ -71,7 +74,7 @@ def repartir(grupos: List[Grupo], semilla: int = SEMILLA) -> Reparto:
     for conjunto, lista in corridas.items():
         for corrida in lista:
             conteos[corrida.clase][conjunto] += 1
-    return Reparto(
+    reparto = Reparto(
         semilla=semilla,
         grupos=ordenados,
         conjunto_de_grupo=conjunto_de_grupo,
@@ -81,3 +84,5 @@ def repartir(grupos: List[Grupo], semilla: int = SEMILLA) -> Reparto:
         metas=metas_familia,
         asignadas=asignadas_familia,
     )
+    verificar_reparto([c for g in ordenados for c in g.corridas], reparto)
+    return reparto
