@@ -50,7 +50,10 @@ verificar_particion(particion: dict[str, list[Simulacion]]) -> None
 ## Uso previsto por KAN-18
 
 ```text
-corridas = cargar_corridas(origen)
+corridas = cargar_corridas(origen)                 # todas: usables y excluidas
 reparto = repartir(formar_grupos(corridas), semilla)
+verificar_reparto(corridas, reparto)               # OBLIGATORIO: con TODAS las corridas
 # construir X/y/margins con reparto.corridas[conjunto]; reporte con reparto.conteos y reparto.grupos
 ```
+
+`repartir` solo conoce las corridas usables (las de los grupos), así que dentro de `repartir` la regla (e) «ninguna corrida excluida en un conjunto» no puede fallar. Quien construye la salida MUST llamar a `verificar_reparto` con todas las corridas devueltas por `cargar_corridas` antes de escribir nada (hallazgo U1 del análisis).

@@ -127,6 +127,7 @@ El analista dispone de una verificación automática que, dado un reparto, confi
 ## Assumptions
 
 - Las corridas llegan ya descubiertas y leídas por la funcionalidad 002 (91 usables en el dataset real: NORM 19, LOCA 16, LOCAC 20, ATWS 18 y TRIP_OK 18), con su área de rotura y su gemela ya determinadas.
+- Terminología: en PWR 3L, «severidad» y «tamaño de rotura» significan el área de rotura en cm²; en NPPAD, «severidad» es el número (1–100) del nombre del archivo de cada simulación LOCA o LOCAC.
 - «Mismo tamaño de rotura» significa exactamente la misma área en cm², tomada del nombre de la carpeta o de la descripción de la corrida. Áreas distintas, aunque cercanas (por ejemplo, 7700 y 8500 cm²), son grupos distintos.
 - La tabla de gemelas ATWS/TRIP_OK es la del proyecto (19 parejas) y no se modifica.
 - Cada corrida aporta una sola muestra, así que las proporciones 70/15/15 se cuentan en corridas.

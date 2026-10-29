@@ -23,9 +23,11 @@ Ejecutar desde la raíz del repositorio (ajustar la ruta):
 from preparacion_pwr3l.lectura import cargar_corridas
 from preparacion_pwr3l.grupos import formar_grupos
 from preparacion_pwr3l.particion import repartir
+from preparacion_pwr3l.verificacion import verificar_reparto
 
 corridas = cargar_corridas(r"C:\Users\User\Desktop\IANuclear\PWR 3L")
 reparto = repartir(formar_grupos(corridas))
+verificar_reparto(corridas, reparto)   # con todas las corridas, incluidas las excluidas
 print(reparto.conteos)
 print({c: len(v) for c, v in reparto.corridas.items()})
 ```
