@@ -2,6 +2,7 @@
 import json
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from preparacion_datos.cli import main
@@ -18,9 +19,9 @@ SECCIONES = [
     "8. Artefactos escritos",
 ]
 CLAVES_METADATA = {
-    "version_formato", "origen", "semilla", "proporciones", "pasos_por_muestra", "paso_segundos", "clases",
-    "variables_planta", "variables_margen", "conteos_archivos", "conteos_muestras", "totales", "simulaciones",
-    "escalador", "referencia", "advertencias", "limitaciones",
+    "version_formato", "origen", "semilla", "proporciones", "pasos_por_muestra", "paso_segundos",
+    "duracion_muestra_segundos", "clases", "variables_planta", "variables_margen", "conteos_archivos",
+    "conteos_muestras", "totales", "simulaciones", "escalador", "referencia", "advertencias", "limitaciones",
 }
 
 
@@ -47,6 +48,8 @@ def test_el_reporte_impreso_tiene_las_secciones_en_orden(origen_sintetico, tmp_p
     salida = capsys.readouterr().out
     posiciones = [salida.index(seccion) for seccion in SECCIONES]
     assert posiciones == sorted(posiciones)
+    assert "paso medido de TIME: 10 s" in salida.split("2. Muestras por clase y conjunto")[0]
+    assert "duración: 1500 s" in salida.split("2. Muestras por clase y conjunto")[0]
     assert "metadata.json" in salida.split("8. Artefactos escritos")[1]
     assert "una sola simulación" in salida.split("5. Advertencias")[1]
 
@@ -63,11 +66,26 @@ def test_metadata_json_tiene_todos_los_campos(origen_sintetico, tmp_path):
     assert metadata["variables_planta"][0] == "P" and len(metadata["variables_planta"]) == 12
     assert metadata["variables_margen"][0] == "DNBR" and len(metadata["variables_margen"]) == 7
     assert metadata["semilla"] == 42 and metadata["pasos_por_muestra"] == 150
+    assert metadata["paso_segundos"] == 10 and metadata["duracion_muestra_segundos"] == 1500
     assert metadata["referencia"]["estado"] == "OMITIDA"
     assert len(metadata["simulaciones"]["train"]) == 142
     assert metadata["escalador"]["filas_ajuste"] == 142 * 150
     for conjunto in CONJUNTOS:
         assert len(metadata["simulaciones"][conjunto]) == np.load(salida / f"y_{conjunto}.npy").shape[0]
+
+
+def test_dataset_con_otro_paso_comun_publica_paso_y_duracion_medidos(origen_sintetico, tmp_path, capsys):
+    for ruta in origen_sintetico.rglob("*.csv"):
+        tabla = pd.read_csv(ruta, dtype=str, keep_default_na=False)
+        tabla["TIME"] = [f"{i * 5.0}" for i in range(len(tabla))]
+        tabla.to_csv(ruta, index=False)
+    salida = tmp_path / "salida"
+    assert ejecutar(origen_sintetico, salida, "--sin-referencia") == 0
+    texto = capsys.readouterr().out
+    assert "paso medido de TIME: 5 s, duración: 750 s" in texto
+    metadata = json.loads((salida / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata["paso_segundos"] == 5
+    assert metadata["duracion_muestra_segundos"] == 750
 
 
 def test_referencia_que_coincide_termina_con_codigo_0(origen_sintetico, tmp_path, capsys):

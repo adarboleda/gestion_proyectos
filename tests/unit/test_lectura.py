@@ -1,8 +1,14 @@
-"""Pruebas de lectura y validación de las simulaciones (FR-001, FR-002, FR-012)."""
+"""Pruebas de lectura, validación de las simulaciones y verificación del paso de muestreo desde TIME."""
 import numpy as np
 import pytest
 
-from preparacion_datos.lectura import ErrorDatos, descubrir_simulaciones, leer_simulacion
+from preparacion_datos import config
+from preparacion_datos.lectura import ErrorDatos, cargar_simulaciones, descubrir_simulaciones, leer_simulacion
+
+
+def test_config_no_asume_paso_segundos_fijo():
+    assert not hasattr(config, "PASO_SEGUNDOS")
+    assert config.VARIABLE_TIEMPO == "TIME"
 
 
 def test_descubre_las_cuatro_clases_con_sus_etiquetas(origen_sintetico):
@@ -26,11 +32,21 @@ def test_severidad_numerica_del_nombre_y_orden_numerico(origen_sintetico):
     assert normal.severidad is None
 
 
-def test_serie_de_forma_150_x_19_con_las_primeras_150_filas(origen_sintetico, ayudas):
+def test_serie_de_forma_150_x_19_con_las_primeras_150_filas_y_paso_medido(origen_sintetico, ayudas):
     sim = leer_simulacion(origen_sintetico, "LOCA", "7.csv")
     assert sim.serie.shape == (150, 19)
+    assert sim.paso_segundos == 10
     esperado = ayudas.leer_independiente(origen_sintetico / "LOCA" / "7.csv", ayudas.VARIABLES)
     np.testing.assert_array_equal(sim.serie, esperado)
+
+
+def test_paso_constante_distinto_de_10_y_ruido_de_redondeo_dentro_de_tolerancia(origen_sintetico, ayudas):
+    ruta = origen_sintetico / "LOCA" / "7.csv"
+    for fila in range(160):
+        ruido = 1e-8 if fila % 2 == 0 else -1e-8
+        ayudas.poner_valor(ruta, "TIME", fila, f"{100.0 + fila * 5.0 + ruido:.10f}")
+    sim = leer_simulacion(origen_sintetico, "LOCA", "7.csv")
+    assert sim.paso_segundos == 5
 
 
 @pytest.mark.parametrize(
@@ -82,6 +98,58 @@ def test_archivo_defectuoso_lanza_error_con_archivo_y_causa(origen_sintetico, ay
     assert causa in mensaje
     if defecto != "corto":
         assert "[variable TSAT]" in mensaje
+
+
+@pytest.mark.parametrize(
+    "defecto, causa",
+    [
+        ("sin_time", "falta la variable"),
+        ("time_vacio", "valor faltante"),
+        ("time_texto", "valor no numérico"),
+        ("time_inf", "valor no finito"),
+        ("una_fila", "menos de 2 filas para calcular el paso de muestreo"),
+        ("repetido", "el tiempo no avanza en la fila de datos 6"),
+        ("retroceso", "el tiempo no avanza en la fila de datos 6"),
+        ("salto_temprano", "paso de muestreo no constante en la fila de datos 6 (esperado 10 s, encontrado 15 s)"),
+        ("salto_tardio", "paso de muestreo no constante en la fila de datos 156 (esperado 10 s, encontrado 12 s)"),
+    ],
+)
+def test_defectos_en_time_detienen_con_archivo_causa_y_variable_time(origen_sintetico, ayudas, defecto, causa):
+    ruta = origen_sintetico / "LOCA" / "7.csv"
+    if defecto == "sin_time":
+        ayudas.quitar_columna(ruta, "TIME")
+    elif defecto == "time_vacio":
+        ayudas.poner_valor(ruta, "TIME", 4, "")
+    elif defecto == "time_texto":
+        ayudas.poner_valor(ruta, "TIME", 4, "no_es_tiempo")
+    elif defecto == "time_inf":
+        ayudas.poner_valor(ruta, "TIME", 4, "inf")
+    elif defecto == "una_fila":
+        ayudas.truncar(ruta, 1)
+    elif defecto == "repetido":
+        ayudas.poner_valor(ruta, "TIME", 5, "40.0")
+    elif defecto == "retroceso":
+        ayudas.poner_valor(ruta, "TIME", 5, "35.0")
+    elif defecto == "salto_temprano":
+        ayudas.poner_valor(ruta, "TIME", 5, "55.0")
+    elif defecto == "salto_tardio":
+        ayudas.poner_valor(ruta, "TIME", 155, "1552.0")
+    with pytest.raises(ErrorDatos) as info:
+        leer_simulacion(origen_sintetico, "LOCA", "7.csv")
+    assert info.value.archivo == "LOCA/7.csv"
+    assert info.value.variable == "TIME"
+    assert causa in info.value.causa
+
+
+def test_cargar_simulaciones_detiene_si_un_archivo_tiene_paso_distinto_al_resto(origen_sintetico, ayudas):
+    ruta = origen_sintetico / "LOCAC" / "3.csv"
+    for fila in range(160):
+        ayudas.poner_valor(ruta, "TIME", fila, f"{fila * 5.0}")
+    with pytest.raises(ErrorDatos) as info:
+        cargar_simulaciones(origen_sintetico)
+    assert info.value.archivo == "LOCAC/3.csv"
+    assert info.value.variable == "TIME"
+    assert "paso de muestreo (5 s) distinto al del resto del dataset (10 s en Normal/1.csv)" in info.value.causa
 
 
 def test_carpeta_de_clase_inexistente(origen_sintetico):

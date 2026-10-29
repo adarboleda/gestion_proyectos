@@ -35,6 +35,8 @@ def test_preparacion_completa_con_el_dataset_real(tmp_path, capsys):
     assert hash_origen() == antes
 
     metadata = json.loads((salida / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata["paso_segundos"] == 10
+    assert metadata["duracion_muestra_segundos"] == 1500
     assert metadata["totales"] == {"train": 142, "val": 30, "test": 30}
     assert metadata["conteos_muestras"] == {
         "NORM": {"train": 1, "val": 0, "test": 0},
@@ -49,3 +51,4 @@ def test_preparacion_completa_con_el_dataset_real(tmp_path, capsys):
         assert np.load(salida / f"margins_{conjunto}.npy").shape == (n, 150, 7)
         assert np.load(salida / f"y_{conjunto}.npy").shape == (n,)
     assert "una sola simulación" in texto
+    assert "paso medido de TIME: 10 s" in texto

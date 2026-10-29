@@ -1,5 +1,6 @@
-"""Pruebas del escalador ajustado solo con entrenamiento (FR-005, FR-006)."""
+"""Pruebas del escalador ajustado solo con entrenamiento (FR-009 a FR-012)."""
 import numpy as np
+import pytest
 
 from preparacion_datos.config import VARIABLES_PLANTA
 from preparacion_datos.escalado import ajustar_escalador, aplicar
@@ -71,3 +72,37 @@ def test_formas_y_tipos():
     assert escalado.shape == (20, 150, 12)
     assert escalado.dtype == np.float32
     assert escalador.variables_sin_varianza == []
+
+
+def test_aplicar_sobre_conjunto_vacio_devuelve_arreglo_vacio_float32():
+    escalador = ajustar_escalador(datos(5, 1))
+    vacio = aplicar(escalador, np.empty((0, 150, 12), dtype=np.float64))
+    assert vacio.shape == (0, 150, 12) and vacio.dtype == np.float32
+
+
+@pytest.mark.parametrize(
+    "forma",
+    [
+        (0, 150, 12),
+        (5, 150),
+        (5, 149, 12),
+        (5, 150, 19),
+    ],
+)
+def test_ajustar_escalador_rechaza_entrenamiento_vacio_o_forma_invalida(forma):
+    with pytest.raises(ValueError):
+        ajustar_escalador(np.zeros(forma, dtype=np.float64))
+
+
+@pytest.mark.parametrize(
+    "forma",
+    [
+        (5, 150),
+        (5, 149, 12),
+        (5, 150, 19),
+    ],
+)
+def test_aplicar_rechaza_forma_invalida(forma):
+    escalador = ajustar_escalador(datos(5, 1))
+    with pytest.raises(ValueError):
+        aplicar(escalador, np.zeros(forma, dtype=np.float64))

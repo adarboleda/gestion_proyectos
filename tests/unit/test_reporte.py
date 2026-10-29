@@ -1,4 +1,4 @@
-"""Pruebas del reporte, la comparación con la referencia y metadata.json (FR-009, FR-010)."""
+"""Pruebas del reporte, la comparación con la referencia y metadata.json (FR-007)."""
 import json
 import re
 from types import SimpleNamespace
@@ -20,11 +20,17 @@ CONJUNTOS = ("train", "val", "test")
 CLASES = ("NORM", "LOCA", "LOCAC", "ATWS")
 
 
-def construir(n_loca=100, n_locac=100):
-    simulaciones = [Simulacion("NORM", 0, None, "Normal/1.csv")]
-    simulaciones += [Simulacion("LOCA", 1, n, f"LOCA/{n}.csv") for n in range(1, n_loca + 1)]
-    simulaciones += [Simulacion("LOCAC", 2, n, f"LOCAC/{n}.csv") for n in range(1, n_locac + 1)]
-    simulaciones.append(Simulacion("ATWS", 3, None, "ATWS/1.csv"))
+def construir(n_loca=100, n_locac=100, paso_segundos=10):
+    simulaciones = [Simulacion("NORM", 0, None, "Normal/1.csv", paso_segundos=paso_segundos)]
+    simulaciones += [
+        Simulacion("LOCA", 1, n, f"LOCA/{n}.csv", paso_segundos=paso_segundos)
+        for n in range(1, n_loca + 1)
+    ]
+    simulaciones += [
+        Simulacion("LOCAC", 2, n, f"LOCAC/{n}.csv", paso_segundos=paso_segundos)
+        for n in range(1, n_locac + 1)
+    ]
+    simulaciones.append(Simulacion("ATWS", 3, None, "ATWS/1.csv", paso_segundos=paso_segundos))
     return simulaciones
 
 
@@ -33,6 +39,28 @@ def resumen():
     particion = repartir(construir(), 42)
     escalador = SimpleNamespace(filas_ajuste=142 * 150, variables_sin_varianza=[])
     return construir_resumen("origen/Operation_csv_data", 42, particion, escalador, referencia=None)
+
+
+def test_paso_medido_y_duracion_en_resumen_metadata_y_reporte(resumen):
+    assert resumen.paso_segundos == 10
+    assert resumen.duracion_muestra_segundos == 1500
+    metadata = construir_metadata(resumen)
+    assert metadata["paso_segundos"] == 10
+    assert metadata["duracion_muestra_segundos"] == 1500
+    texto = formatear_reporte(resumen, artefactos=[])
+    seccion = texto.split("1. Origen y configuración")[1].split("2. Muestras por clase y conjunto")[0]
+    assert "paso medido de TIME: 10 s" in seccion
+    assert "duración: 1500 s" in seccion
+
+
+def test_paso_medido_distinto_de_10_calcula_duracion_real():
+    particion = repartir(construir(paso_segundos=5), 42)
+    escalador = SimpleNamespace(filas_ajuste=142 * 150, variables_sin_varianza=[])
+    resumen = construir_resumen("o", 42, particion, escalador, referencia=None)
+    assert resumen.paso_segundos == 5
+    assert resumen.duracion_muestra_segundos == 750
+    metadata = construir_metadata(resumen)
+    assert metadata["paso_segundos"] == 5 and metadata["duracion_muestra_segundos"] == 750
 
 
 def test_conteos_suman_los_totales_de_cada_conjunto(resumen):
