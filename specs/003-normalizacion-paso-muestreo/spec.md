@@ -8,6 +8,15 @@
 
 **Input**: User description: "Normalización y verificación automática del paso de muestreo. Normalizar las variables de entrada usando solo el conjunto de entrenamiento. Calcular el paso de muestreo a partir de la columna TIME y detener el proceso si no es constante, en lugar de asumirlo." Alcance acordado con el usuario: aplicarlo a las dos preparaciones de datos del repositorio, NPPAD (funcionalidad 001) y PWR 3L (funcionalidad 002), sin tocar el resto de 002 (grupos, reparto, reporte), que está a cargo de otras personas.
 
+## Clarifications
+
+### Session 2026-10-28
+
+> Preguntas de `/speckit-clarify` respondidas por el usuario.
+
+- Q: Si todos los archivos tienen un paso constante y común pero distinto del de diseño (p. ej. 5 s en NPPAD en lugar de 10 s), ¿se detiene o se usa el medido? → A: No se compara con ningún valor esperado: se usa el paso medido, la duración de la muestra se calcula con él (con 5 s serían 750 s) y ambos se publican en metadatos y reporte. Comparar con un valor fijo volvería a suponer el paso.
+- Q: ¿Qué se hace con la regla «el tiempo empieza en 0»? → A: Se mantiene en PWR 3L (regla de 002, FR-014 de esa spec) y no se añade a NPPAD.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - El paso de muestreo se mide, no se supone (Priority: P1)
@@ -77,7 +86,7 @@ El analista ve en el reporte y en los metadatos de la preparación el paso de mu
 
 ### Functional Requirements
 
-- **FR-001**: El sistema MUST calcular el paso de muestreo de cada archivo leído como la diferencia entre valores consecutivos de la columna de tiempo, usando **todas** las filas del archivo, y MUST NOT usar un paso fijo escrito en la configuración.
+- **FR-001**: El sistema MUST calcular el paso de muestreo de cada archivo leído como la diferencia entre valores consecutivos de la columna de tiempo, usando **todas** las filas del archivo, y MUST NOT usar un paso fijo escrito en la configuración ni compararlo con un valor de diseño: el paso común medido es el que se usa y se publica.
 - **FR-002**: El sistema MUST detenerse con un error que nombre el archivo, la variable de tiempo, la fila donde ocurre y la causa cuando el tiempo no avanza (diferencia cero o negativa) o cuando el paso cambia dentro del archivo más allá de la tolerancia (una millonésima relativa del paso); el mensaje de paso no constante MUST mostrar los dos valores de paso.
 - **FR-003**: El sistema MUST detenerse cuando un archivo tenga menos de dos filas de datos, porque no se puede calcular su paso.
 - **FR-004**: El sistema MUST comprobar que todos los archivos leídos de un mismo dataset tienen el mismo paso (con la misma tolerancia) y, si no, MUST detenerse nombrando el archivo discordante, su paso, el paso del resto y el archivo donde se midió ese paso.
