@@ -51,6 +51,8 @@ def test_ejecucion_correcta_escribe_los_artefactos_con_forma_y_tipo(origen_sinte
         ("vacio", "valor faltante"),
         ("infinito", "valor no finito"),
         ("corto", "menos de 150 pasos"),
+        ("paso_variable", "paso de muestreo no constante"),
+        ("paso_discordante", "distinto al del resto del dataset"),
     ],
 )
 def test_archivo_defectuoso_detiene_sin_escribir_ningun_conjunto(
@@ -65,13 +67,20 @@ def test_archivo_defectuoso_detiene_sin_escribir_ningun_conjunto(
         ayudas.poner_valor(ruta, "DNBR", 30, "")
     elif defecto == "infinito":
         ayudas.poner_valor(ruta, "DNBR", 30, "inf")
-    else:
+    elif defecto == "corto":
         ayudas.truncar(ruta, 149)
+    elif defecto == "paso_variable":
+        ayudas.poner_valor(ruta, "TIME", 20, "205.0")
+    else:
+        for fila in range(160):
+            ayudas.poner_valor(ruta, "TIME", fila, f"{fila * 5.0}")
     salida = tmp_path / "salida"
     assert ejecutar(origen_sintetico, salida) == 1
     error = capsys.readouterr().err
     assert "LOCAC/12.csv" in error
     assert causa in error
+    if defecto in ("paso_variable", "paso_discordante"):
+        assert "[variable TIME]" in error
     assert not salida.exists()
 
 
