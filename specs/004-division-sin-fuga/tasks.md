@@ -112,11 +112,11 @@
 
 **Purpose**: Validación con los datasets reales y documentación
 
-- [ ] T021 [P] Crear `tests/pwr3l/integration/test_pwr3l_particion_real.py` (se omite si `datos_reales.ruta_pwr3l()` no existe): 91 corridas usables; 54 grupos (14 `AREA`, 15 `GEMELAS`, 25 individuales) y el grupo `AREA-2000` con 8 corridas; `repartir` sin `ErrorFuga` y `verificar_reparto` sin violaciones con **todas** las corridas reales, incluidas las 18 excluidas (U1); tiempo de agrupar, repartir y verificar menor que 1 s (C1); cota de FR-008 por familia; ninguna de las 9 cortas, 3 descartadas y 6 OOD en un conjunto; las tres familias con al menos una corrida en cada conjunto; mismo reparto en dos ejecuciones y con la lista invertida
-- [ ] T022 [P] Crear `tests/integration/test_verificacion_real.py` (se omite si `datos_reales.ruta_nppad()` no existe): `cargar_simulaciones` + `repartir` de 001 + `verificar_particion` sin violaciones, y cada severidad LOCA/LOCAC presente en un solo conjunto (SC-007)
-- [ ] T023 [P] Añadir al `README.md` una sección «División sin fuga de datos (funcionalidad 004)» en español: qué garantiza, cómo se usa desde Python (`formar_grupos`, `repartir`, `verificar_reparto`), la verificación añadida a `preparar-datos` y la variable `IANUCLEAR_DATOS` para las pruebas reales, sin tocar las demás secciones
-- [ ] T024 Ejecutar las validaciones de `specs/004-division-sin-fuga/quickstart.md` con los datasets reales y anotar los conteos obtenidos en su sección «Resultados obtenidos»
-- [ ] T025 Ejecutar la suite completa (`python -m pytest -q`, con `IANUCLEAR_DATOS` apuntando a los datos reales) y comprobar que todo pasa
+- [X] T021 [P] Crear `tests/pwr3l/integration/test_pwr3l_particion_real.py` (se omite si `datos_reales.ruta_pwr3l()` no existe): 91 corridas usables; 54 grupos (14 `AREA`, 15 `GEMELAS`, 25 individuales) y el grupo `AREA-2000` con 8 corridas; `repartir` sin `ErrorFuga` y `verificar_reparto` sin violaciones con **todas** las corridas reales, incluidas las 18 excluidas (U1); tiempo de agrupar, repartir y verificar menor que 1 s (C1); cota de FR-008 por familia; ninguna de las 9 cortas, 3 descartadas y 6 OOD en un conjunto; las tres familias con al menos una corrida en cada conjunto; mismo reparto en dos ejecuciones y con la lista invertida
+- [X] T022 [P] Crear `tests/integration/test_verificacion_real.py` (se omite si `datos_reales.ruta_nppad()` no existe): `cargar_simulaciones` + `repartir` de 001 + `verificar_particion` sin violaciones, y cada severidad LOCA/LOCAC presente en un solo conjunto (SC-007)
+- [X] T023 [P] Añadir al `README.md` una sección «División sin fuga de datos (funcionalidad 004)» en español: qué garantiza, cómo se usa desde Python (`formar_grupos`, `repartir`, `verificar_reparto`), la verificación añadida a `preparar-datos` y la variable `IANUCLEAR_DATOS` para las pruebas reales, sin tocar las demás secciones
+- [X] T024 Ejecutar las validaciones de `specs/004-division-sin-fuga/quickstart.md` con los datasets reales y anotar los conteos obtenidos en su sección «Resultados obtenidos»
+- [X] T025 Ejecutar la suite completa (`python -m pytest -q`, con `IANUCLEAR_DATOS` apuntando a los datos reales) y comprobar que todo pasa
 
 ---
 
