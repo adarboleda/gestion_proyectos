@@ -26,10 +26,10 @@
 
 **Purpose**: Paquete nuevo y dependencias
 
-- [ ] T001 Modificar `pyproject.toml`: añadir `openpyxl>=3.1` a `dependencies`, el guion `preparar-pwr3l = "preparacion_pwr3l.cli:main"` y actualizar `description` para nombrar las dos preparaciones (NPPAD y PWR 3L)
-- [ ] T002 [P] Crear `src/preparacion_pwr3l/__init__.py` (docstring en español) y `src/preparacion_pwr3l/__main__.py` que llama a `preparacion_pwr3l.cli.main()` y termina con su código; crear `tests/pwr3l/unit/` y `tests/pwr3l/integration/`
-- [ ] T003 [P] Añadir `data_processed_pwr3l/` al `.gitignore` de la raíz (research.md decisión 10)
-- [ ] T004 Reinstalar en modo editable (`uv pip install -e ".[dev]"` o `pip install -e ".[dev]"`) y comprobar que `pytest --collect-only -q` no da errores
+- [X] T001 Modificar `pyproject.toml`: añadir `openpyxl>=3.1` a `dependencies`, el guion `preparar-pwr3l = "preparacion_pwr3l.cli:main"` y actualizar `description` para nombrar las dos preparaciones (NPPAD y PWR 3L)
+- [X] T002 [P] Crear `src/preparacion_pwr3l/__init__.py` (docstring en español) y `src/preparacion_pwr3l/__main__.py` que llama a `preparacion_pwr3l.cli.main()` y termina con su código; crear `tests/pwr3l/unit/` y `tests/pwr3l/integration/`
+- [X] T003 [P] Añadir `data_processed_pwr3l/` al `.gitignore` de la raíz (research.md decisión 10)
+- [X] T004 Reinstalar en modo editable (`uv pip install -e ".[dev]"` o `pip install -e ".[dev]"`) y comprobar que `pytest --collect-only -q` no da errores
 
 ---
 
@@ -41,16 +41,16 @@
 
 ### Tests (escribir primero; deben fallar)
 
-- [ ] T005 Crear `tests/pwr3l/conftest.py` con la fixture de sesión `arbol_pwr3l` (solo lectura) que construye en un directorio temporal un árbol PWR 3L pequeño: carpetas manuales `NORM` (R01 en `.xls` = libro xlsx), `LOCA HOT` (R09 2000 cm², R10 50 cm, CSV), `LOCA COLD` (R03 2000 cm², R07 descartada), `ATWS` (R21, R27 con dos archivos de datos), `TRIP_OK` (R59 gemela de R21, CSV), `LOCA PORV` (R20 OOD) y `auto/` (`R<n>_<CLASE>` con `plotdata.csv` y `config.json`: varias NORM, LOCA y LOCAC con áreas repetidas, pares ATWS/TRIP_OK de la tabla, una OOD, una corrida corta de 295 filas y carpetas `_respaldos` y un archivo suelto que deben ignorarse); columnas `TIME` + 26 entradas + 7 márgenes + `WLR`, 301 filas (salvo la corta), valores deterministas distintos por corrida; y la fixture `copia_pwr3l` (copia por prueba) con ayudantes para corromper un archivo (quitar columna, texto, vacío, `inf`, salto de tiempo), añadir carpetas y calcular el hash de todo el árbol
-- [ ] T006 [P] Crear `tests/pwr3l/unit/test_pwr3l_descubrimiento.py`: clase por carpeta (FR-002) y por sufijo en `auto`; id `R<n>[letra]`; orden por etiqueta y número (`R07b` tras `R07`); se ignoran `_*`, `.*` y archivos sueltos; descartadas (R07, R27) y OOD (R20, `auto/*_OOD`) se marcan sin leerse (R27 con dos archivos no da error); área de rotura desde el nombre de carpeta y desde `config.json`; gemela según la tabla; `ErrorDatos` con ruta y causa para: carpeta no reconocida, clase desconocida en `auto`, nombre sin id, id repetido, sin archivo de datos, más de un archivo de datos, LOCA sin área, origen inexistente, gemela de `config.json` distinta de la tabla y clase de entrenamiento sin ninguna corrida (análisis U1, U2)
-- [ ] T007 [P] Crear `tests/pwr3l/unit/test_pwr3l_lectura.py`: lectura de CSV y de libro xlsx con extensión `.xls`; serie (300, 33) con las filas 0–299 y el orden de columnas de `config`; valores idénticos al texto del CSV (comparar con `float()` sobre el texto); corrida de 295 filas → estado `corta` con `filas = 295`, sin serie; `ErrorDatos` para variable ausente, valor no numérico, vacío, `inf`, tiempo que no empieza en 0 o salta, también cuando el defecto está después de la fila 300; formato del mensaje `ERROR: <archivo>: <causa> [variable <v>]`
+- [X] T005 Crear `tests/pwr3l/conftest.py` con la fixture de sesión `arbol_pwr3l` (solo lectura) que construye en un directorio temporal un árbol PWR 3L pequeño: carpetas manuales `NORM` (R01 en `.xls` = libro xlsx), `LOCA HOT` (R09 2000 cm², R10 50 cm, CSV), `LOCA COLD` (R03 2000 cm², R07 descartada), `ATWS` (R21, R27 con dos archivos de datos), `TRIP_OK` (R59 gemela de R21, CSV), `LOCA PORV` (R20 OOD) y `auto/` (`R<n>_<CLASE>` con `plotdata.csv` y `config.json`: varias NORM, LOCA y LOCAC con áreas repetidas, pares ATWS/TRIP_OK de la tabla, una OOD, una corrida corta de 295 filas y carpetas `_respaldos` y un archivo suelto que deben ignorarse); columnas `TIME` + 26 entradas + 7 márgenes + `WLR`, 301 filas (salvo la corta), valores deterministas distintos por corrida; y la fixture `copia_pwr3l` (copia por prueba) con ayudantes para corromper un archivo (quitar columna, texto, vacío, `inf`, salto de tiempo), añadir carpetas y calcular el hash de todo el árbol
+- [X] T006 [P] Crear `tests/pwr3l/unit/test_pwr3l_descubrimiento.py`: clase por carpeta (FR-002) y por sufijo en `auto`; id `R<n>[letra]`; orden por etiqueta y número (`R07b` tras `R07`); se ignoran `_*`, `.*` y archivos sueltos; descartadas (R07, R27) y OOD (R20, `auto/*_OOD`) se marcan sin leerse (R27 con dos archivos no da error); área de rotura desde el nombre de carpeta y desde `config.json`; gemela según la tabla; `ErrorDatos` con ruta y causa para: carpeta no reconocida, clase desconocida en `auto`, nombre sin id, id repetido, sin archivo de datos, más de un archivo de datos, LOCA sin área, origen inexistente, gemela de `config.json` distinta de la tabla y clase de entrenamiento sin ninguna corrida (análisis U1, U2)
+- [X] T007 [P] Crear `tests/pwr3l/unit/test_pwr3l_lectura.py`: lectura de CSV y de libro xlsx con extensión `.xls`; serie (300, 33) con las filas 0–299 y el orden de columnas de `config`; valores idénticos al texto del CSV (comparar con `float()` sobre el texto); corrida de 295 filas → estado `corta` con `filas = 295`, sin serie; `ErrorDatos` para variable ausente, valor no numérico, vacío, `inf`, tiempo que no empieza en 0 o salta, también cuando el defecto está después de la fila 300; formato del mensaje `ERROR: <archivo>: <causa> [variable <v>]`
 
 ### Implementation
 
-- [ ] T008 Crear `src/preparacion_pwr3l/config.py`: carpetas manuales → clase, clases de `auto`, etiquetas NORM 0 … TRIP_OK 4, `VARIABLES_ENTRADA` (26, orden de research §6), `VARIABLES_MARGEN` (7), `PASOS = 300`, `PASO_SEGUNDOS = 1`, proporciones 0.70/0.15/0.15, `SEMILLA = 42`, `DESCARTADAS` (R07, R27, R28 con motivo), `GEMELAS` (19 pares de research §7), familias de clase y rutas por defecto de `contracts/cli.md`
-- [ ] T009 Crear `src/preparacion_pwr3l/descubrimiento.py` con `ErrorDatos`, la dataclass `Corrida` (data-model.md) y `descubrir_corridas(origen)` según research §2–§3 y §7 (área, gemela y control de `gemelo_de`) y §8 (clase sin corridas) (depende de T008)
-- [ ] T010 Crear `src/preparacion_pwr3l/lectura.py` con `leer_corrida(origen, corrida)` (valida el archivo completo, fija `filas`, `estado` y `serie`) y `cargar_corridas(origen)` (descubre, lee solo las de las cinco clases y se detiene en el primer defecto) según research §4–§5 (depende de T009)
-- [ ] T011 Ejecutar `pytest tests/pwr3l/unit/test_pwr3l_descubrimiento.py tests/pwr3l/unit/test_pwr3l_lectura.py` y comprobar que pasan
+- [X] T008 Crear `src/preparacion_pwr3l/config.py`: carpetas manuales → clase, clases de `auto`, etiquetas NORM 0 … TRIP_OK 4, `VARIABLES_ENTRADA` (26, orden de research §6), `VARIABLES_MARGEN` (7), `PASOS = 300`, `PASO_SEGUNDOS = 1`, proporciones 0.70/0.15/0.15, `SEMILLA = 42`, `DESCARTADAS` (R07, R27, R28 con motivo), `GEMELAS` (19 pares de research §7), familias de clase y rutas por defecto de `contracts/cli.md`
+- [X] T009 Crear `src/preparacion_pwr3l/descubrimiento.py` con `ErrorDatos`, la dataclass `Corrida` (data-model.md) y `descubrir_corridas(origen)` según research §2–§3 y §7 (área, gemela y control de `gemelo_de`) y §8 (clase sin corridas) (depende de T008)
+- [X] T010 Crear `src/preparacion_pwr3l/lectura.py` con `leer_corrida(origen, corrida)` (valida el archivo completo, fija `filas`, `estado` y `serie`) y `cargar_corridas(origen)` (descubre, lee solo las de las cinco clases y se detiene en el primer defecto) según research §4–§5 (depende de T009)
+- [X] T011 Ejecutar `pytest tests/pwr3l/unit/test_pwr3l_descubrimiento.py tests/pwr3l/unit/test_pwr3l_lectura.py` y comprobar que pasan
 
 **Checkpoint**: corridas descubiertas, validadas y clasificadas en usables, cortas, descartadas y OOD
 
@@ -64,19 +64,19 @@
 
 ### Tests (escribir primero; deben fallar)
 
-- [ ] T012 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_grupos.py`: gemelas ATWS/TRIP_OK en un grupo `GEMELAS-<a>-<b>`; LOCA y LOCAC de igual área en un grupo `AREA-<cm2>`, también con repeticiones dentro de una clase; NORM y corridas sin pareja en grupos propios; una gemela corta deja a la otra sola; cada corrida en exactamente un grupo; familia de cada grupo
-- [ ] T013 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_particion.py`: cada grupo en exactamente un conjunto y cada corrida en uno; ningún grupo partido; con grupos de tamaño 1, conteos iguales al redondeo de las metas; con grupos desiguales, ningún conjunto supera su meta en tanto como el grupo más grande (análisis A1); misma semilla → mismo resultado; resultado independiente del orden de entrada; semilla distinta → puede cambiar; orden de filas por etiqueta y número
-- [ ] T014 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_escalado.py`: media y escala iguales (rtol 1e-12) a las de las filas de entrenamiento aplanadas; `X_train` escalado con media |m| < 1e-4 y desviación |s − 1| < 1e-4 por variable; cambiar val/test no altera los parámetros; variable sin varianza informada y sin `nan`/`inf`; salida float32 con la misma forma
-- [ ] T015 [US1] Crear `tests/pwr3l/integration/test_pwr3l_cli.py` (usa `copia_pwr3l`): `main([...])` devuelve 0 y publica `X_*`, `y_*`, `scaler_*`; `X_*.shape[1:] == (300, 26)`; `y` solo en 0–4; ninguna corrida OOD, descartada o corta en los conjuntos; ids sin intersección entre conjuntos; gemelas y áreas en el mismo conjunto; `scaler_mean` = media de las entradas sin escalar de las corridas de entrenamiento; dos ejecuciones dan archivos idénticos byte a byte; archivo defectuoso → código 1, mensaje con el archivo en la salida de error y la salida no se crea; hash del árbol igual antes y después; `python -m preparacion_pwr3l` con `subprocess` devuelve 0; los valores por defecto de `--origen` y `--salida` son `../IA-Nuclear/PWR 3L` y `data_processed_pwr3l` (análisis C1); una salida previa con un archivo ajeno lo conserva y sus artefactos viejos se reemplazan (análisis C2)
+- [X] T012 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_grupos.py`: gemelas ATWS/TRIP_OK en un grupo `GEMELAS-<a>-<b>`; LOCA y LOCAC de igual área en un grupo `AREA-<cm2>`, también con repeticiones dentro de una clase; NORM y corridas sin pareja en grupos propios; una gemela corta deja a la otra sola; cada corrida en exactamente un grupo; familia de cada grupo
+- [X] T013 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_particion.py`: cada grupo en exactamente un conjunto y cada corrida en uno; ningún grupo partido; con grupos de tamaño 1, conteos iguales al redondeo de las metas; con grupos desiguales, ningún conjunto supera su meta en tanto como el grupo más grande (análisis A1); misma semilla → mismo resultado; resultado independiente del orden de entrada; semilla distinta → puede cambiar; orden de filas por etiqueta y número
+- [X] T014 [P] [US1] Crear `tests/pwr3l/unit/test_pwr3l_escalado.py`: media y escala iguales (rtol 1e-12) a las de las filas de entrenamiento aplanadas; `X_train` escalado con media |m| < 1e-4 y desviación |s − 1| < 1e-4 por variable; cambiar val/test no altera los parámetros; variable sin varianza informada y sin `nan`/`inf`; salida float32 con la misma forma
+- [X] T015 [US1] Crear `tests/pwr3l/integration/test_pwr3l_cli.py` (usa `copia_pwr3l`): `main([...])` devuelve 0 y publica `X_*`, `y_*`, `scaler_*`; `X_*.shape[1:] == (300, 26)`; `y` solo en 0–4; ninguna corrida OOD, descartada o corta en los conjuntos; ids sin intersección entre conjuntos; gemelas y áreas en el mismo conjunto; `scaler_mean` = media de las entradas sin escalar de las corridas de entrenamiento; dos ejecuciones dan archivos idénticos byte a byte; archivo defectuoso → código 1, mensaje con el archivo en la salida de error y la salida no se crea; hash del árbol igual antes y después; `python -m preparacion_pwr3l` con `subprocess` devuelve 0; los valores por defecto de `--origen` y `--salida` son `../IA-Nuclear/PWR 3L` y `data_processed_pwr3l` (análisis C1); una salida previa con un archivo ajeno lo conserva y sus artefactos viejos se reemplazan (análisis C2)
 
 ### Implementation
 
-- [ ] T016 [US1] Crear `src/preparacion_pwr3l/grupos.py` con la dataclass `Grupo` y `formar_grupos(corridas_usables)` (research §7)
-- [ ] T017 [US1] Crear `src/preparacion_pwr3l/particion.py` con `repartir(grupos, semilla)` → conjunto por grupo y corridas por conjunto (research §8) (depende de T016)
-- [ ] T018 [P] [US1] Crear `src/preparacion_pwr3l/escalado.py` con `ajustar_escalador(x_train)` y `aplicar(escalador, x)` (research §9)
-- [ ] T019 [US1] Crear `src/preparacion_pwr3l/salida.py` con `construir_conjunto(corridas)` → `x` (N, 300, 26) float64 y `y` (N,) int64, en el orden de la partición (depende de T010)
-- [ ] T020 [US1] Crear `src/preparacion_pwr3l/cli.py` con `main(argv)`: argumentos de `contracts/cli.md`, tolerancia de consola (research §12), cargar → agrupar → repartir → construir → escalar → `preparacion_datos.salida.publicar`; código 1 ante `ErrorDatos` u `OSError` (depende de T016–T019)
-- [ ] T021 [US1] Ejecutar `pytest tests/pwr3l` y comprobar que pasan las pruebas de US1
+- [X] T016 [US1] Crear `src/preparacion_pwr3l/grupos.py` con la dataclass `Grupo` y `formar_grupos(corridas_usables)` (research §7)
+- [X] T017 [US1] Crear `src/preparacion_pwr3l/particion.py` con `repartir(grupos, semilla)` → conjunto por grupo y corridas por conjunto (research §8) (depende de T016)
+- [X] T018 [P] [US1] Crear `src/preparacion_pwr3l/escalado.py` con `ajustar_escalador(x_train)` y `aplicar(escalador, x)` (research §9)
+- [X] T019 [US1] Crear `src/preparacion_pwr3l/salida.py` con `construir_conjunto(corridas)` → `x` (N, 300, 26) float64 y `y` (N,) int64, en el orden de la partición (depende de T010)
+- [X] T020 [US1] Crear `src/preparacion_pwr3l/cli.py` con `main(argv)`: argumentos de `contracts/cli.md`, tolerancia de consola (research §12), cargar → agrupar → repartir → construir → escalar → `preparacion_datos.salida.publicar`; código 1 ante `ErrorDatos` u `OSError` (depende de T016–T019)
+- [X] T021 [US1] Ejecutar `pytest tests/pwr3l` y comprobar que pasan las pruebas de US1
 
 **Checkpoint**: MVP: conjuntos sin fuga con cinco clases y ventanas de 300 s
 
@@ -90,12 +90,12 @@
 
 ### Tests (escribir primero; deben fallar)
 
-- [ ] T022 [US2] Crear `tests/pwr3l/integration/test_pwr3l_margenes.py`: `margins_*.npy` existe con forma (N, 300, 7) float64; para una corrida CSV y una xlsx, sus márgenes son idénticos a las filas 0–299 del archivo (comparación exacta); ninguna variable de margen está en `VARIABLES_ENTRADA` ni cambia el tamaño de los parámetros de escala (26)
+- [X] T022 [US2] Crear `tests/pwr3l/integration/test_pwr3l_margenes.py`: `margins_*.npy` existe con forma (N, 300, 7) float64; para una corrida CSV y una xlsx, sus márgenes son idénticos a las filas 0–299 del archivo (comparación exacta); ninguna variable de margen está en `VARIABLES_ENTRADA` ni cambia el tamaño de los parámetros de escala (26)
 
 ### Implementation
 
-- [ ] T023 [US2] Ampliar `construir_conjunto` en `src/preparacion_pwr3l/salida.py` para devolver también los márgenes y publicar `margins_<conjunto>.npy` desde `src/preparacion_pwr3l/cli.py`
-- [ ] T024 [US2] Ejecutar `pytest tests/pwr3l` y comprobar que pasan
+- [X] T023 [US2] Ampliar `construir_conjunto` en `src/preparacion_pwr3l/salida.py` para devolver también los márgenes y publicar `margins_<conjunto>.npy` desde `src/preparacion_pwr3l/cli.py`
+- [X] T024 [US2] Ejecutar `pytest tests/pwr3l` y comprobar que pasan
 
 **Checkpoint**: US1 y US2 funcionan por separado
 
@@ -109,15 +109,15 @@
 
 ### Tests (escribir primero; deben fallar)
 
-- [ ] T025 [P] [US3] Crear `tests/pwr3l/unit/test_pwr3l_reporte.py`: tabla de muestras con las 5 clases × 3 conjuntos, ceros incluidos y marcados con `*`; totales que cuadran; advertencia por cada celda en cero y por cada corrida corta (con archivo y filas); cada exclusión (OOD, descartada, corta) con id, clase, motivo y detalle; `corridas_encontradas` suma el total de corridas descubiertas; una clase con todas sus corridas cortas aparece en cero con advertencia (análisis U1); las 9 secciones de `contracts/cli.md` en orden
-- [ ] T026 [US3] Ampliar `tests/pwr3l/integration/test_pwr3l_cli.py`: el reporte se imprime en la salida estándar con las 9 secciones; `metadata.json` cumple `contracts/salidas.md` (claves, `corridas[c][i]` alineado con la fila `i`, grupos por conjunto, exclusiones y escalador); la suma de categorías es igual al número de carpetas de corrida del árbol
+- [X] T025 [P] [US3] Crear `tests/pwr3l/unit/test_pwr3l_reporte.py`: tabla de muestras con las 5 clases × 3 conjuntos, ceros incluidos y marcados con `*`; totales que cuadran; advertencia por cada celda en cero y por cada corrida corta (con archivo y filas); cada exclusión (OOD, descartada, corta) con id, clase, motivo y detalle; `corridas_encontradas` suma el total de corridas descubiertas; una clase con todas sus corridas cortas aparece en cero con advertencia (análisis U1); las 9 secciones de `contracts/cli.md` en orden
+- [X] T026 [US3] Ampliar `tests/pwr3l/integration/test_pwr3l_cli.py`: el reporte se imprime en la salida estándar con las 9 secciones; `metadata.json` cumple `contracts/salidas.md` (claves, `corridas[c][i]` alineado con la fila `i`, grupos por conjunto, exclusiones y escalador); la suma de categorías es igual al número de carpetas de corrida del árbol
 
 ### Implementation
 
-- [ ] T027 [US3] Crear `src/preparacion_pwr3l/reporte.py` con `Resumen`, `construir_resumen(...)`, `generar_advertencias(...)`, las limitaciones (incluida la de NORM parecidas sin agrupar, análisis D1) y `formatear_reporte(resumen, artefactos)` (contracts/cli.md)
-- [ ] T028 [US3] Añadir `construir_metadata(resumen)` y `serializar_metadata(...)` en `src/preparacion_pwr3l/salida.py` (contracts/salidas.md)
-- [ ] T029 [US3] Integrar en `src/preparacion_pwr3l/cli.py`: publicar `metadata.json` con los demás artefactos e imprimir el reporte tras publicar
-- [ ] T030 [US3] Ejecutar `pytest tests/pwr3l` y comprobar que pasan
+- [X] T027 [US3] Crear `src/preparacion_pwr3l/reporte.py` con `Resumen`, `construir_resumen(...)`, `generar_advertencias(...)`, las limitaciones (incluida la de NORM parecidas sin agrupar, análisis D1) y `formatear_reporte(resumen, artefactos)` (contracts/cli.md)
+- [X] T028 [US3] Añadir `construir_metadata(resumen)` y `serializar_metadata(...)` en `src/preparacion_pwr3l/salida.py` (contracts/salidas.md)
+- [X] T029 [US3] Integrar en `src/preparacion_pwr3l/cli.py`: publicar `metadata.json` con los demás artefactos e imprimir el reporte tras publicar
+- [X] T030 [US3] Ejecutar `pytest tests/pwr3l` y comprobar que pasan
 
 **Checkpoint**: las tres historias funcionan
 
@@ -125,9 +125,9 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T031 Crear `tests/pwr3l/integration/test_pwr3l_dataset_real.py` (se omite si `../IA-Nuclear/PWR 3L` no existe): código 0; 109 corridas encontradas (100 de las cinco clases, 6 OOD, 3 descartadas); las corridas con menos de 300 filas aparecen como cortas con su número de filas; R07b usable y R07 descartada; ninguna OOD en los conjuntos; la tabla `GEMELAS` coincide con `gemelo_de` de cada `config.json` de `auto`; las restricciones de grupo se cumplen; hash del origen sin cambios
-- [ ] T032 [P] Añadir al `README.md` una sección «Preprocesamiento PWR 3L (funcionalidad 002)»: qué hace, instalación, `preparar-pwr3l`, opciones, artefactos y limitaciones, sin tocar la sección de 001
-- [ ] T033 Ejecutar las validaciones de `specs/002-preprocesamiento-pwr3l/quickstart.md` con el dataset real y anotar en `quickstart.md` los conteos obtenidos
+- [X] T031 Crear `tests/pwr3l/integration/test_pwr3l_dataset_real.py` (se omite si `../IA-Nuclear/PWR 3L` no existe): código 0; 109 corridas encontradas (100 de las cinco clases, 6 OOD, 3 descartadas); las corridas con menos de 300 filas aparecen como cortas con su número de filas; R07b usable y R07 descartada; ninguna OOD en los conjuntos; la tabla `GEMELAS` coincide con `gemelo_de` de cada `config.json` de `auto`; las restricciones de grupo se cumplen; hash del origen sin cambios
+- [X] T032 [P] Añadir al `README.md` una sección «Preprocesamiento PWR 3L (funcionalidad 002)»: qué hace, instalación, `preparar-pwr3l`, opciones, artefactos y limitaciones, sin tocar la sección de 001
+- [X] T033 Ejecutar las validaciones de `specs/002-preprocesamiento-pwr3l/quickstart.md` con el dataset real y anotar en `quickstart.md` los conteos obtenidos
 - [ ] T034 Ejecutar la suite completa (`python -m pytest -q`, 001 + 002) y comprobar que todo pasa
 
 ---
@@ -175,3 +175,12 @@ Task: "Escalado en tests/pwr3l/unit/test_pwr3l_escalado.py"
 - Verificar que las pruebas fallan antes de implementar
 - Commit tras cada grupo lógico (`feat(002)`, `test(002)`, `docs(002)`), con `Causa:` si se reescribe código
 - No tocar el código ni las pruebas de 001 salvo para importar `publicar`
+
+---
+
+## Phase 7: Convergence
+
+- [ ] T035 Corregir en `specs/002-preprocesamiento-pwr3l/data-model.md` el campo `archivo`: el código guarda la carpeta para todas las corridas descartadas y OOD (no solo para R27), porque no se leen per plan: data-model.md (partial)
+- [ ] T036 Añadir a la lista de causas de `specs/002-preprocesamiento-pwr3l/contracts/cli.md` las dos que el código produce y el contrato no nombra: `el archivo no existe` (lectura) y `no hay corridas usables` (`cli.py`, cuando todas las corridas son cortas) per contracts/cli.md (partial)
+- [ ] T037 Añadir en `tests/pwr3l/unit/test_pwr3l_descubrimiento.py` una prueba de `config.json` ilegible en una corrida automática (`archivo ilegible`, ruta del `config.json`), rama de `_leer_configuracion` sin cobertura per FR-014 (partial)
+- [ ] T038 Añadir en `tests/pwr3l/integration/test_pwr3l_cli.py` una prueba de origen sin corridas usables (todas cortas) → código 1 y `no hay corridas usables`, rama de `cli.py` sin cobertura per FR-014 (unrequested)
