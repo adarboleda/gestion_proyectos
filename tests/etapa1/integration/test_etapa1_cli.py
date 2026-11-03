@@ -100,3 +100,18 @@ def test_sin_pytorch_termina_con_codigo_3(con_sinteticas, monkeypatch, tmp_path,
     assert ejecutar(salida) == 3
     assert "PyTorch" in capsys.readouterr().err
     assert not salida.exists()
+
+
+def test_publica_e_imprime_el_reporte(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "etapa1"
+    assert ejecutar(salida) == 0
+    impreso = capsys.readouterr().out
+    reporte = json.loads((salida / "reporte.json").read_text(encoding="utf-8"))
+    assert (salida / "reporte.txt").read_text(encoding="utf-8").strip() == impreso.strip()
+    modelo = json.loads((salida / "modelo.json").read_text(encoding="utf-8"))
+    por_id = {c.id: c for c in con_sinteticas.corridas}
+    eventos_prueba = [r for r in modelo["corridas"]["test"] if por_id[r].clase != "NORM"]
+    assert sorted(d["corrida"] for d in reporte["deteccion"]) == sorted(eventos_prueba)
+    assert sum(map(sum, reporte["global"]["matriz"])) == modelo["muestras"]["test"]
+    for texto in ("consultivo", "Horizonte", "Tiempo de confirmación", "Falsas alarmas", "Metas"):
+        assert texto in impreso, texto
