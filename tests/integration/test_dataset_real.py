@@ -1,17 +1,16 @@
 """Extremo a extremo con el dataset NPPAD real (se omite si no está disponible)."""
 import hashlib
 import json
-from pathlib import Path
 
 import numpy as np
 import pytest
 
+from datos_reales import raiz_ianuclear, ruta_nppad
 from preparacion_datos.cli import main
-from preparacion_datos.config import ORIGEN_POR_DEFECTO, REFERENCIA_POR_DEFECTO
 
-RAIZ = Path(__file__).resolve().parents[2]
-ORIGEN = (RAIZ / ORIGEN_POR_DEFECTO).resolve()
-REFERENCIA = (RAIZ / REFERENCIA_POR_DEFECTO).resolve()
+# Ruta del dataset: variable IANUCLEAR_DATOS o ../IA-Nuclear (tests/datos_reales.py)
+ORIGEN = ruta_nppad()
+REFERENCIA = raiz_ianuclear() / "data_processed" / "metadata.json"
 CARPETAS = ("Normal", "LOCA", "LOCAC", "ATWS")
 
 pytestmark = pytest.mark.skipif(not ORIGEN.is_dir(), reason="dataset NPPAD no disponible")
