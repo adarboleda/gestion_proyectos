@@ -12,6 +12,8 @@ from preparacion_pwr3l.lectura import cargar_corridas
 from preparacion_pwr3l.particion import repartir
 from preparacion_pwr3l.salida import construir_conjunto
 from preparacion_pwr3l.salida import construir_margenes
+from preparacion_pwr3l.reporte import construir_resumen, formatear_reporte
+from preparacion_pwr3l.salida import construir_metadata, serializar_metadata
 
 
 def _crear_parser() -> argparse.ArgumentParser:
@@ -55,6 +57,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         archivos["scaler_std.npy"] = escalador.escala
         for conjunto in CONJUNTOS:
             archivos[f"margins_{conjunto}.npy"] = construir_margenes(particion[conjunto])
+        resumen = construir_resumen(
+            argumentos.origen, argumentos.semilla, corridas, grupos, conjunto_de, particion, escalador
+        )
+        archivos["metadata.json"] = serializar_metadata(construir_metadata(resumen))
         publicar(argumentos.salida, archivos)
     except ErrorDatos as error:
         print(error, file=sys.stderr)
@@ -62,4 +68,5 @@ def main(argv: Optional[List[str]] = None) -> int:
     except OSError as error:
         print(f"ERROR: no se pudo escribir en {argumentos.salida}: {error}", file=sys.stderr)
         return 1
+    print(formatear_reporte(resumen, sorted(archivos)), end="")
     return 0
