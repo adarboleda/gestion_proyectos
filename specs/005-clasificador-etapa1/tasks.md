@@ -118,10 +118,10 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T029 [P] Crear `tests/etapa1/integration/test_etapa1_real.py` (se omite sin `datos_reales.ruta_pwr3l()` o sin PyTorch): `main` con `--epocas 2` sobre el dataset real en una carpeta temporal devuelve 0; `modelo.json["corridas"]` con 63 / 15 / 13; una entrada de detección por corrida de evento de prueba; el hash de los archivos del origen es igual antes y después (FR-015)
-- [ ] T030 [P] Añadir al `README.md` una sección «Clasificador de Etapa 1 (funcionalidad 005)»: qué distingue, instalación de PyTorch, `entrenar-etapa1`, artefactos, cómo leer el reporte y uso de `clasificar`, sin tocar las demás secciones
-- [ ] T031 Entrenar con el dataset real y la configuración por defecto, repetir en otra carpeta para comprobar la reproducibilidad, medir el tiempo y anotar los resultados (métricas, horizontes, detecciones, falsas alarmas y metas) en la sección «Resultados obtenidos» de `specs/005-clasificador-etapa1/quickstart.md`
-- [ ] T032 Ejecutar la suite completa (`python -m pytest -q`, con `IANUCLEAR_DATOS`) y comprobar que todo pasa
+- [X] T029 [P] Crear `tests/etapa1/integration/test_etapa1_real.py` (se omite sin `datos_reales.ruta_pwr3l()` o sin PyTorch): `main` con `--epocas 2` sobre el dataset real en una carpeta temporal devuelve 0; `modelo.json["corridas"]` con 63 / 15 / 13; una entrada de detección por corrida de evento de prueba; el hash de los archivos del origen es igual antes y después (FR-015)
+- [X] T030 [P] Añadir al `README.md` una sección «Clasificador de Etapa 1 (funcionalidad 005)»: qué distingue, instalación de PyTorch, `entrenar-etapa1`, artefactos, cómo leer el reporte y uso de `clasificar`, sin tocar las demás secciones
+- [X] T031 Entrenar con el dataset real y la configuración por defecto, repetir en otra carpeta para comprobar la reproducibilidad, medir el tiempo y anotar los resultados (métricas, horizontes, detecciones, falsas alarmas y metas) en la sección «Resultados obtenidos» de `specs/005-clasificador-etapa1/quickstart.md`
+- [X] T032 Ejecutar la suite completa (`python -m pytest -q`, con `IANUCLEAR_DATOS`) y comprobar que todo pasa
 
 ---
 
