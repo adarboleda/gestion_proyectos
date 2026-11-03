@@ -121,6 +121,46 @@ def test_valores_por_defecto_separados_de_nppad():
     assert argumentos.semilla == 42
 
 
+def test_reporte_impreso_con_las_nueve_secciones(arbol_pwr3l, tmp_path, capsys):
+    from preparacion_pwr3l.reporte import SECCIONES
+
+    assert main(["--origen", str(arbol_pwr3l), "--salida", str(tmp_path / "s")]) == 0
+    texto = capsys.readouterr().out
+    posiciones = [texto.index(f"== {seccion} ==") for seccion in SECCIONES]
+    assert posiciones == sorted(posiciones)
+    assert "R55" in texto and "metadata.json" in texto
+
+
+def test_metadata_cumple_el_contrato(arbol_pwr3l, preparada, ayudantes):
+    import json
+
+    from preparacion_pwr3l.config import CLASES
+
+    _, salida = preparada
+    metadata = json.loads((salida / "metadata.json").read_text(encoding="utf-8"))
+    claves = {
+        "version_formato", "planta", "origen", "semilla", "proporciones", "pasos_por_muestra", "paso_segundos",
+        "clases", "variables_entrada", "variables_margen", "corridas_encontradas", "conteos_muestras", "totales",
+        "corridas", "grupos", "excluidas", "escalador", "advertencias", "limitaciones",
+    }
+    assert set(metadata) == claves
+    assert metadata["clases"] == CLASES and metadata["pasos_por_muestra"] == 300 and metadata["paso_segundos"] == 1
+    assert metadata["variables_entrada"] == VARIABLES_ENTRADA
+    assert sum(sum(v.values()) for v in metadata["corridas_encontradas"].values()) == ayudantes.NUMERO_CORRIDAS
+    assert {e["id"] for e in metadata["excluidas"]} == ayudantes.IDS_DESCARTADAS | ayudantes.IDS_OOD | ayudantes.IDS_CORTAS
+    assert metadata["escalador"]["ajustado_con"] == "train"
+    # la fila i de cada conjunto es la corrida metadata.corridas[c][i]
+    ids = _ids_por_conjunto(arbol_pwr3l, salida)
+    clase_de = {c.id: c.clase for c in cargar_corridas(arbol_pwr3l)}
+    for conjunto in CONJUNTOS:
+        assert metadata["corridas"][conjunto] == ids[conjunto]
+        y = _cargar(salida, f"y_{conjunto}.npy").tolist()
+        assert y == [CLASES[clase_de[i]] for i in ids[conjunto]]
+        assert metadata["totales"][conjunto] == len(y)
+        agrupadas = [i for lista in metadata["grupos"][conjunto].values() for i in lista]
+        assert sorted(agrupadas) == sorted(ids[conjunto])
+
+
 def test_python_m(arbol_pwr3l, tmp_path):
     raiz = Path(__file__).resolve().parents[3]
     resultado = subprocess.run(
