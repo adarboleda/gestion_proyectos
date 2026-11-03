@@ -169,3 +169,12 @@ def test_python_m(arbol_pwr3l, tmp_path):
     )
     assert resultado.returncode == 0, resultado.stderr
     assert (tmp_path / "s" / "X_train.npy").is_file()
+
+
+def test_sin_corridas_usables_codigo_1(tmp_path, ayudantes, capsys):
+    origen = tmp_path / "PWR 3L"
+    for i, clase in enumerate(("NORM", "LOCA", "LOCAC", "ATWS", "TRIP_OK")):
+        ayudantes.escribir_corrida_auto(origen, f"R{400 + i}", clase, descripcion="rotura de 50 cm2", filas=295)
+    assert main(["--origen", str(origen), "--salida", str(tmp_path / "s")]) == 1
+    assert "no hay corridas usables" in capsys.readouterr().err
+    assert not (tmp_path / "s").exists()

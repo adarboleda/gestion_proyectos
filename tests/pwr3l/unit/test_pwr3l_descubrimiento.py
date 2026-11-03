@@ -178,3 +178,9 @@ def test_clase_de_entrenamiento_sin_corridas(copia_pwr3l):
 def test_mensaje_con_ruta_causa_y_variable():
     error = ErrorDatos("auto/R31_NORM/plotdata.csv", "falta la variable", "DNBR")
     assert str(error) == "ERROR: auto/R31_NORM/plotdata.csv: falta la variable [variable DNBR]"
+
+
+def test_config_json_ilegible(copia_pwr3l):
+    (copia_pwr3l / "auto" / "R44_LOCA" / "config.json").write_text("{no es json", encoding="utf-8")
+    error = _error(copia_pwr3l)
+    assert error.archivo == "auto/R44_LOCA/config.json" and error.causa.startswith("archivo ilegible")

@@ -180,7 +180,7 @@ Task: "Escalado en tests/pwr3l/unit/test_pwr3l_escalado.py"
 
 ## Phase 7: Convergence
 
-- [ ] T035 Corregir en `specs/002-preprocesamiento-pwr3l/data-model.md` el campo `archivo`: el código guarda la carpeta para todas las corridas descartadas y OOD (no solo para R27), porque no se leen per plan: data-model.md (partial)
-- [ ] T036 Añadir a la lista de causas de `specs/002-preprocesamiento-pwr3l/contracts/cli.md` las dos que el código produce y el contrato no nombra: `el archivo no existe` (lectura) y `no hay corridas usables` (`cli.py`, cuando todas las corridas son cortas) per contracts/cli.md (partial)
-- [ ] T037 Añadir en `tests/pwr3l/unit/test_pwr3l_descubrimiento.py` una prueba de `config.json` ilegible en una corrida automática (`archivo ilegible`, ruta del `config.json`), rama de `_leer_configuracion` sin cobertura per FR-014 (partial)
-- [ ] T038 Añadir en `tests/pwr3l/integration/test_pwr3l_cli.py` una prueba de origen sin corridas usables (todas cortas) → código 1 y `no hay corridas usables`, rama de `cli.py` sin cobertura per FR-014 (unrequested)
+- [X] T035 Corregir en `specs/002-preprocesamiento-pwr3l/data-model.md` el campo `archivo`: el código guarda la carpeta para todas las corridas descartadas y OOD (no solo para R27), porque no se leen per plan: data-model.md (partial)
+- [X] T036 Añadir a la lista de causas de `specs/002-preprocesamiento-pwr3l/contracts/cli.md` las dos que el código produce y el contrato no nombra: `el archivo no existe` (lectura) y `no hay corridas usables` (`cli.py`, cuando todas las corridas son cortas) per contracts/cli.md (partial)
+- [X] T037 Añadir en `tests/pwr3l/unit/test_pwr3l_descubrimiento.py` una prueba de `config.json` ilegible en una corrida automática (`archivo ilegible`, ruta del `config.json`), rama de `_leer_configuracion` sin cobertura per FR-014 (partial)
+- [X] T038 Añadir en `tests/pwr3l/integration/test_pwr3l_cli.py` una prueba de origen sin corridas usables (todas cortas) → código 1 y `no hay corridas usables`, rama de `cli.py` sin cobertura per FR-014 (unrequested)
