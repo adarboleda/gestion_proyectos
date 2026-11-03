@@ -8,6 +8,13 @@
 
 **Input**: User description: "Entrenar el clasificador de Etapa 1 (familia del evento) de IANuclear para la planta PWR 3L (tarea de Jira de Abner Arboleda): una Bi-LSTM que distingue operación normal (NORM), familia LOCA (LOCA rama caliente y LOCAC rama fría) y transitorio con disparo (ATWS y TRIP_OK). Debe entrenarse con prefijos cortos de la secuencia para que decida con pocos segundos de datos después del inicio del evento, y con pesos de clase para compensar el desbalance. Usa las corridas usables y el reparto sin fuga de la funcionalidad 004 (entrenamiento, validación y prueba) y el escalado ajustado solo con entrenamiento de la 003. Debe reportar con honestidad qué tan rápido y qué tan bien distingue las tres familias en las corridas de prueba, incluidas las falsas alarmas en operación normal. La salida es consultiva: el modelo recomienda, no actúa sobre la planta."
 
+## Clarifications
+
+### Session 2026-11-03
+
+- Q: ¿Qué datos ve el modelo en cada instante para decidir (el «prefijo corto»)? → A: En cada segundo τ, los últimos 30 s hasta τ (al empezar la corrida, lo disponible desde t = 0); se entrena con el tramo previo al evento y los primeros 60 s del evento.
+- Q: En las corridas de evento, ¿cómo se etiquetan los instantes anteriores al inicio del evento? → A: Como operación normal.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Entrenar el clasificador de las tres familias (Priority: P1)
@@ -77,8 +84,8 @@ El analista entrega al modelo guardado los datos de una corrida hasta un instant
 - **FR-001**: El sistema MUST clasificar en tres familias: operación normal (NORM), familia LOCA (LOCA rama caliente y LOCAC rama fría) y transitorio con disparo (ATWS y TRIP_OK). Las corridas cortas, descartadas y OOD MUST NOT usarse.
 - **FR-002**: El sistema MUST usar el reparto sin fuga de la funcionalidad 004: todas las muestras de una corrida MUST pertenecer al conjunto de esa corrida, y la verificación de fuga MUST ejecutarse antes de entrenar.
 - **FR-003**: El sistema MUST usar como entrada las 26 variables medibles en sala de control, escaladas con parámetros ajustados solo con las corridas de entrenamiento (funcionalidad 003); MUST NOT usar el caudal de fuga ni los márgenes térmicos como entrada.
-- **FR-004**: El sistema MUST entrenar con prefijos cortos de la secuencia: [NEEDS CLARIFICATION: ¿qué ve el modelo en cada instante: el comienzo de la corrida hasta ese instante limitado a una ventana corta, solo un tramo alineado con el inicio del evento, o la secuencia completa?]
-- **FR-005**: El sistema MUST etiquetar cada muestra de una corrida de evento según el instante de inicio del evento: [NEEDS CLARIFICATION: ¿las muestras anteriores al inicio del evento se etiquetan como operación normal o se excluyen del entrenamiento?]
+- **FR-004**: El sistema MUST formar una muestra por cada segundo τ de cada corrida, a partir de τ = 5 s, con los datos de los últimos 30 s hasta τ (o desde t = 0 si τ es menor que 30 s): un prefijo corto que el modelo podría ver en tiempo real. El entrenamiento MUST usar todas las muestras de las corridas NORM, todas las del tramo previo al evento y las de los primeros 60 s de cada evento; la validación y la evaluación MUST usar todas las muestras de sus corridas.
+- **FR-005**: El sistema MUST etiquetar cada muestra de una corrida de evento según el instante de inicio del evento: operación normal si τ es anterior al inicio y la familia del evento desde el inicio en adelante. Los segundos desde el inicio del evento (τ − inicio) se guardan con cada muestra para medir los horizontes de FR-009.
 - **FR-006**: El sistema MUST ponderar cada familia en el entrenamiento en proporción inversa a su frecuencia en las muestras de entrenamiento y MUST registrar los pesos usados.
 - **FR-007**: El sistema MUST producir el mismo modelo y las mismas métricas con los mismos datos, la misma configuración y la misma semilla.
 - **FR-008**: El sistema MUST elegir el modelo final (cuándo parar de entrenar) usando solo las corridas de validación; las corridas de prueba MUST usarse solo en la evaluación final.
