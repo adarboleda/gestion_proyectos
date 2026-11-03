@@ -25,9 +25,9 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Modificar `pyproject.toml`: extra opcional `modelo = ["torch>=2.2"]`, guion `entrenar-etapa1 = "clasificador_etapa1.cli:main"` y `description` que nombre también el clasificador de Etapa 1; añadir `modelos/` al `.gitignore`
-- [ ] T002 [P] Crear `src/clasificador_etapa1/__init__.py` (docstring en español), `src/clasificador_etapa1/__main__.py` (llama a `clasificador_etapa1.cli.main()` y sale con su código) y las carpetas `tests/etapa1/unit/` y `tests/etapa1/integration/`
-- [ ] T003 Instalar PyTorch para CPU (`--index-url https://download.pytorch.org/whl/cpu`) y el paquete en modo editable; comprobar que `python -m pytest --collect-only -q` no da errores
+- [X] T001 Modificar `pyproject.toml`: extra opcional `modelo = ["torch>=2.2"]`, guion `entrenar-etapa1 = "clasificador_etapa1.cli:main"` y `description` que nombre también el clasificador de Etapa 1; añadir `modelos/` al `.gitignore`
+- [X] T002 [P] Crear `src/clasificador_etapa1/__init__.py` (docstring en español), `src/clasificador_etapa1/__main__.py` (llama a `clasificador_etapa1.cli.main()` y sale con su código) y las carpetas `tests/etapa1/unit/` y `tests/etapa1/integration/`
+- [X] T003 Instalar PyTorch para CPU (`--index-url https://download.pytorch.org/whl/cpu`) y el paquete en modo editable; comprobar que `python -m pytest --collect-only -q` no da errores
 
 ---
 
@@ -37,17 +37,17 @@
 
 ### Tests (escribir primero; deben fallar)
 
-- [ ] T004 Crear `tests/etapa1/conftest.py` con una fixture `sinteticas` que construye en memoria corridas `preparacion_pwr3l.descubrimiento.Corrida` usables con `serie` (300, 33): ruido pequeño alrededor de un estado estable y, desde un instante de inicio, una señal distinta por familia (LOCA: cae `P` y sube `WECS`; ATWS/TRIP_OK: cae `WFWA`/`WFWB` y sube `TAVG`), con NORM, LOCA, LOCAC, ATWS y TRIP_OK, áreas y gemelas coherentes, un diccionario `inicios` y un reparto (`formar_grupos` + `repartir` de 004); y un ayudante para escribir un árbol PWR 3L mínimo con `validacion.json`, `validacion_corridas.csv` y una carpeta manual `_t<n>` sin validación
-- [ ] T005 [P] Crear `tests/etapa1/unit/test_etapa1_eventos.py`: inicio desde `validacion.json` (automáticas); desde `validacion_corridas.csv` por identificador, ignorando filas `[mitigation]`; desde `_t<n>` del nombre de la carpeta si no hay validación; `None` para NORM; corrida de evento sin ninguna fuente → `ErrorDatos` que nombra el archivo; `inicios_evento(origen, corridas)` cubre todas las usables
-- [ ] T006 [P] Crear `tests/etapa1/unit/test_etapa1_muestras.py`: una muestra por τ = 5…299 en validación/prueba; ventana = filas [τ − 29, τ] y, con τ < 29, relleno repitiendo la fila 0; etiqueta NORM si τ < inicio y familia si τ ≥ inicio, con el inicio redondeado hacia arriba al segundo (un inicio de 24,5 s etiqueta como evento desde τ = 25 y da k = 0 en τ = 25); `k = τ − inicio` y `nan` en NORM; en entrenamiento solo NORM completas, τ < inicio y 0 ≤ k ≤ 60; formas y tipos de data-model.md («`x` (n, 30, 26) float32», «`y` (n,) int64», «`tau` (n,) int64», «`k` (n,) float64»); todas las muestras de un conjunto vienen de corridas de ese conjunto; ninguna fila posterior a τ en su ventana
-- [ ] T007 Ejecutar `python -m pytest tests/etapa1/unit/test_etapa1_eventos.py tests/etapa1/unit/test_etapa1_muestras.py` y comprobar que **fallan**
+- [X] T004 Crear `tests/etapa1/conftest.py` con una fixture `sinteticas` que construye en memoria corridas `preparacion_pwr3l.descubrimiento.Corrida` usables con `serie` (300, 33): ruido pequeño alrededor de un estado estable y, desde un instante de inicio, una señal distinta por familia (LOCA: cae `P` y sube `WECS`; ATWS/TRIP_OK: cae `WFWA`/`WFWB` y sube `TAVG`), con NORM, LOCA, LOCAC, ATWS y TRIP_OK, áreas y gemelas coherentes, un diccionario `inicios` y un reparto (`formar_grupos` + `repartir` de 004); y un ayudante para escribir un árbol PWR 3L mínimo con `validacion.json`, `validacion_corridas.csv` y una carpeta manual `_t<n>` sin validación
+- [X] T005 [P] Crear `tests/etapa1/unit/test_etapa1_eventos.py`: inicio desde `validacion.json` (automáticas); desde `validacion_corridas.csv` por identificador, ignorando filas `[mitigation]`; desde `_t<n>` del nombre de la carpeta si no hay validación; `None` para NORM; corrida de evento sin ninguna fuente → `ErrorDatos` que nombra el archivo; `inicios_evento(origen, corridas)` cubre todas las usables
+- [X] T006 [P] Crear `tests/etapa1/unit/test_etapa1_muestras.py`: una muestra por τ = 5…299 en validación/prueba; ventana = filas [τ − 29, τ] y, con τ < 29, relleno repitiendo la fila 0; etiqueta NORM si τ < inicio y familia si τ ≥ inicio, con el inicio redondeado hacia arriba al segundo (un inicio de 24,5 s etiqueta como evento desde τ = 25 y da k = 0 en τ = 25); `k = τ − inicio` y `nan` en NORM; en entrenamiento solo NORM completas, τ < inicio y 0 ≤ k ≤ 60; formas y tipos de data-model.md («`x` (n, 30, 26) float32», «`y` (n,) int64», «`tau` (n,) int64», «`k` (n,) float64»); todas las muestras de un conjunto vienen de corridas de ese conjunto; ninguna fila posterior a τ en su ventana
+- [X] T007 Ejecutar `python -m pytest tests/etapa1/unit/test_etapa1_eventos.py tests/etapa1/unit/test_etapa1_muestras.py` y comprobar que **fallan**
 
 ### Implementation
 
-- [ ] T008 Crear `src/clasificador_etapa1/config.py`: `FAMILIAS = ("NORM", "LOCA", "TRANS")`, clase → familia (NORM→NORM, LOCA/LOCAC→LOCA, ATWS/TRIP_OK→TRANS), `VENTANA_S = 30`, `TAU_MIN_S = 5`, `HORIZONTE_ENTRENAMIENTO_S = 60`, `UMBRAL = 0.80`, `CONFIRMACION_S = 2`, `HORIZONTES_S = (1, 2, 3, 5, 10, 20, 30)`, hiperparámetros (32 unidades, 1 capa, dropout 0.3, lr 1e-3, weight decay 1e-4, lote 256, 40 épocas, paciencia 6), `SEMILLA = 42`, `SALIDA_POR_DEFECTO = "modelos/etapa1"` y el texto del aviso consultivo
-- [ ] T009 Crear `src/clasificador_etapa1/eventos.py` con `inicio_evento(origen, corrida)` e `inicios_evento(origen, corridas)` según research.md §2
-- [ ] T010 Crear `src/clasificador_etapa1/muestras.py` con la dataclass `Muestras` y `construir_muestras(corridas, series_escaladas, inicios, entrenamiento: bool)` según research.md §3
-- [ ] T011 Ejecutar las pruebas de T005 y T006 y comprobar que pasan
+- [X] T008 Crear `src/clasificador_etapa1/config.py`: `FAMILIAS = ("NORM", "LOCA", "TRANS")`, clase → familia (NORM→NORM, LOCA/LOCAC→LOCA, ATWS/TRIP_OK→TRANS), `VENTANA_S = 30`, `TAU_MIN_S = 5`, `HORIZONTE_ENTRENAMIENTO_S = 60`, `UMBRAL = 0.80`, `CONFIRMACION_S = 2`, `HORIZONTES_S = (1, 2, 3, 5, 10, 20, 30)`, hiperparámetros (32 unidades, 1 capa, dropout 0.3, lr 1e-3, weight decay 1e-4, lote 256, 40 épocas, paciencia 6), `SEMILLA = 42`, `SALIDA_POR_DEFECTO = "modelos/etapa1"` y el texto del aviso consultivo
+- [X] T009 Crear `src/clasificador_etapa1/eventos.py` con `inicio_evento(origen, corrida)` e `inicios_evento(origen, corridas)` según research.md §2
+- [X] T010 Crear `src/clasificador_etapa1/muestras.py` con la dataclass `Muestras` y `construir_muestras(corridas, series_escaladas, inicios, entrenamiento: bool)` según research.md §3
+- [X] T011 Ejecutar las pruebas de T005 y T006 y comprobar que pasan
 
 **Checkpoint**: inicios y muestras listos
 
