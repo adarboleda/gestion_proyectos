@@ -119,6 +119,21 @@ def construir_arbol(raiz: Path) -> Path:
     return raiz
 
 
+def celdas_xlsx(ruta: Path, columnas) -> np.ndarray:
+    """Valores de `columnas` tal como están guardados en el libro, leídos con openpyxl directamente.
+
+    openpyxl guarda 16 cifras significativas, así que el libro no tiene exactamente los valores del
+    generador: la referencia de una lectura exacta es el propio archivo.
+    """
+    import openpyxl
+
+    with open(ruta, "rb") as archivo:  # con un nombre .xls openpyxl rechaza la ruta, no el contenido
+        hoja = openpyxl.load_workbook(archivo, read_only=True).active
+        filas = list(hoja.iter_rows(values_only=True))
+    indices = [list(filas[0]).index(columna) for columna in columnas]
+    return np.array([[fila[i] for i in indices] for fila in filas[1:]], dtype=np.float64)
+
+
 def hash_arbol(raiz: Path) -> str:
     resumen = hashlib.sha256()
     for ruta in sorted(Path(raiz).rglob("*")):
@@ -173,6 +188,7 @@ def copia_pwr3l(arbol_pwr3l, tmp_path) -> Path:
 def ayudantes():
     return SimpleNamespace(
         hash_arbol=hash_arbol,
+        celdas_xlsx=celdas_xlsx,
         corromper_csv=corromper_csv,
         escribir_corrida_auto=escribir_corrida_auto,
         escribir_tabla=escribir_tabla,

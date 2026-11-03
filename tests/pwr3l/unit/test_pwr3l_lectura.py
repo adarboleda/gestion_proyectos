@@ -39,8 +39,8 @@ def test_libro_xlsx_con_extension_xls(arbol_pwr3l, cargadas, ayudantes):
     corrida = cargadas["R01"]
     assert corrida.archivo.endswith(".xls") and corrida.estado == "usable"
     assert corrida.serie.shape == (300, 33)
-    tabla = ayudantes.datos_corrida(1)
-    assert np.array_equal(corrida.serie, tabla[VARIABLES].to_numpy()[:300])
+    esperado = ayudantes.celdas_xlsx(arbol_pwr3l / corrida.archivo, VARIABLES)
+    assert np.array_equal(corrida.serie, esperado[:300])
 
 
 def test_corrida_de_exactamente_300_filas_es_usable(cargadas):
