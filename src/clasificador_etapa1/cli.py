@@ -134,6 +134,26 @@ def entrenar_modelo(origen, semilla: int, epocas: int) -> Ejecucion:
     return Ejecucion(resultado.modelo, configuracion, reparto.corridas["test"], muestras["test"], inicios, artefactos)
 
 
+def agregar_reporte(ejecucion: Ejecucion) -> str:
+    """Evalúa en prueba, añade `reporte.json` y `reporte.txt` a los artefactos y devuelve el texto."""
+    from clasificador_etapa1.evaluacion import evaluar, formatear_reporte
+
+    configuracion = ejecucion.configuracion
+    reporte = evaluar(ejecucion.modelo, ejecucion.muestras_prueba, ejecucion.corridas_prueba, ejecucion.inicios)
+    reporte["entrenamiento"] = {
+        "pesos_clase": configuracion["pesos_clase"],
+        "mejor_epoca": configuracion["mejor_epoca"],
+        "epocas_ejecutadas": len(configuracion["historial"]),
+        "f1_validacion": max(h["f1_val"] for h in configuracion["historial"]),
+        "muestras": configuracion["muestras"],
+        "semilla": configuracion["semilla"],
+    }
+    texto = formatear_reporte(reporte)
+    ejecucion.artefactos["reporte.json"] = json.dumps(reporte, ensure_ascii=False, indent=2).encode("utf-8")
+    ejecucion.artefactos["reporte.txt"] = texto.encode("utf-8")
+    return texto
+
+
 def publicar(salida, artefactos: Dict[str, bytes]) -> None:
     """Escribe los artefactos en una carpeta temporal y luego reemplaza solo esos archivos en `salida`."""
     salida = Path(salida)
@@ -158,6 +178,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 3
     try:
         ejecucion = entrenar_modelo(argumentos.origen, argumentos.semilla, argumentos.epocas)
+        texto = agregar_reporte(ejecucion)
         publicar(argumentos.salida, {n: c for n, c in ejecucion.artefactos.items() if n in ARTEFACTOS})
     except (ErrorDatos, ErrorFuga, ValueError) as error:
         print(error, file=sys.stderr)
@@ -165,4 +186,5 @@ def main(argv: Optional[List[str]] = None) -> int:
     except OSError as error:
         print(f"ERROR: no se pudo escribir en {argumentos.salida}: {error}", file=sys.stderr)
         return 1
+    print(texto, end="")
     return 0
