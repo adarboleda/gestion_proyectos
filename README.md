@@ -122,6 +122,34 @@ Normal y ATWS tienen una sola simulación en el dataset: van completas a entrena
 
 ---
 
+## Preprocesamiento PWR 3L (funcionalidad 002, KAN-18)
+
+Prepara las corridas de la planta **PWR 3L** (2705 MWt, un dato por segundo; carpeta `PWR 3L`) en muestras de **300 pasos de 1 s** con **cinco clases**: NORM (0), LOCA (1), LOCAC (2), ATWS (3) y TRIP_OK (4). Es una planta distinta de NPPAD: paquete, comando y salida propios, sin mezclar datos. Las corridas se reparten por **grupos completos** (gemelas ATWS/TRIP_OK juntas; LOCA y LOCAC de igual área de rotura juntas), ≈ 70/15/15 con semilla 42, y el escalador se ajusta solo con entrenamiento.
+
+**Ejecución** (tras `pip install -e ".[dev]"`; imprime el reporte y escribe `data_processed_pwr3l/`):
+
+```
+preparar-pwr3l
+```
+
+Equivale a `python -m preparacion_pwr3l`. Opciones: `--origen RUTA` (por defecto `../IA-Nuclear/PWR 3L`, solo lectura), `--salida RUTA` y `--semilla N`. Un archivo defectuoso termina con código 1, nombra el archivo y la causa, y no escribe nada.
+
+**Salida** en `data_processed_pwr3l/` (se regenera; no se edita a mano):
+
+| Archivo | Contenido |
+|---|---|
+| `X_train/val/test.npy` | `(N,300,26)` float32: 26 variables medibles escaladas (sin `WLR`) |
+| `y_train/val/test.npy` | `(N,)` int64: 0 = NORM, 1 = LOCA, 2 = LOCAC, 3 = ATWS, 4 = TRIP_OK |
+| `margins_train/val/test.npy` | `(N,300,7)` float64: 7 márgenes térmicos sin escalar |
+| `scaler_mean.npy`, `scaler_std.npy` | `(26,)`, ajustados solo con entrenamiento |
+| `metadata.json` | corridas y grupos de cada conjunto (orden de las filas), corridas excluidas con su motivo, advertencias y limitaciones |
+
+Con la carpeta real: 109 corridas encontradas → 91 muestras (62 / 15 / 14). No aportan muestra las 6 OOD, las 3 descartadas por el equipo (R07, R27, R28) y 9 corridas con menos de 300 filas (se excluyen con aviso; no se rellenan).
+
+**Pruebas**: `pytest tests/pwr3l`. Detalle: [specs/002-preprocesamiento-pwr3l/quickstart.md](specs/002-preprocesamiento-pwr3l/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
