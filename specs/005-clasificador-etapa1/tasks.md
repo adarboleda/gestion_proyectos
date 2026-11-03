@@ -106,13 +106,13 @@
 
 ### Tests for User Story 3 (escribir primero; deben fallar)
 
-- [ ] T025 [P] [US3] Crear `tests/etapa1/unit/test_etapa1_prediccion.py`: con un modelo entrenado y publicado sobre las corridas sintéticas, `cargar(ruta).clasificar(serie)` devuelve tres probabilidades que suman 1; la recomendación es la familia más probable si ≥ 0,80 y «INCIERTO» si no (forzando probabilidades bajas); el aviso es el texto consultivo; el resultado coincide con escalar con `modelo.json["escalador"]` y pasar la ventana al modelo; serie que no es (T, 26) o con T < 5 → `ValueError`
-- [ ] T026 [US3] Ejecutar `python -m pytest tests/etapa1/unit/test_etapa1_prediccion.py` y comprobar que **falla**
+- [X] T025 [P] [US3] Crear `tests/etapa1/unit/test_etapa1_prediccion.py`: con un modelo entrenado y publicado sobre las corridas sintéticas, `cargar(ruta).clasificar(serie)` devuelve tres probabilidades que suman 1; la recomendación es la familia más probable si ≥ 0,80 y «INCIERTO» si no (forzando probabilidades bajas); el aviso es el texto consultivo; el resultado coincide con escalar con `modelo.json["escalador"]` y pasar la ventana al modelo; serie que no es (T, 26) o con T < 5 → `ValueError`
+- [X] T026 [US3] Ejecutar `python -m pytest tests/etapa1/unit/test_etapa1_prediccion.py` y comprobar que **falla**
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Crear `src/clasificador_etapa1/prediccion.py` con `cargar(ruta)` y `Clasificador.clasificar(serie)` (research.md §10; contracts/salidas.md)
-- [ ] T028 [US3] Ejecutar `python -m pytest tests/etapa1` y comprobar que pasan las tres historias
+- [X] T027 [US3] Crear `src/clasificador_etapa1/prediccion.py` con `cargar(ruta)` y `Clasificador.clasificar(serie)` (research.md §10; contracts/salidas.md)
+- [X] T028 [US3] Ejecutar `python -m pytest tests/etapa1` y comprobar que pasan las tres historias
 
 ---
 
