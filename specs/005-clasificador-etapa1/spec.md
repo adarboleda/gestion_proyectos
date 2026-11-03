@@ -85,7 +85,7 @@ El analista entrega al modelo guardado los datos de una corrida hasta un instant
 - **FR-002**: El sistema MUST usar el reparto sin fuga de la funcionalidad 004: todas las muestras de una corrida MUST pertenecer al conjunto de esa corrida, y la verificación de fuga MUST ejecutarse antes de entrenar.
 - **FR-003**: El sistema MUST usar como entrada las 26 variables medibles en sala de control, escaladas con parámetros ajustados solo con las corridas de entrenamiento (funcionalidad 003); MUST NOT usar el caudal de fuga ni los márgenes térmicos como entrada.
 - **FR-004**: El sistema MUST formar una muestra por cada segundo τ de cada corrida, a partir de τ = 5 s, con los datos de los últimos 30 s hasta τ (o desde t = 0 si τ es menor que 30 s): un prefijo corto que el modelo podría ver en tiempo real. El entrenamiento MUST usar todas las muestras de las corridas NORM, todas las del tramo previo al evento y las de los primeros 60 s de cada evento; la validación y la evaluación MUST usar todas las muestras de sus corridas.
-- **FR-005**: El sistema MUST etiquetar cada muestra de una corrida de evento según el instante de inicio del evento: operación normal si τ es anterior al inicio y la familia del evento desde el inicio en adelante. Los segundos desde el inicio del evento (τ − inicio) se guardan con cada muestra para medir los horizontes de FR-009.
+- **FR-005**: El sistema MUST etiquetar cada muestra de una corrida de evento según el instante de inicio del evento: operación normal si τ es anterior al inicio y la familia del evento desde el inicio en adelante; el inicio se redondea hacia arriba al segundo entero. Los segundos desde el inicio del evento (τ − inicio) se guardan con cada muestra para medir los horizontes de FR-009.
 - **FR-006**: El sistema MUST ponderar cada familia en el entrenamiento en proporción inversa a su frecuencia en las muestras de entrenamiento y MUST registrar los pesos usados.
 - **FR-007**: El sistema MUST producir el mismo modelo y las mismas métricas con los mismos datos, la misma configuración y la misma semilla.
 - **FR-008**: El sistema MUST elegir el modelo final (cuándo parar de entrenar) usando solo las corridas de validación; las corridas de prueba MUST usarse solo en la evaluación final.
@@ -99,7 +99,7 @@ El analista entrega al modelo guardado los datos de una corrida hasta un instant
 
 ### Key Entities
 
-- **Familia**: NORM, LOCA (LOCA y LOCAC) o transitorio con disparo (ATWS y TRIP_OK); es la etiqueta que aprende el modelo.
+- **Familia**: NORM, LOCA (LOCA y LOCAC) o transitorio con disparo (ATWS y TRIP_OK; etiqueta TRANS); es la etiqueta que aprende el modelo.
 - **Corrida**: una simulación PWR 3L usable, con su clase, su conjunto (del reparto de 004), su instante de inicio del evento y, si es LOCA, su área de rotura.
 - **Muestra**: los datos que ve el modelo en un instante de una corrida, con la familia que le corresponde en ese instante y los segundos transcurridos desde el inicio del evento.
 - **Modelo entrenado**: el clasificador y todo lo necesario para reutilizarlo: parámetros de escala, clases, configuración, semilla y pesos de clase.
@@ -114,7 +114,7 @@ El analista entrega al modelo guardado los datos de una corrida hasta un instant
 - **SC-002**: En las corridas de operación normal de prueba hay 0 falsas alarmas confirmadas.
 - **SC-003**: Sobre las corridas de prueba, el F1 macro de las tres familias en los primeros 30 segundos desde el inicio del evento (más las muestras de operación normal) es de al menos 0,80.
 - **SC-004**: El 100 % de las corridas de evento de prueba aparece en el reporte con su tiempo de confirmación o «no detectada».
-- **SC-005**: Dos entrenamientos con los mismos datos y la misma semilla producen métricas idénticas en el 100 % de los valores.
+- **SC-005**: Dos entrenamientos con los mismos datos y la misma semilla, en la misma máquina y con la misma versión del entorno, producen métricas idénticas en el 100 % de los valores.
 - **SC-006**: Entrenar y evaluar con todas las corridas usables termina en menos de 15 minutos en una computadora portátil sin aceleración gráfica.
 - **SC-007**: 0 muestras de una corrida aparecen en un conjunto distinto del de su corrida.
 

@@ -14,7 +14,7 @@
 
 ## 3. Muestras: ventana causal de 30 s
 
-- **Decisión**: para cada segundo τ = 5…299 (fila τ de la serie, paso de 1 s medido por 003), la muestra son las filas [τ − 29, τ] de las 26 variables escaladas; si τ < 29, las filas que faltan al principio se rellenan repitiendo la fila 0. Etiqueta: NORM si τ < inicio; si no, la familia de la corrida. Se guardan τ y k = τ − inicio (sin valor en las corridas NORM).
+- **Decisión**: para cada segundo τ = 5…299 (fila τ de la serie, paso de 1 s medido por 003), la muestra son las filas [τ − 29, τ] de las 26 variables escaladas; si τ < 29, las filas que faltan al principio se rellenan repitiendo la fila 0. El inicio se redondea hacia arriba al segundo entero (`ceil`), porque τ es entero (hallazgo U1). Etiqueta: NORM si τ < inicio; si no, la familia de la corrida. Se guardan τ y k = τ − inicio (sin valor en las corridas NORM).
 - **Entrenamiento**: todas las muestras de las corridas NORM, todas las de τ < inicio y las de 0 ≤ k ≤ 60 de cada evento (primera aclaración). Validación y prueba: todas las muestras.
 - **Razón**: FR-004 y FR-005. Es exactamente lo que el modelo vería en tiempo real cada segundo. Repetir la primera fila es un dato pasado (estado inicial estable), no información futura, y evita máscaras de longitud variable.
 - **Alternativas**: relleno con ceros (en datos escalados, cero es la media de entrenamiento, no el estado de la planta); secuencias de longitud variable empaquetadas (más complejo, sin ganancia para ventanas de 30 s).
@@ -28,12 +28,13 @@
 ## 5. Entrenamiento
 
 - **Decisión**: pérdida de entropía cruzada con pesos de clase `w_c = N / (3 · n_c)` sobre las muestras de entrenamiento (FR-006); Adam (lr 1e-3, weight decay 1e-4); lotes de 256; hasta 40 épocas; parada temprana con paciencia 6 sobre el F1 macro de validación, conservando el mejor estado (FR-008).
-- **Determinismo (FR-007)**: `torch.manual_seed(semilla)`, `torch.use_deterministic_algorithms(True)`, un `torch.Generator` con la semilla para barajar y `numpy` con la semilla; CPU. Dos ejecuciones con la misma semilla dan los mismos pesos y métricas.
+- **Determinismo (FR-007)**: `torch.manual_seed(semilla)`, `torch.use_deterministic_algorithms(True)`, un `torch.Generator` con la semilla para barajar y `numpy` con la semilla; CPU. Dos ejecuciones con la misma semilla dan los mismos pesos y métricas en la misma máquina, con la misma versión de PyTorch y el mismo número de hilos (hallazgo A1); la versión de PyTorch y los hilos se registran en `modelo.json`.
 - **Alternativas**: sobremuestreo (duplica muestras casi idénticas de pocas corridas); focal loss (otro hiperparámetro sin datos para ajustarlo).
 
 ## 6. Métricas por familia y por horizonte
 
 - **Decisión**: sobre todas las muestras de prueba, matriz de confusión, precisión, exhaustividad y F1 por familia y F1 macro. **Horizonte h** (1, 2, 3, 5, 10, 20, 30 s): muestras de evento con k = h (una por corrida de evento) más todas las muestras de operación normal de prueba; se informan la exhaustividad de cada familia de evento en k = h y el F1 macro. **Primeros 30 s** (SC-003): muestras de evento con 0 ≤ k ≤ 30 más todas las de operación normal.
+- **Metas sin datos (U2)**: si ninguna corrida de prueba permite evaluar una meta, se informa «sin datos», ni cumple ni falla.
 - **Razón**: FR-009. La exhaustividad en k = h responde a la pregunta de la tarea («¿acierta con h segundos de datos?»); sumar las muestras NORM evita un F1 que ignore las falsas alarmas.
 
 ## 7. Confirmación y tiempo de detección

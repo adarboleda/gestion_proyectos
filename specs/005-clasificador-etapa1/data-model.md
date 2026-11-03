@@ -48,6 +48,7 @@ Entrenamiento: NORM completas, τ < inicio y 0 ≤ k ≤ 60. Validación y prueb
 | `mejor_epoca` | entero |
 | `corridas` | ids por conjunto |
 | `version` | versión del paquete |
+| `entorno` | versión de PyTorch y número de hilos usados |
 
 ## Reporte de evaluación (nuevo)
 
