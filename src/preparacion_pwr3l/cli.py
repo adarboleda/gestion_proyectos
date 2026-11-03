@@ -11,6 +11,7 @@ from preparacion_pwr3l.grupos import formar_grupos
 from preparacion_pwr3l.lectura import cargar_corridas
 from preparacion_pwr3l.particion import repartir
 from preparacion_pwr3l.salida import construir_conjunto
+from preparacion_pwr3l.salida import construir_margenes
 
 
 def _crear_parser() -> argparse.ArgumentParser:
@@ -52,6 +53,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             archivos[f"y_{conjunto}.npy"] = y
         archivos["scaler_mean.npy"] = escalador.media
         archivos["scaler_std.npy"] = escalador.escala
+        for conjunto in CONJUNTOS:
+            archivos[f"margins_{conjunto}.npy"] = construir_margenes(particion[conjunto])
         publicar(argumentos.salida, archivos)
     except ErrorDatos as error:
         print(error, file=sys.stderr)

@@ -17,3 +17,11 @@ def construir_conjunto(corridas: List[Corrida]) -> Tuple[np.ndarray, np.ndarray]
         x[i] = corrida.serie[:, :N_ENTRADAS]
         y[i] = corrida.etiqueta
     return x, y
+
+
+def construir_margenes(corridas: List[Corrida]) -> np.ndarray:
+    """Márgenes térmicos (N, 300, 7) float64 en sus unidades originales, sin ninguna transformación."""
+    margenes = np.empty((len(corridas), PASOS, len(VARIABLES_MARGEN)), dtype=np.float64)
+    for i, corrida in enumerate(corridas):
+        margenes[i] = corrida.serie[:, N_ENTRADAS:]
+    return margenes
