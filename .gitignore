@@ -11,3 +11,6 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .venv/
+
+# Modelos entrenados (regenerables con entrenar-etapa1)
+modelos/

@@ -149,6 +149,37 @@ print(reparto.conteos)
 
 ---
 
+## Clasificador de Etapa 1 (funcionalidad 005)
+
+Una Bi-LSTM que, cada segundo, mira los últimos 30 s de las 26 variables medibles de **PWR 3L** y recomienda la familia del evento: **NORM** (operación normal), **LOCA** (rama caliente o fría) o **TRANS** (transitorio con disparo: ATWS o TRIP_OK). Se entrena con el reparto sin fuga de 004, el escalado de 003, pesos de clase para el desbalance y parada por validación. Es **consultivo**: recomienda, no actúa sobre la planta.
+
+**Instalación** (PyTorch para CPU):
+
+```powershell
+uv pip install --python .venv\Scripts\python.exe -e ".[dev]"
+uv pip install --python .venv\Scripts\python.exe torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+**Entrenar y evaluar**:
+
+```powershell
+.venv\Scripts\entrenar-etapa1.exe --origen "D:\Personal\IANuclear\PWR 3L" --salida modelos\etapa1
+```
+
+Deja en `modelos\etapa1\` (no se versiona) `modelo.pt`, `modelo.json`, `reporte.json` y `reporte.txt`, e imprime el reporte: métricas por familia, exhaustividad a 1–30 s del inicio del evento, tiempo de confirmación de cada corrida de prueba (≥ 0,80 dos segundos seguidos), falsas alarmas y metas.
+
+**Usar el modelo**:
+
+```python
+from clasificador_etapa1.prediccion import cargar
+resultado = cargar("modelos/etapa1").clasificar(serie)   # serie: (T, 26) sin escalar, hasta el instante actual
+# {"probabilidades": {...}, "recomendacion": "LOCA" | ... | "INCIERTO", "aviso": "Recomendación consultiva: ..."}
+```
+
+Resultados y detalle: [specs/005-clasificador-etapa1/quickstart.md](specs/005-clasificador-etapa1/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
