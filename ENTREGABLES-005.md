@@ -4,7 +4,7 @@
 **Rama**: `005-clasificador-etapa1` (creada desde `main` con 001–004 fusionadas) · **Fecha**: 2026-11-03
 **Herramienta**: GitHub Spec Kit + Claude Code (`claude-opus-5-5`) + `speckit-metricas` · **Constitución**: v2.0.0, sin cambios
 
-> **Estado: iteración completa y convergente (`converged` en la 2.ª pasada).** Se ejecutaron todas las fases de Spec Kit (`/speckit-specify` → `/speckit-clarify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-analyze` → `/speckit-implement` → `/speckit-converge` ×2) y todos los comandos de métricas. 35/35 tareas (108 puntos), 50 pruebas nuevas. Con los datos reales: **cumple 2 de las 3 metas**. La familia LOCA se reconoce más tarde de lo que pedía la meta de detección temprana; se informa tal como sale.
+> **Estado: iteración completa y convergente (`converged` en la 2.ª pasada).** Se ejecutaron todas las fases de Spec Kit (`/speckit-specify` → `/speckit-clarify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-analyze` → `/speckit-implement` → `/speckit-converge` ×2) y todos los comandos de métricas. 35/35 tareas (108 puntos), 50 pruebas nuevas; suite completa con los datos reales: 261 pasadas. Con los datos reales: **cumple 2 de las 3 metas**. La familia LOCA se reconoce más tarde de lo que pedía la meta de detección temprana; se informa tal como sale.
 
 ---
 
@@ -210,7 +210,7 @@ uv pip install --python .venv\Scripts\python.exe torch --index-url https://downl
 # Pruebas
 $env:IANUCLEAR_DATOS = "D:\Personal\IANuclear"
 .venv\Scripts\python.exe -m pytest tests/etapa1 -q      # 50 pruebas
-.venv\Scripts\python.exe -m pytest -q                   # suite completa
+.venv\Scripts\python.exe -m pytest -q                   # suite completa: 261 passed
 ```
 
 ---
@@ -221,4 +221,4 @@ $env:IANUCLEAR_DATOS = "D:\Personal\IANuclear"
 |---|---|
 | Mejorar la detección temprana de LOCA (SC-001) | Selección por el F1 de los primeros segundos, ventana más corta o atención, variables de tendencia; siempre evaluado con validación |
 | Etapa 2 | Distinguir rama caliente o fría y ATWS o TRIP_OK sobre los eventos que la Etapa 1 clasifique |
-| PR de 005 | Subir la rama y abrir el pull request hacia `main` |
+| KAN-18 (002) | Salida, reporte y comando de PWR 3L (T015, T019–T034 de 002) |

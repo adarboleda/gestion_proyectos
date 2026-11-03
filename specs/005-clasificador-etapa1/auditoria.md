@@ -9,7 +9,7 @@
 - **Análisis inicial**: 6 hallazgos (0 críticos, 1 medio y 5 bajos), cobertura del 100 % y FR-015 parcial. El responsable aprobó de forma explícita aplicar los 6, en un commit aparte (`094e1b6`).
 - **Converge, 1.ª pasada**: 3 hallazgos `partial` (1 medio y 2 bajos), que generaron las tareas T033–T035. Se implementaron solo con inserciones de código (+13 / −0).
 - **Converge, 2.ª pasada**: **`converged`**, 0 hallazgos.
-- **Estado final**: 35/35 tareas y 50 pruebas de `etapa1`. Con los datos reales, la suite completa da 259 pasadas y 1 omitida antes de las tareas de convergencia; las pruebas de `etapa1` siguen en verde después.
+- **Estado final**: 35/35 tareas y 50 pruebas de `etapa1`. Con los datos reales, la suite completa da **261 pasadas y 0 omitidas** (tras corregir la ruta de la prueba real de NPPAD de 001, que antes se omitía siempre).
 - **Resultado con los datos reales**: cumple SC-002 (0 falsas alarmas) y SC-003 (F1 de los primeros 30 s = 0,927), pero **no cumple SC-001**: las LOCA de 100 cm² se confirman en 19 s, frente a la meta de ≤ 10 s. Se informa tal como sale, como pide la spec.
 
 ## 2. Cobertura de requisitos (estado final)
