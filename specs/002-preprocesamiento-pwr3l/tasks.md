@@ -128,7 +128,7 @@
 - [X] T031 Crear `tests/pwr3l/integration/test_pwr3l_dataset_real.py` (se omite si `../IA-Nuclear/PWR 3L` no existe): código 0; 109 corridas encontradas (100 de las cinco clases, 6 OOD, 3 descartadas); las corridas con menos de 300 filas aparecen como cortas con su número de filas; R07b usable y R07 descartada; ninguna OOD en los conjuntos; la tabla `GEMELAS` coincide con `gemelo_de` de cada `config.json` de `auto`; las restricciones de grupo se cumplen; hash del origen sin cambios
 - [X] T032 [P] Añadir al `README.md` una sección «Preprocesamiento PWR 3L (funcionalidad 002)»: qué hace, instalación, `preparar-pwr3l`, opciones, artefactos y limitaciones, sin tocar la sección de 001
 - [X] T033 Ejecutar las validaciones de `specs/002-preprocesamiento-pwr3l/quickstart.md` con el dataset real y anotar en `quickstart.md` los conteos obtenidos
-- [ ] T034 Ejecutar la suite completa (`python -m pytest -q`, 001 + 002) y comprobar que todo pasa
+- [X] T034 Ejecutar la suite completa (`python -m pytest -q`, 001 + 002) y comprobar que todo pasa
 
 ---
 
