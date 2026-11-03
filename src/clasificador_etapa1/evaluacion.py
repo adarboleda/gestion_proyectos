@@ -83,6 +83,7 @@ def por_horizonte(m: Muestras, probabilidades: np.ndarray, horizontes: Iterable[
         seleccion = en_h | normales
         f1 = _f1_macro(m.y[seleccion], pred[seleccion])
         tabla.append({"h": h, "eventos": int(en_h.sum()), "exhaustividad": exhaustividad, "f1_macro": f1})
+        tabla[-1]["metricas"] = metricas(m.y[seleccion], pred[seleccion])  # precisión, exhaustividad y F1 por familia
     return tabla
 
 
@@ -252,6 +253,9 @@ def formatear_reporte(reporte: Dict) -> str:
                    f"Pesos de clase (NORM, LOCA, TRANS): {', '.join(_fmt(p) for p in e['pesos_clase'])}",
                    f"Mejor época: {e['mejor_epoca']} de {e['epocas_ejecutadas']} | F1 macro de validación: {_fmt(e['f1_validacion'])}",
                    ""]
+    if "reparto" in reporte:
+        lineas.insert(-1, "Reparto: " + " | ".join(
+            f"{c} {v['corridas']} corridas ({v['muestras']} muestras)" for c, v in reporte["reparto"].items()))
     g = reporte["global"]
     lineas += ["== 3. Métricas globales (todas las muestras de prueba) ==",
                f"{'Familia':<8}{'Precisión':>11}{'Exhaust.':>10}{'F1':>8}{'Muestras':>10}"]
@@ -276,6 +280,10 @@ def formatear_reporte(reporte: Dict) -> str:
         v = r[familia]
         lineas.append(f"  {familia}: {v['detectadas']} de {v['corridas']} detectadas; mediana {_fmt(v['mediana_s'], 1)} s; "
                       f"máximo {_fmt(v['maximo_s'], 1)} s")
+    if r.get("LOCA_por_area"):
+        lineas.append("  LOCA por área: " + "; ".join(
+            f"{area} cm²: " + ", ".join("no detectada" if t is None else f"{t:.0f} s" for t in tiempos)
+            for area, tiempos in r["LOCA_por_area"].items()))
     fa = reporte["falsas_alarmas"]
     lineas += ["", "== 6. Falsas alarmas (confirmación de LOCA o TRANS en operación normal) =="]
     for nombre, clave in (("Corridas NORM", "corridas_norm"), ("Tramos previos al evento", "tramos_previos")):

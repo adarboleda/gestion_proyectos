@@ -148,6 +148,11 @@ def agregar_reporte(ejecucion: Ejecucion) -> str:
         "muestras": configuracion["muestras"],
         "semilla": configuracion["semilla"],
     }
+    reporte["validacion"] = {"f1_macro": reporte["entrenamiento"]["f1_validacion"], "mejor_epoca": configuracion["mejor_epoca"]}
+    reporte["reparto"] = {
+        conjunto: {"corridas": len(configuracion["corridas"][conjunto]), "muestras": configuracion["muestras"][conjunto]}
+        for conjunto in CONJUNTOS
+    }
     texto = formatear_reporte(reporte)
     ejecucion.artefactos["reporte.json"] = json.dumps(reporte, ensure_ascii=False, indent=2).encode("utf-8")
     ejecucion.artefactos["reporte.txt"] = texto.encode("utf-8")

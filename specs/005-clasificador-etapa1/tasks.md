@@ -162,6 +162,6 @@
 
 ## Phase 7: Convergence
 
-- [ ] T033 Añadir a cada horizonte de `por_horizonte` en `src/clasificador_etapa1/evaluacion.py` las métricas completas por familia (precisión, exhaustividad, F1 y matriz de confusión con `metricas()` sobre las muestras del horizonte), conservar la tabla resumida del texto y probarlo en `tests/etapa1/unit/test_etapa1_evaluacion.py` per FR-009, US2/AC1 (partial)
-- [ ] T034 Imprimir en `formatear_reporte` (`src/clasificador_etapa1/evaluacion.py`) el resumen del tiempo de confirmación de LOCA por área de rotura y el reparto (corridas y muestras por conjunto), y comprobarlo en `tests/etapa1/integration/test_etapa1_cli.py` per US2/AC4, contracts/cli.md (partial)
-- [ ] T035 Añadir `reporte["validacion"]` con el F1 macro y la mejor época de validación en `src/clasificador_etapa1/cli.py` y comprobarlo en `tests/etapa1/integration/test_etapa1_cli.py` per data-model.md: Reporte de evaluación (partial)
+- [X] T033 Añadir a cada horizonte de `por_horizonte` en `src/clasificador_etapa1/evaluacion.py` las métricas completas por familia (precisión, exhaustividad, F1 y matriz de confusión con `metricas()` sobre las muestras del horizonte), conservar la tabla resumida del texto y probarlo en `tests/etapa1/unit/test_etapa1_evaluacion.py` per FR-009, US2/AC1 (partial)
+- [X] T034 Imprimir en `formatear_reporte` (`src/clasificador_etapa1/evaluacion.py`) el resumen del tiempo de confirmación de LOCA por área de rotura y el reparto (corridas y muestras por conjunto), y comprobarlo en `tests/etapa1/integration/test_etapa1_cli.py` per US2/AC4, contracts/cli.md (partial)
+- [X] T035 Añadir `reporte["validacion"]` con el F1 macro y la mejor época de validación en `src/clasificador_etapa1/cli.py` y comprobarlo en `tests/etapa1/integration/test_etapa1_cli.py` per data-model.md: Reporte de evaluación (partial)
