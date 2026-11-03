@@ -59,6 +59,11 @@ def test_horizonte_usa_k_igual_h_y_las_muestras_normales():
     assert tabla[2]["exhaustividad"] == {"LOCA": 1.0, "TRANS": 0.0}
     assert tabla[3]["exhaustividad"] == {"LOCA": 0.0, "TRANS": None}
     assert 0 <= tabla[2]["f1_macro"] <= 1
+    completas = tabla[2]["metricas"]
+    assert completas["por_familia"]["LOCA"]["exhaustividad"] == 1.0
+    assert completas["por_familia"]["TRANS"]["exhaustividad"] == 0.0
+    assert set(completas["por_familia"]["NORM"]) == {"precision", "exhaustividad", "f1", "soporte"}
+    assert sum(map(sum, completas["matriz"])) == 4  # 2 normales + 2 eventos en k = 2
 
 
 def test_f1_de_los_primeros_30_s():

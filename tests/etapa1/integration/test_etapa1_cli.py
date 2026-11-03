@@ -115,3 +115,17 @@ def test_publica_e_imprime_el_reporte(con_sinteticas, tmp_path, capsys):
     assert sum(map(sum, reporte["global"]["matriz"])) == modelo["muestras"]["test"]
     for texto in ("consultivo", "Horizonte", "Tiempo de confirmación", "Falsas alarmas", "Metas"):
         assert texto in impreso, texto
+
+
+def test_reporte_con_reparto_area_y_validacion(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "etapa1"
+    assert ejecutar(salida) == 0
+    impreso = capsys.readouterr().out
+    reporte = json.loads((salida / "reporte.json").read_text(encoding="utf-8"))
+    modelo = json.loads((salida / "modelo.json").read_text(encoding="utf-8"))
+    assert reporte["validacion"] == {"f1_macro": max(h["f1_val"] for h in modelo["historial"]),
+                                     "mejor_epoca": modelo["mejor_epoca"]}
+    assert reporte["reparto"] == {c: {"corridas": len(modelo["corridas"][c]), "muestras": modelo["muestras"][c]}
+                                  for c in ("train", "val", "test")}
+    assert "Reparto:" in impreso and f"train {len(modelo['corridas']['train'])} corridas" in impreso
+    assert "LOCA por área" in impreso
