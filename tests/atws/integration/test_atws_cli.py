@@ -115,4 +115,4 @@ def test_resumen_y_reporte_impreso(arbol_atws, tmp_path, capsys):
     assert [texto.index(f"== {s} ==") for s in SECCIONES] == sorted(texto.index(f"== {s} ==") for s in SECCIONES)
     resumen = json.loads((tmp_path / "s" / "resumen.json").read_text(encoding="utf-8"))
     assert resumen["aviso"] == AVISO and resumen["errores"] == []
-    assert sum(c["total"] for c in resumen["por_conjunto"].values()) == 32
+    assert sum(c["total"] for c in resumen["por_conjunto"].values()) == 42  # 10 NORM + 10 LOCA/LOCAC + 22 ATWS/TRIP_OK
