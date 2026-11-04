@@ -111,3 +111,12 @@
 ## Dependencies
 
 Setup → Foundational → US1/US2 → US3 → Polish. Se pueden hacer en paralelo T002 con T003, T005 tras T004, T009 con T010 y T019 con T018.
+
+---
+
+## Phase 6: Convergence
+
+- [X] T022 Corregir `specs/006-regla-atws/research.md` §2: «tomar el mayor es conservador» solo vale si el retardo real del tipo no visto no es mayor que los de entrenamiento; con la carpeta real «turbine trip» (5 s) recibe 2.5 s y produce la falsa alarma R54 per research §2 (partial)
+- [X] T023 Añadir en la sección Clarifications de `specs/006-regla-atws/spec.md` una nota bajo la primera respuesta con el resultado real (la respuesta no se cambia: se cambiaría mirando validación) per spec Clarifications (partial)
+- [X] T024 Ajustar la validación 2 de `specs/006-regla-atws/quickstart.md`: la excepción R54 per quickstart (partial)
+- [X] T025 Añadir la coma que falta en `description` de `pyproject.toml` (`(002-004), clasificador…`) per plan (unrequested)

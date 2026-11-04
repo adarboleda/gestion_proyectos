@@ -28,6 +28,7 @@ Medición previa sobre las corridas ATWS y TRIP_OK reales (script de exploració
 
 - **Decisión**: por tipo de señal, el mayor `t(Reactor Scram) − t(señal)` observado en las corridas de entrenamiento que tienen ambas (TRIP_OK, LOCA, LOCAC). A un tipo no visto se le asigna el mayor de todos (aclaración 1).
 - **Razón**: medir «2 s desde la señal» daría falsas alarmas en los TRIP_OK por turbina, cuyo scram llega a los 5 s. Tomar el mayor es conservador: espera más antes de declarar ATWS. Se mide en entrenamiento para no usar validación ni prueba (principio II).
+- **Corrección tras implementar (converge, T022)**: tomar el mayor de entrenamiento solo es conservador si el retardo real del tipo no visto no es mayor que ese. Con la carpeta real y el reparto de 004, «turbine trip» no tiene TRIP_OK de entrenamiento (R54 está en validación y R55 es corta). Recibe 2.5 s cuando el real es 5 s, y eso produce la falsa alarma R54. Se mantiene la decisión (cambiarla mirando validación sería fuga) y se propone usar los retardos de la documentación de diseño de la lógica de protección, a validar con la experta.
 
 ## 3. Decisión
 

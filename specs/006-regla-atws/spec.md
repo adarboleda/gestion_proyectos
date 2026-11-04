@@ -17,6 +17,7 @@
 > Respuestas elegidas por el agente (Claude Code) por delegación del responsable, con la opción recomendada; quedan para revisión en el PR. La señal de demanda queda además pendiente de validar con la experta, como pide KAN-22.
 
 - Q: ¿Qué retardo se asigna a un tipo de señal de disparo que no aparece en las corridas de entrenamiento? → A: El mayor retardo medido en entrenamiento entre todos los tipos (conservador: espera más antes de declarar ATWS, lo que evita falsas alarmas a costa de tiempo), y el reporte lo advierte.
+  - *Nota tras implementar (2026-11-04)*: con la carpeta real, el tipo «turbine trip» queda sin ejemplo en entrenamiento y su retardo real (5 s) supera al mayor de entrenamiento (2.5 s): produce una falsa alarma en validación (R54). La respuesta no se cambia, porque se cambiaría mirando validación. La mejora queda propuesta para revisarla con la experta.
 - Q: ¿Cómo se elige el umbral de flujo? → A: Si en entrenamiento todos los ATWS quedan por encima de todos los no-ATWS, el punto medio entre el mínimo ATWS y el máximo no-ATWS; si se solapan, el mayor umbral que no omite ningún ATWS de entrenamiento (se prioriza no omitir un ATWS) y se informan las falsas alarmas que eso produce en entrenamiento.
 - Q: ¿Desde cuándo se mide la meta de 3 s? → A: Desde la demanda de disparo del reactor (instante en que el scram debía ocurrir). También se informa el tiempo desde la señal de disparo del anunciador, que en un disparo de turbina incluye los ~5 s de la lógica.
 

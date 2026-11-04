@@ -10,7 +10,7 @@ Imprime el reporte y escribe `resultados_regla_atws/` (`regla.json`, `evaluacion
 ## Validaciones
 
 1. `regla.json → calibrada_con` es `train`. Con la misma semilla el resultado es idéntico.
-2. Todos los TRIP_OK con demanda quedan «sin ATWS (flujo caído)» y todas las NORM sin demanda, «sin ATWS (sin demanda)».
+2. Todos los TRIP_OK con demanda quedan «sin ATWS (flujo caído)», salvo los de un tipo de señal sin retardo medido en entrenamiento (con la carpeta real, R54). Todas las NORM quedan «sin ATWS (sin demanda)».
 3. Cada ATWS detectado tiene `t_deteccion_demanda` ≤ 3 s.
 4. `evaluacion.csv` tiene 91 filas (63/15/13).
 
