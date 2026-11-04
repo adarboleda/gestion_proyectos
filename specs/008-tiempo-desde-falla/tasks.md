@@ -67,10 +67,10 @@
 
 **Independent Test**: la comparación muestra ambos tiempos y su diferencia; `lineas_tiempo.csv` tiene una fila por segundo con la decisión de la regla en su segundo.
 
-- [ ] T019 [P] [US3] Ampliar `tests/tiempo/unit/test_tiempo_evaluacion.py` y `tests/tiempo/integration/test_tiempo_cli.py`: `tiempo_desde_validador_s` calculado como en 005 (inicio redondeado hacia arriba) y su diferencia en el reporte; `lineas_tiempo.csv` con 295 filas por corrida evaluada, columnas de contracts/salidas.md, y `decision_atws` solo en el segundo de decisión de la regla
-- [ ] T020 [US3] Ejecutar las pruebas de T019 y comprobar que **fallan**
-- [ ] T021 [US3] Implementar en `src/tiempo_deteccion/evaluacion.py` y `src/tiempo_deteccion/cli.py` la comparación con el validador y la exportación de `lineas_tiempo.csv`
-- [ ] T022 [US3] Ejecutar `python -m pytest tests/tiempo` y comprobar que pasan
+- [X] T019 [P] [US3] Ampliar `tests/tiempo/unit/test_tiempo_evaluacion.py` y `tests/tiempo/integration/test_tiempo_cli.py`: `tiempo_desde_validador_s` calculado como en 005 (inicio redondeado hacia arriba) y su diferencia en el reporte; `lineas_tiempo.csv` con 295 filas por corrida evaluada, columnas de contracts/salidas.md, y `decision_atws` solo en el segundo de decisión de la regla
+- [X] T020 [US3] Ejecutar las pruebas de T019 y comprobar que **fallan**
+- [X] T021 [US3] Implementar en `src/tiempo_deteccion/evaluacion.py` y `src/tiempo_deteccion/cli.py` la comparación con el validador y la exportación de `lineas_tiempo.csv`
+- [X] T022 [US3] Ejecutar `python -m pytest tests/tiempo` y comprobar que pasan
 
 ---
 

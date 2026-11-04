@@ -94,7 +94,7 @@ def medir(origen, modelo, semilla: int):
     archivos = {
         "tiempos.json": evaluacion.serializar_json(datos),
         "tiempos.csv": evaluacion.serializar_tiempos_csv(datos),
-        "lineas_tiempo.csv": evaluacion.serializar_lineas_csv(lineas, [r.corrida for r in resultados]),
+        "lineas_tiempo.csv": evaluacion.serializar_lineas_csv(lineas, [r.corrida for r in resultados], atws),
         "reporte.txt": texto,
     }
     return archivos, texto

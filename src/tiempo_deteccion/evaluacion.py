@@ -19,6 +19,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 import numpy as np
 
 from clasificador_etapa1.config import FAMILIA_DE_CLASE
+from clasificador_etapa1.muestras import inicio_entero
 from preparacion_pwr3l.descubrimiento import Corrida, clave_id
 from tiempo_deteccion.atws import ResultadoATWS
 from tiempo_deteccion.config import AVISO, CONJUNTOS_EVALUADOS, META_ATWS_S, META_DIAGNOSTICO_S
@@ -41,6 +42,7 @@ class ResultadoCorrida:
     primera_familia: str  # primera familia confirmada tras la falla, o «»
     confusion: bool
     tiempo_diagnostico_s: Optional[float]
+    tiempo_desde_validador_s: Optional[float]  # como en 005, para comparar (FR-011)
     atws: Optional[ResultadoATWS]
     falsas_alarmas_etapa1: Optional[Dict]  # {"episodios", "instantes"}; None en las inciertas
 
@@ -64,6 +66,13 @@ def tiempo_diagnostico(linea: LineaTiempo, familia: str, t_inicio: Optional[floa
         return None, None
     tau = int(linea.tau[np.argmax(validos)])
     return tau, round(tau - t_inicio, 6)
+
+
+def tiempo_desde_validador(linea: LineaTiempo, familia: str, inicio_validador: Optional[float]) -> Optional[float]:
+    """Tiempo medido como en 005: desde el inicio del validador redondeado hacia arriba al segundo."""
+    if inicio_validador is None:
+        return None
+    return tiempo_diagnostico(linea, familia, float(inicio_entero(inicio_validador)))[1]
 
 
 def primera_familia(linea: LineaTiempo, t_falla: Optional[float]) -> str:
@@ -102,15 +111,18 @@ def resultados_por_corrida(
         t_falla = falla.t if falla is not None else None
         if familia == "NORM":
             t_conf, tiempo, primera, alarmas = None, None, "", falsas_alarmas_etapa1(linea, None)
+            desde_validador = None
         else:
             t_conf, tiempo = tiempo_diagnostico(linea, familia, t_falla)
             primera = primera_familia(linea, t_falla)
+            desde_validador = tiempo_desde_validador(linea, familia, falla.inicio_validador if falla else None)
             incierta = falla is None or falla.incierta
             alarmas = None if incierta else falsas_alarmas_etapa1(linea, t_falla)
         resultados.append(ResultadoCorrida(
             corrida=corrida.id, clase=corrida.clase, familia=familia, conjunto=conjunto, area=corrida.area,
             falla=falla, t_confirmacion=t_conf, primera_familia=primera,
             confusion=familia != "NORM" and primera not in ("", familia), tiempo_diagnostico_s=tiempo,
+            tiempo_desde_validador_s=desde_validador,
             atws=atws.get(corrida.id), falsas_alarmas_etapa1=alarmas,
         ))
     return sorted(resultados, key=lambda r: (CONJUNTOS_EVALUADOS.index(r.conjunto) if r.conjunto in CONJUNTOS_EVALUADOS else 9,
@@ -247,6 +259,7 @@ def resultado_a_dict(r: ResultadoCorrida) -> Dict:
         "corrida": r.corrida, "conjunto": r.conjunto, "clase": r.clase, "familia": r.familia, "area": r.area,
         "falla": falla_a_dict(r.falla), "t_confirmacion": r.t_confirmacion, "primera_familia": r.primera_familia,
         "confusion": r.confusion, "tiempo_diagnostico_s": _num(r.tiempo_diagnostico_s),
+        "tiempo_desde_validador_s": _num(r.tiempo_desde_validador_s),
         "atws": atws_a_dict(r.atws), "falsas_alarmas_etapa1": r.falsas_alarmas_etapa1,
     }
 
@@ -272,7 +285,7 @@ def construir_tiempos(resultados: List[ResultadoCorrida], fallas: Dict[str, Inst
 
 COLUMNAS_TIEMPOS = [
     "corrida", "conjunto", "clase", "familia", "area", "t_falla", "fuente_falla", "incierta", "inicio_validador",
-    "t_confirmacion", "primera_familia", "tiempo_diagnostico_s", "atws_recomendacion", "t_demanda",
+    "t_confirmacion", "primera_familia", "tiempo_diagnostico_s", "tiempo_desde_validador_s", "atws_recomendacion", "t_demanda",
     "tiempo_atws_demanda_s", "tiempo_atws_falla_s", "falsas_alarmas_etapa1",
 ]
 
@@ -294,7 +307,8 @@ def serializar_tiempos_csv(datos: Dict) -> str:
             "area": c["area"], "t_falla": falla.get("t"), "fuente_falla": falla.get("fuente"),
             "incierta": falla.get("incierta", False) if c["falla"] else "", "inicio_validador": falla.get("inicio_validador"),
             "t_confirmacion": c["t_confirmacion"], "primera_familia": c["primera_familia"],
-            "tiempo_diagnostico_s": c["tiempo_diagnostico_s"], "atws_recomendacion": atws.get("recomendacion"),
+            "tiempo_diagnostico_s": c["tiempo_diagnostico_s"], "tiempo_desde_validador_s": c["tiempo_desde_validador_s"],
+            "atws_recomendacion": atws.get("recomendacion"),
             "t_demanda": atws.get("t_demanda"), "tiempo_atws_demanda_s": atws.get("tiempo_desde_demanda_s"),
             "tiempo_atws_falla_s": atws.get("tiempo_desde_falla_s"),
             "falsas_alarmas_etapa1": alarmas["episodios"] if alarmas is not None else None,
@@ -303,19 +317,24 @@ def serializar_tiempos_csv(datos: Dict) -> str:
     return salida.getvalue()
 
 
-COLUMNAS_LINEAS = ["corrida", "conjunto", "tau", "p_norm", "p_loca", "p_trans", "confirmada"]
+COLUMNAS_LINEAS = ["corrida", "conjunto", "tau", "p_norm", "p_loca", "p_trans", "confirmada", "decision_atws"]
 
 
-def serializar_lineas_csv(lineas: Dict[str, LineaTiempo], orden: Sequence[str]) -> str:
+def serializar_lineas_csv(lineas: Dict[str, LineaTiempo], orden: Sequence[str],
+                          atws: Optional[Dict[str, ResultadoATWS]] = None) -> str:
+    """Una fila por corrida y segundo; `decision_atws` solo en el segundo de decisión de la regla."""
+    atws = atws or {}
     salida = io.StringIO()
     escritor = csv.writer(salida, lineterminator="\n")
     escritor.writerow(COLUMNAS_LINEAS)
     for rid in orden:
         linea = lineas[rid]
+        regla = atws.get(rid)
+        decision = regla.t_decision if regla is not None else None
         for i, tau in enumerate(linea.tau):
             p = linea.probabilidades[i]
             escritor.writerow([rid, linea.conjunto, int(tau), f"{p[0]:.4f}", f"{p[1]:.4f}", f"{p[2]:.4f}",
-                               linea.confirmada[i]])
+                               linea.confirmada[i], regla.recomendacion if decision == int(tau) else ""])
     return salida.getvalue()
 
 
@@ -335,6 +354,13 @@ def _cumple(valor) -> str:
 
 def _lista(ids) -> str:
     return ", ".join(ids) if ids else "ninguna"
+
+
+def _diferencia(c: Dict) -> Optional[float]:
+    """Tiempo desde el validador menos tiempo desde la falla (positivo: la medición de 005 daba más)."""
+    if c["tiempo_desde_validador_s"] is None or c["tiempo_diagnostico_s"] is None:
+        return None
+    return round(c["tiempo_desde_validador_s"] - c["tiempo_diagnostico_s"], 4)
 
 
 def formatear_reporte(datos: Dict) -> str:
@@ -360,7 +386,7 @@ def formatear_reporte(datos: Dict) -> str:
     for conjunto in ("test", "val"):
         nombre = "prueba" if conjunto == "test" else "validación (referencia: el clasificador eligió su época con ella)"
         lineas += ["", f"Diagnóstico de la Etapa 1 — {nombre}",
-                   "  corrida  clase    área   t_falla  fuente      t_conf  desde falla  primera"]
+                   "  corrida  clase    área   t_falla  fuente      t_conf  desde falla  desde validador  diferencia  primera"]
         for c in datos["corridas"]:
             if c["conjunto"] != conjunto or c["familia"] == "NORM":
                 continue
@@ -369,6 +395,7 @@ def formatear_reporte(datos: Dict) -> str:
             lineas.append(
                 f"  {c['corrida']:<7}  {c['clase']:<7}  {_t(c['area']):>5}  {_t(falla.get('t')):>7}  "
                 f"{falla.get('fuente', ''):<10}  {_t(c['t_confirmacion']):>6}  {_t(c['tiempo_diagnostico_s']):>11}  "
+                f"{_t(c['tiempo_desde_validador_s']):>15}  {_t(_diferencia(c)):>10}  "
                 f"{c['primera_familia'] or '—'}{marca}"
             )
         diag = datos["resumen"]["diagnostico"][conjunto]
