@@ -164,3 +164,24 @@ def test_falsas_alarmas_y_confusiones_en_el_resumen(escenario):
     assert prueba["etapa1"]["inciertas_no_contadas"] == ["R48"]
     assert prueba["regla"] == {"recomendaciones": 1, "corridas": ["R49"]}
     assert datos["confusiones"]["test"] == ["R42"]
+
+
+# --- US3: comparación con el inicio del validador (FR-011) ---------------------------------------
+
+def test_tiempo_desde_el_validador_como_en_005():
+    from tiempo_deteccion.evaluacion import tiempo_desde_validador
+
+    alta = linea(altas=[("LOCA", 24, 299)])
+    # inicio del validador 21,3 → se redondea hacia arriba a 22 (005); confirmación en τ = 25 → 3 s
+    assert tiempo_desde_validador(alta, "LOCA", 21.3) == 3.0
+    assert tiempo_desde_validador(alta, "LOCA", None) is None
+    assert tiempo_desde_validador(linea(), "LOCA", 21.3) is None
+
+
+def test_resultado_incluye_el_tiempo_desde_el_validador():
+    from tiempo_deteccion.evaluacion import resultados_por_corrida as resultados
+
+    f = InstanteFalla(20.0, "programado", "x", 21.3, False, None)
+    r = resultados([(_corrida("R41", "LOCA", 100), "test")], {"R41": linea("R41", "test", [("LOCA", 24, 299)])},
+                   {"R41": f}, {})[0]
+    assert (r.tiempo_diagnostico_s, r.tiempo_desde_validador_s) == (5.0, 3.0)

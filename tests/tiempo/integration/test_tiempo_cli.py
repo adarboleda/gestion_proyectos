@@ -103,3 +103,37 @@ def test_sin_pytorch_termina_con_codigo_3(con_sinteticas, monkeypatch, tmp_path,
     assert ejecutar(con_sinteticas, salida) == 3
     assert "PyTorch" in capsys.readouterr().err
     assert not salida.exists()
+
+
+# --- US3: comparación con el validador y líneas de tiempo (FR-011, FR-012) -----------------------
+
+def test_tiempos_csv_compara_con_el_validador(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "resultados"
+    ejecutar(con_sinteticas, salida)
+    filas = leer_csv(salida / "tiempos.csv")
+    assert "tiempo_desde_validador_s" in filas[0]
+    eventos = [f for f in filas if f["familia"] != "NORM" and f["incierta"] == "False" and f["tiempo_diagnostico_s"]]
+    assert eventos
+    for fila in eventos:  # en el sintético el validador coincide con la falla (entera)
+        assert float(fila["tiempo_desde_validador_s"]) == pytest.approx(float(fila["tiempo_diagnostico_s"]))
+    texto = capsys.readouterr().out
+    assert "desde validador" in texto
+
+
+def test_lineas_de_tiempo_una_fila_por_segundo(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "resultados"
+    ejecutar(con_sinteticas, salida)
+    filas = leer_csv(salida / "lineas_tiempo.csv")
+    assert list(filas[0]) == ["corrida", "conjunto", "tau", "p_norm", "p_loca", "p_trans", "confirmada", "decision_atws"]
+    tiempos = {f["corrida"]: f for f in leer_csv(salida / "tiempos.csv")}
+    por_corrida = {}
+    for fila in filas:
+        por_corrida.setdefault(fila["corrida"], []).append(fila)
+    assert set(por_corrida) == set(tiempos)
+    datos = json.loads((salida / "tiempos.json").read_text(encoding="utf-8"))
+    decision = {c["corrida"]: (c["atws"] or {}).get("t_decision") for c in datos["corridas"]}
+    for rid, lista in por_corrida.items():
+        assert [int(f["tau"]) for f in lista] == list(range(5, 300))
+        con_decision = [int(f["tau"]) for f in lista if f["decision_atws"]]
+        assert con_decision == ([decision[rid]] if decision[rid] is not None and 5 <= decision[rid] <= 299 else [])
+        assert all(f["decision_atws"] == tiempos[rid]["atws_recomendacion"] for f in lista if f["decision_atws"])
