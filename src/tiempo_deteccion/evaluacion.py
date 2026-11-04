@@ -242,8 +242,12 @@ def _num(valor, decimales=4):
 def falla_a_dict(falla: Optional[InstanteFalla]) -> Optional[Dict]:
     if falla is None:
         return None
+    diferencia = None
+    if falla.t is not None and falla.inicio_validador is not None:
+        diferencia = falla.inicio_validador - falla.t  # negativa: el validador ve cambios antes de la falla
     return {"t": _num(falla.t), "fuente": falla.fuente, "detalle": falla.detalle,
-            "inicio_validador": _num(falla.inicio_validador), "incierta": falla.incierta, "motivo": falla.motivo}
+            "inicio_validador": _num(falla.inicio_validador), "diferencia_validador_s": _num(diferencia),
+            "incierta": falla.incierta, "motivo": falla.motivo}
 
 
 def atws_a_dict(r: Optional[ResultadoATWS]) -> Optional[Dict]:
@@ -285,7 +289,7 @@ def construir_tiempos(resultados: List[ResultadoCorrida], fallas: Dict[str, Inst
 
 COLUMNAS_TIEMPOS = [
     "corrida", "conjunto", "clase", "familia", "area", "t_falla", "fuente_falla", "incierta", "inicio_validador",
-    "t_confirmacion", "primera_familia", "tiempo_diagnostico_s", "tiempo_desde_validador_s", "atws_recomendacion", "t_demanda",
+    "diferencia_validador_s", "t_confirmacion", "primera_familia", "tiempo_diagnostico_s", "tiempo_desde_validador_s", "atws_recomendacion", "atws_motivo", "t_demanda",
     "tiempo_atws_demanda_s", "tiempo_atws_falla_s", "falsas_alarmas_etapa1",
 ]
 
@@ -294,8 +298,13 @@ def _celda(valor) -> str:
     return "" if valor is None else str(valor)  # los números ya vienen redondeados a 4 decimales
 
 
+def _aviso_csv() -> str:
+    return f"# {AVISO}\n"
+
+
 def serializar_tiempos_csv(datos: Dict) -> str:
     salida = io.StringIO()
+    salida.write(_aviso_csv())
     escritor = csv.writer(salida, lineterminator="\n")
     escritor.writerow(COLUMNAS_TIEMPOS)
     for c in datos["corridas"]:
@@ -306,9 +315,9 @@ def serializar_tiempos_csv(datos: Dict) -> str:
             "corrida": c["corrida"], "conjunto": c["conjunto"], "clase": c["clase"], "familia": c["familia"],
             "area": c["area"], "t_falla": falla.get("t"), "fuente_falla": falla.get("fuente"),
             "incierta": falla.get("incierta", False) if c["falla"] else "", "inicio_validador": falla.get("inicio_validador"),
-            "t_confirmacion": c["t_confirmacion"], "primera_familia": c["primera_familia"],
+            "diferencia_validador_s": falla.get("diferencia_validador_s"), "t_confirmacion": c["t_confirmacion"], "primera_familia": c["primera_familia"],
             "tiempo_diagnostico_s": c["tiempo_diagnostico_s"], "tiempo_desde_validador_s": c["tiempo_desde_validador_s"],
-            "atws_recomendacion": atws.get("recomendacion"),
+            "atws_recomendacion": atws.get("recomendacion"), "atws_motivo": atws.get("motivo"),
             "t_demanda": atws.get("t_demanda"), "tiempo_atws_demanda_s": atws.get("tiempo_desde_demanda_s"),
             "tiempo_atws_falla_s": atws.get("tiempo_desde_falla_s"),
             "falsas_alarmas_etapa1": alarmas["episodios"] if alarmas is not None else None,
@@ -325,6 +334,7 @@ def serializar_lineas_csv(lineas: Dict[str, LineaTiempo], orden: Sequence[str],
     """Una fila por corrida y segundo; `decision_atws` solo en el segundo de decisión de la regla."""
     atws = atws or {}
     salida = io.StringIO()
+    salida.write(_aviso_csv())
     escritor = csv.writer(salida, lineterminator="\n")
     escritor.writerow(COLUMNAS_LINEAS)
     for rid in orden:
@@ -386,7 +396,7 @@ def formatear_reporte(datos: Dict) -> str:
     for conjunto in ("test", "val"):
         nombre = "prueba" if conjunto == "test" else "validación (referencia: el clasificador eligió su época con ella)"
         lineas += ["", f"Diagnóstico de la Etapa 1 — {nombre}",
-                   "  corrida  clase    área   t_falla  fuente      t_conf  desde falla  desde validador  diferencia  primera"]
+                   "  corrida  clase    área   t_falla  fuente      validador − falla  t_conf  desde falla  desde validador  diferencia  primera"]
         for c in datos["corridas"]:
             if c["conjunto"] != conjunto or c["familia"] == "NORM":
                 continue
@@ -394,7 +404,7 @@ def formatear_reporte(datos: Dict) -> str:
             marca = " (incierta)" if falla.get("incierta") else ""
             lineas.append(
                 f"  {c['corrida']:<7}  {c['clase']:<7}  {_t(c['area']):>5}  {_t(falla.get('t')):>7}  "
-                f"{falla.get('fuente', ''):<10}  {_t(c['t_confirmacion']):>6}  {_t(c['tiempo_diagnostico_s']):>11}  "
+                f"{falla.get('fuente', ''):<10}  {_t(falla.get('diferencia_validador_s')):>17}  {_t(c['t_confirmacion']):>6}  {_t(c['tiempo_diagnostico_s']):>11}  "
                 f"{_t(c['tiempo_desde_validador_s']):>15}  {_t(_diferencia(c)):>10}  "
                 f"{c['primera_familia'] or '—'}{marca}"
             )
@@ -407,13 +417,13 @@ def formatear_reporte(datos: Dict) -> str:
             lineas.append("  LOCA por área (cm²): " + "; ".join(
                 f"{area}: {', '.join(_t(t) for t in tiempos)} s" for area, tiempos in diag["LOCA_por_area"].items()))
     lineas += ["", "ATWS — regla de 006 (tiempo desde la demanda de disparo; desde la falla como dato)",
-               "  corrida  conjunto  clase    recomendación  t_demanda  t_decisión  desde demanda  desde falla"]
+               "  corrida  conjunto  clase    recomendación  motivo                        t_demanda  t_decisión  desde demanda  desde falla"]
     for c in datos["corridas"]:
         a = c["atws"]
         if a is None or c["clase"] not in ("ATWS", "TRIP_OK"):
             continue
         lineas.append(
-            f"  {c['corrida']:<7}  {c['conjunto']:<8}  {c['clase']:<7}  {a['recomendacion']:<13}  {_t(a['t_demanda']):>9}  "
+            f"  {c['corrida']:<7}  {c['conjunto']:<8}  {c['clase']:<7}  {a['recomendacion']:<13}  {a['motivo']:<28}  {_t(a['t_demanda']):>9}  "
             f"{_t(a['t_decision']):>10}  {_t(a['tiempo_desde_demanda_s']):>13}  {_t(a['tiempo_desde_falla_s']):>11}"
         )
     lineas += ["", "Falsas alarmas"]
