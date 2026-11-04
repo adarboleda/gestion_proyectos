@@ -85,7 +85,7 @@ def test_atws_sin_demanda_no_entra_en_el_umbral():
         _caso("R97", "ATWS", None, None, _alto(90.0)),
     ]
     regla = calibrar(casos)
-    assert regla.minimo_atws == 55.0
+    assert regla.minimo_atws == pytest.approx(55.0)
     resultado = evaluar(regla, casos[2])
     assert resultado.recomendacion == "sin ATWS" and resultado.motivo == "sin demanda"
     assert resultado.acierto is False
