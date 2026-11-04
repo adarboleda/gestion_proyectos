@@ -265,6 +265,30 @@ Detalle: [specs/008-tiempo-desde-falla/quickstart.md](specs/008-tiempo-desde-fal
 
 ---
 
+## Clasificador de Etapa 2 (funcionalidad 009)
+
+Una Bi-LSTM que separa la rotura en **rama caliente (LOCA)** de la rotura en **rama fría (LOCAC)** cuando la Etapa 1 detecta la familia LOCA en **PWR 3L**. Utiliza como entrada los dos canales de desviación pico causal de potencia térmica (`PWR`) y flujo neutrónico (`PWNT`) previa al scram. Si la confianza es menor al 80 %, el sistema se abstiene (`UNCERTAIN`). Si la Etapa 1 no indica LOCA, devuelve `NO_APLICA`. La salida es **consultiva**: recomienda, no actúa sobre la planta.
+
+**Entrenar y evaluar**:
+
+```powershell
+.venv\Scripts\entrenar-etapa2.exe --origen "C:\Users\Administrador\Desktop\Nuecleare\IA-Nuclear\PWR 3L" --salida modelos\etapa2
+```
+
+Deja en `modelos\etapa2\` (no se versiona) `modelo.pt`, `modelo.json`, `reporte.json` y `reporte.txt`, e imprime el reporte con las métricas con abstención, horizontes a 1–30 s, resultado por corrida y por rango de área.
+
+**Usar el modelo en cascada**:
+
+```python
+from clasificador_etapa2.prediccion import cargar
+etapa2 = cargar("modelos/etapa2")
+resultado = etapa2.clasificar(serie, familia_etapa1="LOCA")  # serie: (T, 2) de [PWR, PWNT] crudas
+```
+
+Detalle: [specs/009-clasificador-etapa2/quickstart.md](specs/009-clasificador-etapa2/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
