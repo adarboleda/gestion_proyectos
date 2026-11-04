@@ -12,7 +12,7 @@ Las tres iteraciones construyen, por partes, la preparación de datos de la plan
 
 ```
 PWR 3L:  descubrir y leer corridas  →  medir paso de TIME  →  agrupar y repartir sin fuga  →  escalar  →  salida/reporte/comando
-              (002, Marcelo)             (003, Christian)          (004, Abner)              (003)        (pendiente, KAN-18)
+              (002, Marcelo)             (003, Christian)          (004, Abner)              (003)        (002, cierre 04/11)
 
 NPPAD:   lectura y reparto (001)  +  paso medido de TIME (003)  +  verificación de fuga (004)
 ```
@@ -22,7 +22,7 @@ NPPAD:   lectura y reparto (001)  +  paso medido de TIME (003)  +  verificación
 | **Tarea** | KAN-18: preprocesamiento PWR 3L (ventanas de 300 s, 5 clases) | Normalización solo con entrenamiento y paso de muestreo medido | División en entrenamiento, validación y prueba sin fuga |
 | **Responsable** | Marcelo Acuña | Christian Bonifaz | Abner Arboleda |
 | **Rama** | `002-preprocesamiento-pwr3l` | `003-normalizacion-paso-muestreo` | `004-division-sin-fuga` |
-| **Estado** | **A medias**: documentos completos; implementación en la fase 2 de 6 (T001–T010) | **Completa**, `converged` | **Completa**, `converged` |
+| **Estado** | **Completa** (cierre del 2026-11-04 en `002-preprocesamiento-pwr3l-cierre`): 38/38 tareas, `converged` | **Completa**, `converged` | **Completa**, `converged` |
 | **Fusionada en `main`** | Sí (PR #2) | Sí (PR #3) | No (pendiente de PR) |
 
 ---
@@ -195,6 +195,6 @@ gestion_proyectos/
 
 | Pendiente | Responsable previsto | Detalle |
 |---|---|---|
-| Terminar KAN-18 (002) | Marcelo Acuña | Salida `X_*`, `y_*`, `margins_*`, reporte, `metadata.json` y comando `preparar-pwr3l` (T019–T034 de 002), usando `repartir` y `verificar_reparto(corridas, reparto)` de 004 con todas las corridas, y el escalado de 003. Marcar en el `tasks.md` de 002 las tareas ya hechas (T001–T010, y T012, T013, T016 y T017 cubiertas por 004) |
+| ~~Terminar KAN-18 (002)~~ **Hecho el 2026-11-04** (rama `002-preprocesamiento-pwr3l-cierre`, ver [ENTREGABLES-002.md](ENTREGABLES-002.md)) | Marcelo Acuña | Salida `X_*`, `y_*`, `margins_*`, reporte, `metadata.json` y comando `preparar-pwr3l` (T019–T034 de 002), usando `repartir` y `verificar_reparto(corridas, reparto)` de 004 con todas las corridas, y el escalado de 003. Marcar en el `tasks.md` de 002 las tareas ya hechas (T001–T010, y T012, T013, T016 y T017 cubiertas por 004) |
 | PR de 004 | Abner Arboleda | Subir la rama y abrir el pull request hacia `main` |
 | Limitación conocida | — | Las corridas NORM parecidas entre sí no se agrupan (D1 de 002) |

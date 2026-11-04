@@ -11,7 +11,7 @@
 | `id` | str | Identificador `R<n>[letra]` (p. ej. `R07b`), único en el origen |
 | `clase` | str | NORM, LOCA, LOCAC, ATWS, TRIP_OK u OOD |
 | `origen` | str | `manual` (carpetas de clase) o `auto` |
-| `archivo` | str | Ruta relativa al origen con `/` (p. ej. `LOCA HOT/R10_LOCA_hot_50cm_t60/R10_plotdata_LOCAH50_t60.xls`); para R27 (descartada, dos archivos) la carpeta |
+| `archivo` | str | Ruta relativa al origen con `/` (p. ej. `LOCA HOT/R10_LOCA_hot_50cm_t60/R10_plotdata_LOCAH50_t60.xls`); para las descartadas y las OOD, que no se leen, la carpeta de la corrida (p. ej. `ATWS/R27_ATWS_LOFW_tripman_FAILED_t30_op90`, que tiene dos archivos de datos) |
 | `area` | int o None | Área de rotura en cm² (solo LOCA y LOCAC) |
 | `gemela` | str o None | Id de la gemela ATWS/TRIP_OK según la tabla fija |
 | `estado` | str | `usable`, `ood`, `descartada` o `corta` (se fija tras la lectura) |
