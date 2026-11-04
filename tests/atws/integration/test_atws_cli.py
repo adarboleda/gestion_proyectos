@@ -105,3 +105,14 @@ def test_python_m(arbol_atws, tmp_path):
         cwd=raiz, capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     assert resultado.returncode == 0, resultado.stderr
+
+
+def test_resumen_y_reporte_impreso(arbol_atws, tmp_path, capsys):
+    from regla_atws.reporte import SECCIONES
+
+    assert main(["--origen", str(arbol_atws), "--salida", str(tmp_path / "s")]) == 0
+    texto = capsys.readouterr().out
+    assert [texto.index(f"== {s} ==") for s in SECCIONES] == sorted(texto.index(f"== {s} ==") for s in SECCIONES)
+    resumen = json.loads((tmp_path / "s" / "resumen.json").read_text(encoding="utf-8"))
+    assert resumen["aviso"] == AVISO and resumen["errores"] == []
+    assert sum(c["total"] for c in resumen["por_conjunto"].values()) == 32
