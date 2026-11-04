@@ -7,7 +7,7 @@
 | `t` | float o None | segundos desde el inicio de la corrida |
 | `fuente` | str | «registro», «programado» o «ninguna» |
 | `detalle` | str | línea del registro, «config.json fallas=7:0:50» o «carpeta _t60» |
-| `inicio_validador` | float o None | inicio de 005 (`inicios_evento`) |
+| `inicio_validador` | float o None | inicio de 005 (`inicios_evento`); en las salidas se acompaña de `diferencia_validador_s` = inicio_validador − t |
 | `incierta` | bool | `t` es None o `inicio_validador < t − 2` |
 | `motivo` | str o None | por qué es incierta |
 
@@ -25,7 +25,7 @@ Por corrida: arreglos alineados por τ = 5…299: `tau` (int), `probabilidades` 
 | `primera_familia` | primera familia de evento (LOCA o TRANS) confirmada con τ − 1 ≥ t_falla, o «» (ninguna); si no es la correcta, la corrida es una «confusión» |
 | `tiempo_diagnostico_s` | `t_confirmacion − t_falla`, o None («no detectado») |
 | `tiempo_desde_validador_s` | el mismo cálculo desde el inicio del validador (comparación) |
-| `atws` | solo ATWS/TRIP_OK: recomendación de la regla, `t_demanda`, `t_decision`, `tiempo_desde_demanda_s`, `tiempo_desde_falla_s` |
+| `atws` | toda corrida evaluada (hace falta para contar «posible ATWS» sin ATWS, FR-009): recomendación de la regla, motivo, `t_demanda`, `t_decision`, `tiempo_desde_demanda_s` y `tiempo_desde_falla_s` (estos dos solo en ATWS detectados) |
 | `falsas_alarmas` | episodios de la Etapa 1 antes de la falla (o en toda la corrida NORM; no se cuentan en las inciertas); `posible ATWS` sin ATWS (en todas) |
 
 ## Resumen y metas
