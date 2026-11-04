@@ -45,7 +45,8 @@ def test_medicion_con_el_dataset_real(tmp_path, capsys):
 
     modelo = json.loads((MODELO / "modelo.json").read_text(encoding="utf-8"))
     evaluadas = set(modelo["corridas"]["val"]) | set(modelo["corridas"]["test"])
-    filas = list(csv.DictReader(io.StringIO((salida / "tiempos.csv").read_text(encoding="utf-8"))))
+    texto = (salida / "tiempos.csv").read_text(encoding="utf-8")
+    filas = list(csv.DictReader(io.StringIO("".join(l for l in texto.splitlines(True) if not l.startswith("#")))))
     assert len(filas) == len(evaluadas) == 28
     assert {f["corrida"] for f in filas} == evaluadas
     assert {"diagnostico_10s", "atws_3s"} == set(datos["metas"])

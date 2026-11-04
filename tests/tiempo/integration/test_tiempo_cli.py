@@ -27,7 +27,9 @@ def ejecutar(modelo, salida, *extra):
 
 
 def leer_csv(ruta):
-    return list(csv.DictReader(io.StringIO(ruta.read_text(encoding="utf-8"))))
+    """Filas del CSV sin la línea de comentario con el aviso consultivo."""
+    lineas = [l for l in ruta.read_text(encoding="utf-8").splitlines(keepends=True) if not l.startswith("#")]
+    return list(csv.DictReader(io.StringIO("".join(lineas))))
 
 
 def test_publica_los_cuatro_archivos(con_sinteticas, tmp_path, capsys):
@@ -137,3 +139,36 @@ def test_lineas_de_tiempo_una_fila_por_segundo(con_sinteticas, tmp_path, capsys)
         con_decision = [int(f["tau"]) for f in lista if f["decision_atws"]]
         assert con_decision == ([decision[rid]] if decision[rid] is not None and 5 <= decision[rid] <= 299 else [])
         assert all(f["decision_atws"] == tiempos[rid]["atws_recomendacion"] for f in lista if f["decision_atws"])
+
+
+# --- Convergencia (T028–T030) -------------------------------------------------------------------
+
+def test_csv_identificados_como_consultivos(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "resultados"
+    ejecutar(con_sinteticas, salida)
+    for nombre in ("tiempos.csv", "lineas_tiempo.csv"):
+        primera = (salida / nombre).read_text(encoding="utf-8").splitlines()[0]
+        assert primera.startswith("# ") and "consultiv" in primera.lower(), nombre
+
+
+def test_diferencia_entre_validador_y_falla(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "resultados"
+    ejecutar(con_sinteticas, salida)
+    filas = {f["corrida"]: f for f in leer_csv(salida / "tiempos.csv")}
+    datos = json.loads((salida / "tiempos.json").read_text(encoding="utf-8"))
+    for rid, instante in datos["instantes"].items():
+        assert instante["diferencia_validador_s"] == pytest.approx(instante["inicio_validador"] - instante["t"])
+        if rid in filas:
+            assert float(filas[rid]["diferencia_validador_s"]) == pytest.approx(instante["diferencia_validador_s"])
+    assert datos["instantes"]["R22"]["diferencia_validador_s"] == pytest.approx(-10.0)  # incierta sintética
+    assert "validador − falla" in capsys.readouterr().out
+
+
+def test_motivo_de_la_regla_de_atws(con_sinteticas, tmp_path, capsys):
+    salida = tmp_path / "resultados"
+    ejecutar(con_sinteticas, salida)
+    filas = leer_csv(salida / "tiempos.csv")
+    motivos = {f["atws_motivo"] for f in filas}
+    assert "sin demanda" in motivos  # corridas NORM
+    assert motivos <= {"flujo alto", "flujo caído", "sin demanda", "decisión fuera de la ventana"}
+    assert "motivo" in capsys.readouterr().out
