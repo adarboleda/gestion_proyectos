@@ -1,0 +1,26 @@
+tarea,completada,paralela,historia,seccion,descripcion,tipo,complejidad,puntos,clasificado_por,origen,eliminada
+T001,si,no,,Phase 1: Setup,"Añadir a `pyproject.toml` el guion `evaluar-regla-atws = ""regla_atws.cli:main""` y nombrar 006 en `description`",configuracion,baja,1,agente,plan,no
+T002,si,si,,Phase 1: Setup,Crear `src/regla_atws/__init__.py` y `src/regla_atws/__main__.py`; crear `tests/atws/unit/` y `tests/atws/integration/`,configuracion,baja,1,agente,plan,no
+T003,si,si,,Phase 1: Setup,Añadir `resultados_regla_atws/` al `.gitignore`,configuracion,baja,1,agente,plan,no
+T004,si,no,,Tests (escribir primero; deben fallar),"Crear `tests/atws/conftest.py` con un árbol PWR 3L sintético que `preparacion_pwr3l` acepte: las cinco clases, `config.json` coherentes con la tabla de gemelas y `transientlist.dat` por corrida. Los perfiles de PWNT son: TRIP_OK cae a 6 % tras la demanda + retardo; ATWS se queda alto (40–90 %); un ATWS sin señal en el registro sube a ≥ 118 % (extracción de barras); LOCA con «Scram Lo RX Press» y scram; NORM sin señal. Ayudantes para quitar o duplicar un `.dat` y para cambiar el PWNT de una corrida",prueba,alta,4,agente,plan,no
+T005,si,si,,Tests (escribir primero; deben fallar),Crear `tests/atws/unit/test_atws_eventos.py`. Casos:,prueba,media,2,agente,plan,no
+T006,si,no,,Implementation,"Crear `src/regla_atws/config.py`: señales de disparo, `PUNTO_ALTO_FLUJO = 118.0`, `ESPERA_S = 2.0`, `META_S = 3.0`, salida por defecto y aviso consultivo",datos,baja,2,agente,plan,no
+T007,si,no,,Implementation,"Crear `src/regla_atws/eventos.py` con `Senal`, `leer_eventos(origen, corrida)`, `tipo_senal(texto)`, `primera_senal(eventos, pwnt)` e `instante_scram(eventos)` (research §1 y §6)",logica,media,5,agente,plan,no
+T008,si,no,,Implementation,Ejecutar `pytest tests/atws/unit/test_atws_eventos.py`,prueba,baja,1,agente,plan,no
+T009,si,si,US1,Tests (escribir primero; deben fallar),Crear `tests/atws/unit/test_atws_regla.py`. Casos:,prueba,media,2,agente,plan,no
+T010,si,no,US2,Tests (escribir primero; deben fallar),Crear `tests/atws/integration/test_atws_cli.py`. Casos:,prueba,alta,4,agente,plan,no
+T011,si,no,US1,Implementation,"Crear `src/regla_atws/regla.py` con `Regla`, `Resultado`, `calibrar_retardos`, `calibrar_umbral`, `calibrar` y `evaluar_corrida` (research §2–§4)",logica,alta,8,agente,plan,no
+T012,si,no,US2,Implementation,"Crear `src/regla_atws/cli.py`: corridas (002), grupos y reparto con verificación (004), señales, calibración con train, evaluación de todas y publicación de `regla.json` y `evaluacion.csv` (depende de T007 y T011)",integracion,media,6,agente,plan,no
+T013,si,no,,Implementation,Ejecutar `pytest tests/atws`,prueba,baja,1,agente,plan,no
+T014,si,si,US3,Tests (escribir primero; deben fallar),Crear `tests/atws/unit/test_atws_reporte.py`. Casos:,prueba,media,2,agente,plan,no
+T015,si,no,US3,Implementation,"Crear `src/regla_atws/reporte.py` con `resumir(resultados, regla)` y `formatear_reporte(...)` (contracts/cli.md y salidas.md)",interfaz,media,5,agente,plan,no
+T016,si,no,US3,Implementation,Integrar en `src/regla_atws/cli.py`: publicar `resumen.json` e imprimir el reporte,integracion,baja,4,agente,plan,no
+T017,si,no,,Implementation,Ejecutar `pytest tests/atws`,prueba,baja,1,agente,plan,no
+T018,si,no,,Phase 5: Polish,Crear `tests/atws/integration/test_atws_dataset_real.py` (se omite sin datos). Casos:,prueba,media,2,agente,plan,no
+T019,si,si,,Phase 5: Polish,Añadir al `README.md` la sección «Regla determinista de ATWS (funcionalidad 006)»,documentacion,baja,1,agente,plan,no
+T020,si,no,,Phase 5: Polish,Ejecutar `evaluar-regla-atws` con la carpeta real y anotar el resultado en `quickstart.md`,prueba,baja,1,agente,plan,no
+T021,si,no,,Phase 5: Polish,Ejecutar la suite completa y comprobar que todo pasa,prueba,baja,1,agente,plan,no
+T022,si,no,,Phase 6: Convergence,Corregir `specs/006-regla-atws/research.md` §2: «tomar el mayor es conservador» solo vale si el retardo real del tipo no visto no es mayor que los de entrenamiento; con la carpeta real «turbine trip» (5 s) recibe 2.5 s y produce la falsa alarma R54 per research §2 (partial),documentacion,baja,1,agente,agregada,no
+T023,si,no,,Phase 6: Convergence,Añadir en la sección Clarifications de `specs/006-regla-atws/spec.md` una nota bajo la primera respuesta con el resultado real (la respuesta no se cambia: se cambiaría mirando validación) per spec Clarifications (partial),documentacion,baja,1,agente,agregada,no
+T024,si,no,,Phase 6: Convergence,Ajustar la validación 2 de `specs/006-regla-atws/quickstart.md`: la excepción R54 per quickstart (partial),documentacion,baja,1,agente,agregada,no
+T025,si,no,,Phase 6: Convergence,"Añadir la coma que falta en `description` de `pyproject.toml` (`(002-004), clasificador…`) per plan (unrequested)",configuracion,baja,1,agente,agregada,no

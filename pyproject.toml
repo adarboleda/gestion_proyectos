@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "preparacion-datos"
 version = "0.1.0"
-description = "Preparación sin fuga de los datos NPPAD (001) y PWR 3L (002-004) y clasificador de Etapa 1 de PWR 3L (005)"
+description = "Preparación sin fuga de los datos NPPAD (001) y PWR 3L (002-004), clasificador de Etapa 1 (005) y regla determinista de ATWS (006) de PWR 3L"
 requires-python = ">=3.11"
 dependencies = [
     "pandas>=2.2",
@@ -22,6 +22,7 @@ modelo = ["torch>=2.2"]
 preparar-datos = "preparacion_datos.cli:main"
 preparar-pwr3l = "preparacion_pwr3l.cli:main"
 entrenar-etapa1 = "clasificador_etapa1.cli:main"
+evaluar-regla-atws = "regla_atws.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

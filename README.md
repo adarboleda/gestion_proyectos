@@ -122,6 +122,34 @@ Normal y ATWS tienen una sola simulación en el dataset: van completas a entrena
 
 ---
 
+## Preprocesamiento PWR 3L (funcionalidad 002, KAN-18)
+
+Prepara las corridas de la planta **PWR 3L** (2705 MWt, un dato por segundo; carpeta `PWR 3L`) en muestras de **300 pasos de 1 s** con **cinco clases**: NORM (0), LOCA (1), LOCAC (2), ATWS (3) y TRIP_OK (4). Es una planta distinta de NPPAD: paquete, comando y salida propios, sin mezclar datos. Las corridas se reparten por **grupos completos** (gemelas ATWS/TRIP_OK juntas; LOCA y LOCAC de igual área de rotura juntas), ≈ 70/15/15 con semilla 42 (reparto y verificación de fuga de 004), el escalador se ajusta solo con entrenamiento (003) y el paso de muestreo se mide desde `TIME` (003).
+
+**Ejecución** (tras `pip install -e ".[dev]"`; imprime el reporte y escribe `data_processed_pwr3l/`):
+
+```
+preparar-pwr3l
+```
+
+Equivale a `python -m preparacion_pwr3l`. Opciones: `--origen RUTA` (por defecto `../IA-Nuclear/PWR 3L`, solo lectura), `--salida RUTA` y `--semilla N`. Un archivo defectuoso termina con código 1, nombra el archivo y la causa, y no escribe nada.
+
+**Salida** en `data_processed_pwr3l/` (se regenera; no se edita a mano):
+
+| Archivo | Contenido |
+|---|---|
+| `X_train/val/test.npy` | `(N,300,26)` float32: 26 variables medibles escaladas (sin `WLR`) |
+| `y_train/val/test.npy` | `(N,)` int64: 0 = NORM, 1 = LOCA, 2 = LOCAC, 3 = ATWS, 4 = TRIP_OK |
+| `margins_train/val/test.npy` | `(N,300,7)` float64: 7 márgenes térmicos sin escalar |
+| `scaler_mean.npy`, `scaler_std.npy` | `(26,)`, ajustados solo con entrenamiento |
+| `metadata.json` | corridas y grupos de cada conjunto (orden de las filas), corridas excluidas con su motivo, advertencias y limitaciones |
+
+Con la carpeta real: 109 corridas encontradas → 91 muestras (63 / 15 / 13). No aportan muestra las 6 OOD, las 3 descartadas por el equipo (R07, R27, R28) y 9 corridas con menos de 300 filas (se excluyen con aviso; no se rellenan).
+
+**Pruebas**: `pytest tests/pwr3l`. Detalle: [specs/002-preprocesamiento-pwr3l/quickstart.md](specs/002-preprocesamiento-pwr3l/quickstart.md).
+
+---
+
 ## División sin fuga de datos (funcionalidad 004)
 
 Reparte las corridas usables de **PWR 3L** en entrenamiento, validación y prueba por corrida completa, sin fuga de datos:
@@ -177,6 +205,28 @@ resultado = cargar("modelos/etapa1").clasificar(serie)   # serie: (T, 26) sin es
 ```
 
 Resultados y detalle: [specs/005-clasificador-etapa1/quickstart.md](specs/005-clasificador-etapa1/quickstart.md).
+
+---
+
+## Regla determinista de ATWS (funcionalidad 006, KAN-22)
+
+Regla fija y explicable para el canal rápido de **PWR 3L**. Si hay **demanda de disparo** del reactor y el flujo neutrónico (PWNT) sigue por encima de un umbral **2 s después**, recomienda **«posible ATWS»**. Es **consultiva**: no actúa sobre la planta ni sustituye la protección.
+
+- **Demanda de disparo** = primera señal del sistema de protección en el registro de eventos (`*.dat`: Low SG Level, Turbine trip, RCP-A trip, Scram …) o PWNT ≥ 118 % (alto flujo), más el retardo de la lógica de protección para ese tipo de señal.
+- **Calibración solo con entrenamiento** del reparto de 004: los retardos por tipo (el mayor tiempo señal → «Reactor Scram») y el umbral (punto medio entre el ATWS con menor flujo y el no-ATWS con mayor flujo).
+
+```
+evaluar-regla-atws                    # o: python -m regla_atws
+```
+
+Opciones: `--origen` (por defecto `../IA-Nuclear/PWR 3L`), `--salida` (`resultados_regla_atws`) y `--semilla` (42). Escribe `regla.json`, `evaluacion.csv` (una fila por corrida) y `resumen.json`.
+
+**Resultado con la carpeta real**:
+- Umbral: 19.3 % del PWNT inicial. Margen en entrenamiento: el ATWS con menor flujo queda en 32.9 % y el no-ATWS con mayor flujo en 5.7 %.
+- **18 de 18 ATWS detectados**, todos en ≤ 3 s desde la demanda.
+- **1 falsa alarma** (R54, en validación). Es un disparo correcto por turbina, un tipo de señal sin ejemplo en entrenamiento: recibe el mayor retardo de entrenamiento (2.5 s), y el real es de 5 s.
+
+Detalle: [specs/006-regla-atws/quickstart.md](specs/006-regla-atws/quickstart.md).
 
 ---
 

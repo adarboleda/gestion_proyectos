@@ -33,6 +33,21 @@ Equivale a `python -m preparacion_pwr3l`. Lee `../IA-Nuclear/PWR 3L` (solo lectu
 6. **Archivo defectuoso**: copiar la carpeta, quitar la columna `DNBR` de un `plotdata.csv` y ejecutar con `--origen` sobre la copia: termina con código 1, nombra el archivo y no crea la salida.
 7. **Origen sin cambios**: el hash de los archivos de `PWR 3L` es igual antes y después.
 
+## Resultado con la carpeta real (2026-11-04, reparto de 004)
+
+Ejecución con `preparar-pwr3l` (≈ 30 s, código 0); paso medido: 1 s en todas las corridas.
+
+| Clase | train | val | test | Total | Cortas | Descartadas |
+|---|---|---|---|---|---|---|
+| NORM | 13 | 3 | 3 | 19 | 1 (R38) | 0 |
+| LOCA | 11 | 4 | 1 | 16 | 4 (R41, R42, R43, R82) | 0 |
+| LOCAC | 14 | 2 | 4 | 20 | 0 | 1 (R07) |
+| ATWS | 12 | 3 | 3 | 18 | 2 (R91, R98) | 2 (R27, R28) |
+| TRIP_OK | 13 | 3 | 2 | 18 | 2 (R55, R63) | 0 |
+| **Total** | **63** | **15** | **13** | **91** | 9 | 3 |
+
+Más 6 OOD → 109 corridas encontradas. Validaciones 1–5 y 7: `tests/pwr3l/integration/test_pwr3l_dataset_real.py`; la 6: `test_pwr3l_cli.py` sobre una copia sintética.
+
 ## Pruebas
 
 ```
