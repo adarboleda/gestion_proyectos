@@ -17,15 +17,15 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Añadir a `pyproject.toml` el guion `medir-tiempo-deteccion = "tiempo_deteccion.cli:main"` y `resultados_tiempo_deteccion/` al `.gitignore`; reinstalar en modo editable
-- [ ] T002 [P] Crear `src/tiempo_deteccion/__init__.py`, `src/tiempo_deteccion/__main__.py` y las carpetas `tests/tiempo/unit/` y `tests/tiempo/integration/`
+- [X] T001 Añadir a `pyproject.toml` el guion `medir-tiempo-deteccion = "tiempo_deteccion.cli:main"` y `resultados_tiempo_deteccion/` al `.gitignore`; reinstalar en modo editable
+- [X] T002 [P] Crear `src/tiempo_deteccion/__init__.py`, `src/tiempo_deteccion/__main__.py` y las carpetas `tests/tiempo/unit/` y `tests/tiempo/integration/`
 
 ---
 
 ## Phase 2: Foundational
 
-- [ ] T003 Crear `tests/tiempo/conftest.py`: (a) ayudante que escribe un árbol PWR 3L mínimo con registros `.dat` y `config.json` de cada tipo (FWIV, RCP-A trip, Turbine Trip, AFW, LOCA automática `1:100:50`, LOCA manual `_t60`, extracción de barras con `Scram High Flux`, falla 9 con retardo no cumplido, corrida sin fuente) más su `validacion.json`; (b) fixture de sesión que entrena y publica un modelo de 005 sobre las corridas sintéticas de `tests/etapa1/conftest.py` (cargado por ruta con `importlib`) en una carpeta temporal, con `entrenar-etapa1 --epocas 4`
-- [ ] T004 Crear `src/tiempo_deteccion/config.py`: `META_DIAGNOSTICO_S = 10`, `META_ATWS_S = 3`, `TOLERANCIA_INCIERTA_S = 2`, patrones del iniciador del registro (research.md §1), falla excluida «8», `SALIDA_POR_DEFECTO = "resultados_tiempo_deteccion"`, `MODELO_POR_DEFECTO = "modelos/etapa1"`, archivos de salida y aviso consultivo
+- [X] T003 Crear `tests/tiempo/conftest.py`: (a) ayudante que escribe un árbol PWR 3L mínimo con registros `.dat` y `config.json` de cada tipo (FWIV, RCP-A trip, Turbine Trip, AFW, LOCA automática `1:100:50`, LOCA manual `_t60`, extracción de barras con `Scram High Flux`, falla 9 con retardo no cumplido, corrida sin fuente) más su `validacion.json`; (b) fixture de sesión que entrena y publica un modelo de 005 sobre las corridas sintéticas de `tests/etapa1/conftest.py` (cargado por ruta con `importlib`) en una carpeta temporal, con `entrenar-etapa1 --epocas 4`
+- [X] T004 Crear `src/tiempo_deteccion/config.py`: `META_DIAGNOSTICO_S = 10`, `META_ATWS_S = 3`, `TOLERANCIA_INCIERTA_S = 2`, patrones del iniciador del registro (research.md §1), falla excluida «8», `SALIDA_POR_DEFECTO = "resultados_tiempo_deteccion"`, `MODELO_POR_DEFECTO = "modelos/etapa1"`, archivos de salida y aviso consultivo
 
 ---
 
@@ -35,10 +35,10 @@
 
 **Independent Test**: con el árbol sintético, cada corrida da el instante y la fuente esperados, y las inciertas quedan marcadas.
 
-- [ ] T005 [P] [US1] Crear `tests/tiempo/unit/test_tiempo_falla.py`: (a) ATWS/TRIP_OK con `FWIV #n Position Change: 0%` → instante de la primera línea con t > 0 y fuente «registro»; las líneas en t = 0 se ignoran; (b) `RCP-A trip`, `Turbine Trip Control Change: True` y `AFW Turbine Valve #1 Position Change: 100%` → «registro»; (c) LOCA automática `fallas=1:100:50` → 50 «programado»; con `1:500:30;6:0:30` → 30; la falla 8 se ignora (`7:0:50;8:0:0` sin línea → 50); (d) LOCA manual `_t60` → 60 «programado»; (e) extracción de barras: `Scram High Flux` no es iniciador → instante programado; una LOCA cuyo registro tiene `Turbine Trip Control Change: True` (consecuencia del scram) → instante programado, porque el registro solo se busca en ATWS y TRIP_OK; (f) inicio del validador más de 2 s antes del instante → `incierta = True` con motivo; (g) sin ninguna fuente → `t = None`, `incierta`; (h) NORM → sin instante; (i) `instantes_falla(origen, corridas)` cubre todas las corridas de evento usables
-- [ ] T006 [US1] Ejecutar `python -m pytest tests/tiempo/unit/test_tiempo_falla.py` y comprobar que **falla**
-- [ ] T007 [US1] Crear `src/tiempo_deteccion/falla.py` con la dataclass `InstanteFalla` (campos de data-model.md) e `instante_falla` / `instantes_falla` según research.md §1–§2 (usa `regla_atws.eventos.leer_eventos` y `clasificador_etapa1.eventos.inicios_evento`)
-- [ ] T008 [US1] Ejecutar las pruebas de T005 y comprobar que pasan
+- [X] T005 [P] [US1] Crear `tests/tiempo/unit/test_tiempo_falla.py`: (a) ATWS/TRIP_OK con `FWIV #n Position Change: 0%` → instante de la primera línea con t > 0 y fuente «registro»; las líneas en t = 0 se ignoran; (b) `RCP-A trip`, `Turbine Trip Control Change: True` y `AFW Turbine Valve #1 Position Change: 100%` → «registro»; (c) LOCA automática `fallas=1:100:50` → 50 «programado»; con `1:500:30;6:0:30` → 30; la falla 8 se ignora (`7:0:50;8:0:0` sin línea → 50); (d) LOCA manual `_t60` → 60 «programado»; (e) extracción de barras: `Scram High Flux` no es iniciador → instante programado; una LOCA cuyo registro tiene `Turbine Trip Control Change: True` (consecuencia del scram) → instante programado, porque el registro solo se busca en ATWS y TRIP_OK; (f) inicio del validador más de 2 s antes del instante → `incierta = True` con motivo; (g) sin ninguna fuente → `t = None`, `incierta`; (h) NORM → sin instante; (i) `instantes_falla(origen, corridas)` cubre todas las corridas de evento usables
+- [X] T006 [US1] Ejecutar `python -m pytest tests/tiempo/unit/test_tiempo_falla.py` y comprobar que **falla**
+- [X] T007 [US1] Crear `src/tiempo_deteccion/falla.py` con la dataclass `InstanteFalla` (campos de data-model.md) e `instante_falla` / `instantes_falla` según research.md §1–§2 (usa `regla_atws.eventos.leer_eventos` y `clasificador_etapa1.eventos.inicios_evento`)
+- [X] T008 [US1] Ejecutar las pruebas de T005 y comprobar que pasan
 
 ---
 
