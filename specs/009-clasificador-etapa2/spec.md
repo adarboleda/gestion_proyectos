@@ -12,8 +12,8 @@
 
 ### Session 2026-11-04
 
-- Q: ¿Qué entradas recibe la Bi-LSTM de Etapa 2? → A: [NEEDS CLARIFICATION: solo los canales de desviación pico de PWR y PWNT, o las 26 variables de sala de control más esos dos canales]
-- Q: ¿Sobre qué muestras se evalúa la Etapa 2? → A: [NEEDS CLARIFICATION: solo sobre los instantes de evento de las corridas LOCA/LOCAC de prueba (Etapa 1 ideal), o encadenada con la salida real de la Etapa 1]
+- Q: ¿Qué entradas recibe la Bi-LSTM de Etapa 2? → A: Solo los 2 canales de desviación pico (PWR y PWNT): modelo pequeño, explicable y fiel a la tarea.
+- Q: ¿Sobre qué muestras se evalúa la Etapa 2? → A: Sobre los instantes de evento de las corridas LOCA/LOCAC de prueba, como si la Etapa 1 fuera ideal (se mide solo la Etapa 2); la cascada con la Etapa 1 real queda fuera.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -86,13 +86,13 @@ El analista entrega al modelo guardado los datos de una corrida hasta un instant
 - **FR-001**: El sistema MUST clasificar en dos clases: LOCA (rotura en rama caliente) y LOCAC (rotura en rama fría), usando solo corridas usables de esas clases; las demás clases, las cortas, las descartadas y las OOD MUST NOT usarse.
 - **FR-002**: El sistema MUST usar el reparto sin fuga de la funcionalidad 004 sin cambios y ejecutar su verificación de fuga antes de entrenar; todas las muestras de una corrida MUST pertenecer a su conjunto.
 - **FR-003**: El sistema MUST calcular, para PWR y PWNT, el canal de desviación pico causal: en cada segundo τ, el máximo de la media móvil de 3 s en [τ − 14, τ] menos el valor inicial de la variable (t = 0), usando solo datos hasta τ.
-- **FR-004**: El sistema MUST usar como entrada de la Bi-LSTM los canales definidos en la aclaración de entradas, escalados con parámetros ajustados solo con las corridas de entrenamiento (003); MUST NOT usar el caudal de fuga (WLR) ni los márgenes térmicos.
+- **FR-004**: El sistema MUST usar como entrada de la Bi-LSTM solo los 2 canales de desviación pico (PWR y PWNT), escalados con parámetros ajustados solo con las corridas de entrenamiento (003); MUST NOT usar el caudal de fuga (WLR) ni los márgenes térmicos.
 - **FR-005**: El sistema MUST formar una muestra por segundo τ desde el inicio del evento (redondeado hacia arriba) hasta el final de la corrida, con la ventana de los últimos 30 s hasta τ (rellenada con la primera fila al comenzar), etiquetada con la clase de la corrida y con k = τ − inicio. El entrenamiento MUST usar los primeros 60 s de cada evento; validación y evaluación, todas las muestras de evento.
 - **FR-006**: El sistema MUST ponderar cada clase en proporción inversa a su frecuencia en entrenamiento y registrar los pesos.
 - **FR-007**: El sistema MUST elegir el modelo final solo con las corridas de validación (parada temprana); la prueba MUST usarse solo en la evaluación final.
 - **FR-008**: El sistema MUST producir el mismo modelo y las mismas métricas con los mismos datos, configuración y semilla.
 - **FR-009**: El sistema MUST abstenerse (UNCERTAIN) cuando la mayor probabilidad sea menor que 0,80.
-- **FR-010**: El sistema MUST reportar sobre prueba: matriz de confusión con la columna UNCERTAIN; precisión, exhaustividad y F1 de cada rama sobre todas las muestras (UNCERTAIN cuenta como no acierto); cobertura, exactitud sobre las decisiones y errores con confianza; en total y a 1, 2, 3, 5, 10, 20 y 30 s.
+- **FR-010**: El sistema MUST reportar sobre los instantes de evento de las corridas LOCA/LOCAC de prueba (Etapa 1 ideal): matriz de confusión con la columna UNCERTAIN; precisión, exhaustividad y F1 de cada rama sobre todas las muestras (UNCERTAIN cuenta como no acierto); cobertura, exactitud sobre las decisiones y errores con confianza; en total y a 1, 2, 3, 5, 10, 20 y 30 s.
 - **FR-011**: El sistema MUST reportar para cada corrida de prueba el tiempo de confirmación de la rama correcta (≥ 0,80 dos segundos seguidos), si se confirmó la rama equivocada, o «sin decisión», y agruparlo por tamaño de rotura.
 - **FR-012**: El sistema MUST guardar el modelo, el escalador, las clases, los canales, la configuración, la semilla, los pesos, el historial y el reporte, y regenerarlos con una sola ejecución documentada, sin tocar los artefactos de la Etapa 1.
 - **FR-013**: El sistema MUST ofrecer la clasificación de una serie nueva junto con la familia de la Etapa 1: si la familia no es LOCA, «no aplica»; si es LOCA, las probabilidades de las dos ramas y la recomendada o UNCERTAIN; toda salida MUST identificarse como consultiva.
