@@ -99,3 +99,13 @@
 ## Notes
 
 - KAN-25. El informe del Hito 1 (007, KAN-27) podrá leer `tiempos.json`; generarlo queda fuera.
+
+---
+
+## Phase 7: Convergence
+
+- [ ] T027 CRITICAL: registrar la causa «requisito» de las 7 líneas reescritas sin trailer `Causa:` en el commit 2363b19 (US3 amplía `evaluacion.py` y `cli.py`): pasarlas de `loc_elim_sin_clasificar` a `loc_elim_requisito` con una nota en `metricas/sesiones/20261104-1630-implementar-cf9c.csv` y documentarlo en `specs/008-tiempo-desde-falla/auditoria.md`, sin reescribir el historial (los registros de sesión apuntan a sus hashes) per Constitution (Commits) (contradicts)
+- [ ] T028 Informar para cada corrida de evento la diferencia entre el inicio del validador y el instante de la falla (`diferencia_validador_s = inicio_validador − t_falla`) en `instantes` de `tiempos.json`, en una columna de `tiempos.csv` y en el reporte (con su prueba en `tests/tiempo/`) per FR-003 / US1-AC4 (partial)
+- [ ] T029 Identificar como consultivos `tiempos.csv` y `lineas_tiempo.csv` (primera línea de comentario `# <aviso>`, actualizando contracts/salidas.md y las pruebas que los leen) per FR-013 (partial)
+- [ ] T030 Mostrar el motivo de la regla («sin demanda», «flujo caído», …) en la tabla de ATWS del reporte y en una columna `atws_motivo` de `tiempos.csv`, para que un ATWS no detectado se informe con su motivo per Edge Cases (ATWS no detectado) (partial)
+- [ ] T031 Alinear data-model.md: `ResultadoCorrida.atws` se guarda para toda corrida evaluada (hace falta para contar «posible ATWS» sin ATWS, FR-009), no solo para ATWS/TRIP_OK per plan: data-model (partial)
