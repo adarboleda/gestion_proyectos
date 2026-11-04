@@ -16,6 +16,7 @@ from preparacion_pwr3l.verificacion import ErrorFuga, verificar_reparto
 from regla_atws.config import AVISO, META_S, PUNTO_ALTO_FLUJO, SALIDA_POR_DEFECTO
 from regla_atws.eventos import instante_scram, leer_eventos, primera_senal
 from regla_atws.regla import Caso, Regla, calibrar, evaluar_todas
+from regla_atws.reporte import formatear_reporte, resumir, serializar_resumen
 
 INDICE_PWNT = VARIABLES_ENTRADA.index("PWNT")
 COLUMNAS_CSV = [
@@ -118,6 +119,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             "regla.json": serializar_regla(regla, argumentos.semilla),
             "evaluacion.csv": serializar_evaluacion(resultados),
         }
+        resumen = resumir(resultados, regla)
+        archivos["resumen.json"] = serializar_resumen(resumen)
         publicar(argumentos.salida, archivos)
     except (ErrorDatos, ErrorFuga) as error:
         print(error, file=sys.stderr)
@@ -128,4 +131,5 @@ def main(argv: Optional[List[str]] = None) -> int:
     except OSError as error:
         print(f"ERROR: no se pudo escribir en {argumentos.salida}: {error}", file=sys.stderr)
         return 1
+    print(formatear_reporte(argumentos.origen, argumentos.semilla, regla, resumen, resultados, sorted(archivos)), end="")
     return 0
