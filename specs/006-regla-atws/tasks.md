@@ -104,7 +104,7 @@
   - origen sin cambios
 - [X] T019 [P] Añadir al `README.md` la sección «Regla determinista de ATWS (funcionalidad 006)»
 - [X] T020 Ejecutar `evaluar-regla-atws` con la carpeta real y anotar el resultado en `quickstart.md`
-- [ ] T021 Ejecutar la suite completa y comprobar que todo pasa
+- [X] T021 Ejecutar la suite completa y comprobar que todo pasa
 
 ---
 
