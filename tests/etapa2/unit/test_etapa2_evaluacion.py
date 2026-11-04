@@ -124,3 +124,4 @@ def test_evaluar_probabilidades_horizontes_areas_metas_y_reporte():
     texto = formatear_reporte(rep)
     assert AVISO_REPORTE in texto
     assert "UNCERTAIN" in texto and "R44" in texto and "R19" in texto
+

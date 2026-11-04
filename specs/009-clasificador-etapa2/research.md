@@ -37,3 +37,4 @@
 
 - **Decision**: `Clasificador.clasificar(serie, familia_etapa1)` con `serie` (T, 2) de PWR y PWNT sin escalar desde t = 0; si `familia_etapa1 != "LOCA"` devuelve `NO_APLICA` sin ejecutar el modelo.
 - **Rationale**: no se modifica la Etapa 1; la cascada real queda para quien integre la consola.
+

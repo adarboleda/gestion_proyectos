@@ -17,3 +17,4 @@ from clasificador_etapa2.prediccion import cargar
 etapa2 = cargar("modelos/etapa2")
 etapa2.clasificar(serie_pwr_pwnt, familia_etapa1="LOCA")   # (T, 2) sin escalar desde t = 0
 ```
+

@@ -33,3 +33,4 @@
 
 - «Bi-LSTM» aparece porque lo exige la tarea de Jira (tipo de modelo pedido), igual que en 005.
 - Las 2 marcas [NEEDS CLARIFICATION] de la versión inicial se resolvieron con `/speckit-clarify` (entradas del modelo y forma de evaluación). Resultado: 16/16.
+

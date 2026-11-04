@@ -99,3 +99,4 @@ def test_codigos_de_salida_sin_torch_y_error_de_datos(monkeypatch, tmp_path):
 
     monkeypatch.setattr(cli, "_torch_disponible", lambda: True)
     assert cli.main(["--origen", str(tmp_path / "no-existe"), "--salida", str(tmp_path / "s")]) == 1
+

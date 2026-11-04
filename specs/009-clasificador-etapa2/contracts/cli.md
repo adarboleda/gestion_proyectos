@@ -18,3 +18,4 @@ entrenar-etapa2 [--origen RUTA] [--salida RUTA] [--semilla N] [--epocas N]
 | 3 | falta PyTorch |
 
 Publica solo `modelo.pt`, `modelo.json`, `reporte.json`, `reporte.txt` en `--salida`, reemplazándolos de forma atómica; no toca otros archivos.
+

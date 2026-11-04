@@ -21,3 +21,4 @@
 {"probabilidades": {"LOCA": 0.93, "LOCAC": 0.07}, "recomendacion": "LOCA", "aviso": "..."}
 {"probabilidades": null, "recomendacion": "NO_APLICA", "aviso": "..."}
 ```
+

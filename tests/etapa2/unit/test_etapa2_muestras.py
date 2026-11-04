@@ -43,3 +43,4 @@ def test_construir_muestras_ignora_otras_clases_y_falla_sin_inicio(sinteticas):
     inicios_mal = dict(sinteticas.inicios, **{una_loca.id: None})
     with pytest.raises(ValueError, match=una_loca.id):
         construir_muestras([una_loca], canales, inicios_mal, entrenamiento=True)
+

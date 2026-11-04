@@ -88,3 +88,4 @@ tests/etapa2/
 ## Complexity Tracking
 
 Sin violaciones que justificar.
+

@@ -41,3 +41,4 @@
 ## Próximo paso
 
 Aplicar U1, C1 y C2 y continuar con `/speckit-implement`.
+

@@ -31,7 +31,8 @@ def test_entrenamiento_corto_etapa2_con_dataset_real(tmp_path, capsys):
     assert hash_origen() == antes
 
     modelo = json.loads((salida / "modelo.json").read_text(encoding="utf-8"))
-    assert {c: len(v) for c, v in modelo["corridas"].items()} == {"train": 24, "val": 6, "test": 5}
+    assert {c: len(v) for c, v in modelo["corridas"].items()} == {"train": 25, "val": 6, "test": 5}
 
     reporte = json.loads((salida / "reporte.json").read_text(encoding="utf-8"))
     assert [c["corrida"] for c in reporte["corridas"]] == modelo["corridas"]["test"]
+

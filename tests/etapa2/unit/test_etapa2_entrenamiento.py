@@ -79,3 +79,4 @@ def test_entrenar_falla_si_falta_una_rama_en_entrenamiento(sinteticas):
     solo_loca.y = np.zeros_like(solo_loca.y)
     with pytest.raises(ValueError, match="LOCAC"):
         entrenar(solo_loca, muestras["val"], dict(HIPERPARAMETROS, epocas=2), semilla=42)
+

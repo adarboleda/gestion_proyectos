@@ -102,3 +102,4 @@ def escribir_csv_corrida(ruta: Path, serie: np.ndarray, pwr=None, incluir_pwr: b
                 fila.append(valor_pwr)
             fila.extend(float(v) for v in serie[fila_idx])
             escritor.writerow(fila)
+

@@ -79,3 +79,4 @@ def test_leer_pwr_falla_si_falta_columna_o_no_es_numerica(tmp_path):
     corrida_mal = Corrida("R42", "LOCA", "auto", rel_mal, area=50, estado="usable", filas=PASOS, paso_segundos=1, serie=serie)
     with pytest.raises(ErrorDatos, match="PWR"):
         leer_pwr(tmp_path, corrida_mal)
+

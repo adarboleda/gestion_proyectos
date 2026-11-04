@@ -11,3 +11,4 @@
 | Recomendación | `dict` | `probabilidades` {LOCA, LOCAC} o `None`, `recomendacion` ∈ {LOCA, LOCAC, UNCERTAIN, NO_APLICA}, `aviso` |
 
 Reglas: `y` depende solo de la clase de la corrida; `k = τ − ceil(inicio)` ≥ 0; en entrenamiento `k ≤ 60`.
+

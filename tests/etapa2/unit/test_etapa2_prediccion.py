@@ -78,3 +78,4 @@ def test_clasificar_rechaza_serie_vacia_o_forma_invalida(tmp_path):
         clf.clasificar(np.ones((10, 3)), familia_etapa1="LOCA")
     with pytest.raises(ValueError):
         clf.clasificar(np.ones(10), familia_etapa1="LOCA")
+
