@@ -56,7 +56,7 @@
 
 ### Tests
 
-- [ ] T012 [P] [US2] Crear `tests/etapa2/unit/test_etapa2_evaluacion.py`: `decidir` con umbral (0,79 → UNCERTAIN, 0,80 → rama); matriz 2 × 3; precisión/exhaustividad/F1/cobertura/exactitud/errores con valores calculados a mano; horizontes con k == h; confirmación 2 s seguidos, rama equivocada confirmada y «sin decisión»; agrupación por área; metas SC-001/SC-002; advertencia de pocas corridas; reporte de texto con el aviso
+- [ ] T012 [P] [US2] Crear `tests/etapa2/unit/test_etapa2_evaluacion.py`: `decidir` con umbral (0,79 → UNCERTAIN, 0,80 → rama); matriz 2 × 3; precisión/exhaustividad/F1/cobertura/exactitud/errores con valores calculados a mano; horizontes con k == h; confirmación 2 s seguidos, rama equivocada confirmada y «sin decisión»; agrupación por área; metas SC-001/SC-002; advertencia de pocas corridas; una rama sin muestras en prueba → cero, sin métricas inventadas; reporte de texto con el aviso
 
 ### Implementation
 
@@ -80,7 +80,7 @@
 ## Phase 6: Polish
 
 - [ ] T017 [P] Crear `tests/etapa2/integration/test_etapa2_real.py`: entrenamiento corto con el dataset real (omitido sin datos): no modifica el origen, 24/6/5 corridas LOCA/LOCAC, las 5 de prueba en el reporte
-- [ ] T018 Ejecutar `entrenar-etapa2` con los datos reales y la suite completa; documentar resultados en `README.md` (sección Etapa 2) y marcar las tareas
+- [ ] T018 Ejecutar `entrenar-etapa2` con los datos reales y la suite completa; documentar resultados en `README.md` (sección Etapa 2); comprobar con `git diff --stat main -- src/` que solo cambió `src/clasificador_etapa2/` (FR-015) y marcar las tareas
 
 ---
 
