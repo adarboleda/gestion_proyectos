@@ -77,3 +77,51 @@ def cargar_sinteticas_etapa1():
     modulo = importlib.util.module_from_spec(especificacion)
     especificacion.loader.exec_module(modulo)
     return modulo
+
+
+# --- Datos sintéticos para la integración (US2/US3) ---------------------------------------------
+
+def fallas_sinteticas(corridas, inicios, inciertas=()):
+    """Instante de la falla = inicio sintético (fuente «programado»); `inciertas` se marcan como tales."""
+    from tiempo_deteccion.falla import InstanteFalla
+
+    fallas = {}
+    for corrida in corridas:
+        inicio = inicios.get(corrida.id)
+        if inicio is None:
+            continue
+        if corrida.id in inciertas:
+            fallas[corrida.id] = InstanteFalla(inicio + 10.0, "programado", "sintético", inicio, True, "validador antes")
+        else:
+            fallas[corrida.id] = InstanteFalla(inicio, "programado", "sintético", inicio, False, None)
+    return fallas
+
+
+def caso_atws(corrida, conjunto, inicio):
+    """Caso de 006 sintético: ATWS sin scram con flujo alto; TRIP_OK con scram 5 s después y flujo caído;
+    LOCA con señal 10 s después del inicio y scram; NORM sin señal."""
+    import numpy as np
+
+    from regla_atws.eventos import Senal
+    from regla_atws.regla import Caso
+
+    pwnt = np.full(300, 100.0)
+    if corrida.clase == "ATWS":
+        return Caso(corrida, conjunto, Senal(inicio, "turbine trip", "registro"), None, pwnt)
+    if corrida.clase == "TRIP_OK":
+        pwnt[np.arange(300) > inicio + 5] = 6.0
+        return Caso(corrida, conjunto, Senal(inicio, "turbine trip", "registro"), inicio + 5, pwnt)
+    if corrida.clase in ("LOCA", "LOCAC"):
+        pwnt[np.arange(300) > inicio + 10.5] = 6.0
+        return Caso(corrida, conjunto, Senal(inicio + 10, "lo rx press", "registro"), inicio + 10.5, pwnt)
+    return Caso(corrida, conjunto, None, None, pwnt)
+
+
+def casos_sinteticos(corridas, inicios, semilla):
+    """Casos de 006 en el orden del reparto de 004 (como `regla_atws.cli.construir_casos`)."""
+    from preparacion_pwr3l.config import CONJUNTOS
+    from preparacion_pwr3l.grupos import formar_grupos
+    from preparacion_pwr3l.particion import repartir
+
+    reparto = repartir(formar_grupos(corridas), semilla)
+    return [caso_atws(c, conjunto, inicios.get(c.id) or 0.0) for conjunto in CONJUNTOS for c in reparto.corridas[conjunto]]
