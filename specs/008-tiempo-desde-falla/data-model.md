@@ -22,7 +22,7 @@ Por corrida: arreglos alineados por τ = 5…299: `tau` (int), `probabilidades` 
 | `corrida`, `clase`, `familia`, `conjunto`, `area` | identificación (`familia`: NORM, LOCA o TRANS) |
 | `falla` | `InstanteFalla` |
 | `t_confirmacion` | primer τ de confirmación de la familia correcta tras la falla, o None |
-| `primera_familia` | primera familia confirmada con τ − 1 ≥ t_falla, o «» (ninguna); si no es la correcta, la corrida es una «confusión» |
+| `primera_familia` | primera familia de evento (LOCA o TRANS) confirmada con τ − 1 ≥ t_falla, o «» (ninguna); si no es la correcta, la corrida es una «confusión» |
 | `tiempo_diagnostico_s` | `t_confirmacion − t_falla`, o None («no detectado») |
 | `tiempo_desde_validador_s` | el mismo cálculo desde el inicio del validador (comparación) |
 | `atws` | solo ATWS/TRIP_OK: recomendación de la regla, `t_demanda`, `t_decision`, `tiempo_desde_demanda_s`, `tiempo_desde_falla_s` |
