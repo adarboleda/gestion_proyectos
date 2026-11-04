@@ -51,7 +51,9 @@
   - umbral = punto medio cuando hay separación, y el mayor que no omite ATWS cuando se solapan, contando las falsas alarmas;
   - evaluación con flujo caído, flujo alto, sin demanda y decisión fuera de la ventana;
   - `t_decision = ⌈t_d + 2⌉` y tiempo de detección desde la demanda en [2, 3) s;
-  - la calibración solo recibe corridas de entrenamiento
+  - la calibración solo recibe corridas de entrenamiento;
+  - un ATWS sin demanda queda como omisión y no entra en el umbral (análisis U1);
+  - `PWNT[0]` ≤ 0 detiene con error (análisis A1)
 - [ ] T010 [US2] Crear `tests/atws/integration/test_atws_cli.py`. Casos:
   - código 0 y publica `regla.json` y `evaluacion.csv`;
   - una fila por corrida usable, con su conjunto de 004;
@@ -60,7 +62,8 @@
   - reproducible byte a byte;
   - sin `.dat` → código 1 sin salida;
   - origen sin cambios;
-  - `python -m regla_atws`
+  - `python -m regla_atws`;
+  - aviso consultivo también en `regla.json` (análisis C1)
 
 ### Implementation
 
@@ -78,7 +81,8 @@
   - tabla por conjunto que cuadra con los resultados;
   - errores nombrados;
   - tiempos y meta de 3 s;
-  - advertencia por señal no vista en entrenamiento;
+  - advertencia por señal no vista en entrenamiento y por ATWS sin demanda;
+  - limitación del registro de eventos incompleto en los ATWS (análisis U2);
   - aviso consultivo en el reporte y en `resumen.json`;
   - las 8 secciones en orden
 

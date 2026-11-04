@@ -41,7 +41,7 @@ Un analista aplica la regla a cada corrida PWR 3L y obtiene, para cada una, si h
 
 ### User Story 2 - Calibración solo con entrenamiento y evaluación en datos no vistos (Priority: P1)
 
-El analista calibra el umbral de flujo y los retardos de la lógica de protección usando solo las corridas de entrenamiento del reparto de 002, y mide la regla en validación y prueba: ATWS detectados, ATWS omitidos, falsas alarmas y tiempos de detección.
+El analista calibra el umbral de flujo y los retardos de la lógica de protección usando solo las corridas de entrenamiento del reparto de 004, y mide la regla en validación y prueba: ATWS detectados, ATWS omitidos, falsas alarmas y tiempos de detección.
 
 **Why this priority**: Sin separar calibración y evaluación (principio II), las cifras del Hito 1 no valdrían nada.
 
@@ -49,7 +49,7 @@ El analista calibra el umbral de flujo y los retardos de la lógica de protecci�
 
 **Acceptance Scenarios**:
 
-1. **Given** el reparto de 002, **When** se calibra la regla, **Then** el umbral y los retardos dependen solo de corridas de entrenamiento.
+1. **Given** el reparto de 004, **When** se calibra la regla, **Then** el umbral y los retardos dependen solo de corridas de entrenamiento.
 2. **Given** la regla calibrada, **When** se evalúa, **Then** se obtiene por conjunto una tabla de ATWS detectados/omitidos y de falsas alarmas/rechazos correctos, y el tiempo de detección de cada ATWS detectado.
 3. **Given** los mismos datos y configuración, **When** se repite, **Then** el resultado es idéntico.
 
@@ -78,6 +78,8 @@ El analista recibe un reporte y archivos con la regla calibrada (umbral, retardo
 - Distribuciones de flujo de ATWS y no-ATWS que se solapen en entrenamiento: se toma el mayor umbral que no omite ningún ATWS de entrenamiento y se informan las falsas alarmas.
 - Corrida cuyo instante de decisión cae fuera de los 300 s de la muestra: se recomienda «sin ATWS» con el motivo «decisión fuera de la ventana» y se advierte.
 - Corrida sin registro de eventos (archivo `.dat`) o con un registro ilegible: la evaluación se detiene nombrando el archivo.
+- Un ATWS sin demanda (ni señal ni alto flujo): no entra en la calibración y se cuenta como omisión, también en entrenamiento, con advertencia.
+- Una corrida con PWNT inicial ≤ 0: la evaluación se detiene nombrando la corrida.
 - Corridas que no aportan muestra en 002 (cortas, descartadas, OOD): no se evalúan, porque no están en ningún conjunto.
 
 ## Requirements *(mandatory)*
@@ -119,4 +121,5 @@ El analista recibe un reporte y archivos con la regla calibrada (umbral, retardo
 - PWNT es el flujo neutrónico en % del nominal y vale ~100 % en el estado inicial de todas las corridas; tras un scram cae a ~6 % en 1 s.
 - El registro de eventos de PCTran (`transientlist.dat`) refleja las señales del anunciador; en las corridas ATWS el simulador puede omitir algunas señales de disparo (p. ej. R91 no registra «Scram High Prz Level», que sí aparece en su gemela).
 - La espera de 2 s y el punto de disparo por alto flujo (118 %) vienen de KAN-22 y de la lógica de protección del simulador; la señal de demanda debe validarse con la experta.
+- En los ATWS el simulador puede no registrar la señal real (R91 no registra la que sí aparece en su gemela R99): la demanda puede salir más tarde de lo real; el reporte lo declara como limitación.
 - Con ~3 ATWS por conjunto de validación y prueba, las cifras tienen mucha incertidumbre.

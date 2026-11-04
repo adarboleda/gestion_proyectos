@@ -45,6 +45,8 @@ Medición previa sobre las corridas ATWS y TRIP_OK reales (script de exploració
   - Si `min(ATWS) > max(no-ATWS)`: umbral = punto medio entre ambos.
   - Si se solapan: umbral = `min(ATWS)` menos un épsilon, el mayor que no omite ningún ATWS, y se cuentan las falsas alarmas de entrenamiento (aclaración 2).
   - Se informan mínimo, máximo y separación.
+  - Solo entran las corridas con demanda. Un ATWS sin demanda se cuenta como omisión, también en entrenamiento, y se advierte (análisis U1).
+  - Si `PWNT[0]` ≤ 0, la evaluación se detiene con un error que nombra la corrida (análisis A1).
 
 ## 5. Datos y reparto
 
