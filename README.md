@@ -208,6 +208,28 @@ Resultados y detalle: [specs/005-clasificador-etapa1/quickstart.md](specs/005-cl
 
 ---
 
+## Regla determinista de ATWS (funcionalidad 006, KAN-22)
+
+Regla fija y explicable para el canal rápido de **PWR 3L**. Si hay **demanda de disparo** del reactor y el flujo neutrónico (PWNT) sigue por encima de un umbral **2 s después**, recomienda **«posible ATWS»**. Es **consultiva**: no actúa sobre la planta ni sustituye la protección.
+
+- **Demanda de disparo** = primera señal del sistema de protección en el registro de eventos (`*.dat`: Low SG Level, Turbine trip, RCP-A trip, Scram …) o PWNT ≥ 118 % (alto flujo), más el retardo de la lógica de protección para ese tipo de señal.
+- **Calibración solo con entrenamiento** del reparto de 004: los retardos por tipo (el mayor tiempo señal → «Reactor Scram») y el umbral (punto medio entre el ATWS con menor flujo y el no-ATWS con mayor flujo).
+
+```
+evaluar-regla-atws                    # o: python -m regla_atws
+```
+
+Opciones: `--origen` (por defecto `../IA-Nuclear/PWR 3L`), `--salida` (`resultados_regla_atws`) y `--semilla` (42). Escribe `regla.json`, `evaluacion.csv` (una fila por corrida) y `resumen.json`.
+
+**Resultado con la carpeta real**:
+- Umbral: 19.3 % del PWNT inicial. Margen en entrenamiento: el ATWS con menor flujo queda en 32.9 % y el no-ATWS con mayor flujo en 5.7 %.
+- **18 de 18 ATWS detectados**, todos en ≤ 3 s desde la demanda.
+- **1 falsa alarma** (R54, en validación). Es un disparo correcto por turbina, un tipo de señal sin ejemplo en entrenamiento: recibe el mayor retardo de entrenamiento (2.5 s), y el real es de 5 s.
+
+Detalle: [specs/006-regla-atws/quickstart.md](specs/006-regla-atws/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
