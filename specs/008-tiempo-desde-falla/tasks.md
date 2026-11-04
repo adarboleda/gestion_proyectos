@@ -76,10 +76,10 @@
 
 ## Phase 6: Polish
 
-- [ ] T023 [P] Crear `tests/tiempo/integration/test_tiempo_real.py` (se omite sin `datos_reales.ruta_pwr3l()`, sin PyTorch o sin `modelos/etapa1`): código 0; 72 corridas de evento con instante (29 «registro», 43 «programado») y 5 inciertas (R22, R47, R48, R54, R99); una fila por corrida de evento de validación y prueba en `tiempos.csv`; origen sin cambios (hash)
-- [ ] T024 [P] Añadir al `README.md` la sección «Tiempo de detección desde la falla (funcionalidad 008)»: qué mide, de dónde sale el instante de la falla, el comando, los archivos y cómo leer las metas
-- [ ] T025 Ejecutar `medir-tiempo-deteccion` con los datos reales dos veces (comprobar `tiempos.json` idéntico), medir el tiempo y anotar los resultados en «Resultados obtenidos» de `specs/008-tiempo-desde-falla/quickstart.md`
-- [ ] T026 Ejecutar la suite completa con `IANUCLEAR_DATOS` y comprobar que todo pasa
+- [X] T023 [P] Crear `tests/tiempo/integration/test_tiempo_real.py` (se omite sin `datos_reales.ruta_pwr3l()`, sin PyTorch o sin `modelos/etapa1`): código 0; 72 corridas de evento con instante (29 «registro», 43 «programado») y 5 inciertas (R22, R47, R48, R54, R99); una fila por corrida de evento de validación y prueba en `tiempos.csv`; origen sin cambios (hash)
+- [X] T024 [P] Añadir al `README.md` la sección «Tiempo de detección desde la falla (funcionalidad 008)»: qué mide, de dónde sale el instante de la falla, el comando, los archivos y cómo leer las metas
+- [X] T025 Ejecutar `medir-tiempo-deteccion` con los datos reales dos veces (comprobar `tiempos.json` idéntico), medir el tiempo y anotar los resultados en «Resultados obtenidos» de `specs/008-tiempo-desde-falla/quickstart.md`
+- [X] T026 Ejecutar la suite completa con `IANUCLEAR_DATOS` y comprobar que todo pasa
 
 ---
 

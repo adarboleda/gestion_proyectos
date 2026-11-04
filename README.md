@@ -230,6 +230,41 @@ Detalle: [specs/006-regla-atws/quickstart.md](specs/006-regla-atws/quickstart.md
 
 ---
 
+## Tiempo de detección desde la falla (funcionalidad 008, KAN-25)
+
+Mide cuánto tardan el clasificador de Etapa 1 (005) y la regla de ATWS (006) en reconocer el evento en **PWR 3L**. Reproduce cada corrida de validación y de prueba segundo a segundo, de forma causal: en cada segundo solo usa los datos hasta ese segundo. El tiempo se cuenta **desde el instante de la falla**, no desde el inicio de la ventana ni desde el inicio que detectó el validador. No entrena ni ajusta nada.
+
+- **Instante de la falla.** En ATWS y TRIP_OK es la primera línea del Transient Report (`*.dat`, con t > 0) que registra la acción iniciadora: cierre de una FWIV, «RCP-A trip», «Turbine Trip Control Change: True» o la válvula de la turbina del AFW al 100 %. En las demás corridas el registro no anota la rotura, así que se usa el **instante programado**: el retardo de la falla en `config.json` (sin contar la falla 8) o el `_t<n>` del nombre de la carpeta.
+- **Corrida incierta.** Es aquella en la que el validador ve cambios más de 2 s antes del instante de la falla. Se informa aparte y no cuenta para la meta de diagnóstico.
+- **Diagnóstico.** Es el primer segundo τ en que la familia correcta tiene probabilidad ≥ 0,80 dos segundos seguidos, con τ − 1 ≥ t_falla. El tiempo es τ − t_falla.
+- **ATWS.** Es la decisión «posible ATWS» de la regla menos la demanda de disparo. El tiempo desde la falla se da como dato.
+
+```powershell
+.venv\Scripts\medir-tiempo-deteccion.exe --origen "D:\Personal\IANuclear\PWR 3L" --modelo modelos\etapa1   # o: python -m tiempo_deteccion
+```
+
+Opciones: `--origen`, `--modelo` (`modelos/etapa1`, publicado por `entrenar-etapa1`), `--salida` (`resultados_tiempo_deteccion`) y `--semilla` (42; debe ser la del modelo, o el comando termina con código 1).
+
+El comando escribe cuatro archivos:
+- `tiempos.json`: por corrida, resumen, metas, falsas alarmas, confusiones, inciertas e instantes.
+- `tiempos.csv`: una fila por corrida.
+- `lineas_tiempo.csv`: una fila por corrida y segundo, con las probabilidades, la familia confirmada y la decisión de ATWS.
+- `reporte.txt`: el reporte legible.
+
+**Cómo leer las metas**:
+- `diagnostico_10s` cuenta las corridas de evento de prueba no inciertas confirmadas en ≤ 10 s desde la falla.
+- `atws_3s` cuenta los ATWS de validación y prueba reconocidos en ≤ 3 s desde la demanda. La regla no usó validación para calibrarse.
+
+**Resultado con la carpeta real** (≈ 1 min, idéntico en dos ejecuciones):
+- Instante de la falla: 72 corridas de evento (29 del registro y 43 programado). Hay 5 inciertas: R22, R47, R48, R54 y R99; ninguna está en prueba.
+- **Diagnóstico ≤ 10 s: NO CUMPLE (5 de 10 en prueba).** TRANS: 5 de 5, en 2–5 s. LOCA: 0 de 5, en 19 s (100 cm²), 120–121 s (10 cm²) y no detectada (5 cm²).
+- **ATWS ≤ 3 s desde la demanda: CUMPLE (6 de 6;** solo prueba, 3 de 3), en 2–2,5 s.
+- Falsas alarmas en prueba: 0 de la Etapa 1 y 0 de la regla. En validación, 1 de la regla (R54, la misma de 006).
+
+Detalle: [specs/008-tiempo-desde-falla/quickstart.md](specs/008-tiempo-desde-falla/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
