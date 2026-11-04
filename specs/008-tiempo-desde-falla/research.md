@@ -3,7 +3,7 @@
 ## 1. Instante de la falla
 
 - **Decisión**: `falla.instante_falla(origen, corrida)` → `InstanteFalla(t, fuente, detalle)`:
-  1. **ATWS y TRIP_OK**: primera línea del Transient Report con t > 0 que sea el iniciador: `FWIV #<n> Position Change: 0%` (pérdida de agua de alimentación), `RCP-A trip` (bomba del refrigerante), `Turbine Trip Control Change: True` (disparo de turbina) o `AFW Turbine Valve #1 Position Change: 100%` (pérdida de energía exterior). Fuente «registro».
+  1. **Solo ATWS y TRIP_OK** (en LOCA y NORM el registro solo trae consecuencias, como el disparo de turbina tras el scram, y no se busca): primera línea del Transient Report con t > 0 que sea el iniciador: `FWIV #<n> Position Change: 0%` (pérdida de agua de alimentación), `RCP-A trip` (bomba del refrigerante), `Turbine Trip Control Change: True` (disparo de turbina) o `AFW Turbine Valve #1 Position Change: 100%` (pérdida de energía exterior). Fuente «registro».
   2. **Si no hay esa línea** (LOCA, extracción de barras y fallas sin iniciador registrado): el instante programado. En las automáticas es el retardo (tercer campo) de la primera falla de `config.json["fallas"]` distinta de la 8, que es el «fallo del disparo» y siempre está en 0. En las manuales es el número tras `_t` en el nombre de la carpeta. Fuente «programado».
   3. Ninguna fuente → `t = None`, «incierta».
 - **Por qué no se usan otras líneas**: en las LOCA el registro solo anota `Malfunction # 1/2` en t ≈ 0, con un retardo oculto (es la inserción, no la rotura). En la extracción de barras (falla 12), la primera línea es `Scram High Flux`, que es la consecuencia (el disparo), no la falla. Las líneas en t = 0 son la configuración inicial (por ejemplo, el abrir y cerrar de la FWIV #4 en R21).
@@ -11,7 +11,7 @@
 
 ## 2. Corridas inciertas
 
-- **Decisión**: incierta si `t` es `None` o si el inicio del validador (`clasificador_etapa1.eventos.inicios_evento`, el mismo de 005) es menor que `t − 2 s`. Se informa con su motivo y no cuenta para las metas.
+- **Decisión**: incierta si `t` es `None` o si el inicio del validador (`clasificador_etapa1.eventos.inicios_evento`, el mismo de 005) es menor que `t − 2 s`. Se informa con su motivo y no cuenta para la meta de diagnóstico. Sí cuenta para la meta de ATWS, que se mide desde la demanda (su `tiempo_desde_falla_s` queda vacío).
 - **Datos reales**: 5 inciertas.
   - **R47, R48 (ATWS) y R54, R99 (TRIP_OK)**: la falla 9 tenía programados 45, 20, 45 y 60 s, pero la planta cambia desde 1 s; PCTran no respetó el retardo.
   - **R22 (ATWS)**: las válvulas FWIV se cierran a los 47,5 s, pero el validador ve cambios desde 13 s.
@@ -32,14 +32,15 @@
 
 ## 5. Falsas alarmas
 
-- **Etapa 1**: confirmaciones de LOCA o TRANS en corridas NORM, o en corridas de evento con τ − 1 y τ anteriores a t_falla. Se cuentan los episodios y las corridas.
-- **Regla**: «posible ATWS» en corridas que no son ATWS.
+- **Etapa 1**: confirmaciones de LOCA o TRANS en corridas NORM, o en corridas de evento no inciertas con τ < t_falla (τ − 1 y τ antes de la falla). Se cuentan los episodios y las corridas. En las inciertas no se cuentan (el instante no es fiable) y se informan aparte. Una confirmación con τ − 1 < t_falla ≤ τ no es detección ni falsa alarma.
+- **Confusión**: primera familia confirmada con τ − 1 ≥ t_falla distinta de la correcta. Se informa por corrida (`primera_familia`) y se cuenta en el resumen; no cambia el tiempo de diagnóstico.
+- **Regla**: «posible ATWS» en corridas que no son ATWS, inciertas incluidas.
 - Solo en validación y prueba.
 
 ## 6. Metas
 
 - **Diagnóstico ≤ 10 s**: fracción de corridas de evento no inciertas de prueba con tiempo ≤ 10 s, en total, por familia y para LOCA por área. «Sin datos» si no hay corridas.
-- **ATWS ≤ 3 s desde la demanda**: fracción de ATWS (no inciertos) de validación y prueba con tiempo ≤ 3 s. Un ATWS no detectado cuenta como incumplimiento.
+- **ATWS ≤ 3 s desde la demanda**: fracción de todos los ATWS de validación y prueba (inciertos incluidos: la demanda no depende del instante de la falla) con tiempo ≤ 3 s, más la cifra solo de prueba. Un ATWS no detectado cuenta como incumplimiento. Validación es válida para esta meta porque la regla se calibra solo con entrenamiento.
 - Se informa también la versión con validación del diagnóstico, marcada como referencia (FR-014).
 
 ## 7. Salidas

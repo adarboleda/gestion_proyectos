@@ -29,7 +29,7 @@ Un analista obtiene, para cada corrida de evento, el instante en que ocurrió la
 
 1. **Given** una corrida cuyo registro anota la acción que inicia la falla (cierre de válvulas de agua de alimentación, disparo de una bomba del refrigerante, disparo de la turbina, pérdida de energía), **When** se determina el instante de la falla, **Then** es el instante de esa primera línea del registro y la fuente es «registro».
 2. **Given** una corrida de LOCA, cuyo registro no anota el instante de la rotura, **When** se determina el instante de la falla, **Then** se aplica la regla acordada en FR-002 y se informa su fuente.
-3. **Given** una corrida en la que la planta ya cambia (según el validador) más de 2 s antes del instante de la falla determinado, **When** se determina el instante, **Then** la corrida queda marcada como «incierta», se informa y no cuenta para las metas.
+3. **Given** una corrida en la que la planta ya cambia (según el validador) más de 2 s antes del instante de la falla determinado, **When** se determina el instante, **Then** la corrida queda marcada como «incierta», se informa y no cuenta para la meta de diagnóstico.
 4. **Given** cualquier corrida de evento, **When** se informa su instante de falla, **Then** aparece también el inicio detectado por el validador y la diferencia entre ambos.
 
 ---
@@ -47,7 +47,7 @@ El analista reproduce las corridas de prueba segundo a segundo, como si llegaran
 1. **Given** una corrida de prueba, **When** se reproduce segundo a segundo, **Then** la decisión de cada segundo usa solo datos hasta ese segundo.
 2. **Given** una corrida de evento, **When** la familia correcta alcanza la confianza mínima durante 2 segundos seguidos después de la falla, **Then** el tiempo de diagnóstico es el segundo de confirmación menos el instante de la falla; si nunca ocurre, «no detectado».
 3. **Given** una corrida de ATWS, **When** la regla de ATWS recomienda «posible ATWS», **Then** el tiempo de ATWS se mide desde la demanda de disparo (FR-006), y también se informa desde la falla.
-4. **Given** las corridas de prueba, **When** termina la evaluación, **Then** el resumen indica qué fracción cumple la meta de 10 s (por familia y, en LOCA, por tamaño de rotura) y qué fracción de ATWS cumple la de 3 s.
+4. **Given** las corridas de prueba, **When** termina la evaluación, **Then** el resumen indica qué fracción cumple la meta de 10 s (por familia y, en LOCA, por tamaño de rotura) y qué fracción de ATWS cumple la de 3 s (validación y prueba, con la de prueba aparte).
 5. **Given** una corrida de operación normal, o el tramo previo a la falla, **When** el diagnóstico confirma una familia de evento o la regla recomienda «posible ATWS» sin que lo sea, **Then** se cuenta como falsa alarma.
 
 ---
@@ -74,6 +74,7 @@ El analista ve, para cada corrida, el tiempo medido desde la falla junto al que 
 - La planta cambia antes del instante de falla determinado (por ejemplo, la falla programada se activó antes): la corrida es «incierta».
 - Una corrida de ATWS en la que la regla no encuentra demanda de disparo: «ATWS no detectado», con el motivo.
 - El diagnóstico confirma la familia correcta y después cambia: cuenta la primera confirmación; los cambios posteriores se informan en la línea de tiempo.
+- El diagnóstico confirma primero una familia equivocada tras la falla: el tiempo sigue siendo el de la primera confirmación de la familia correcta (o «no detectado»), y la corrida se informa como «confusión» con la primera familia confirmada.
 - El modelo guardado de la Etapa 1 no corresponde al reparto actual (otra semilla u otras corridas): la evaluación se detiene con un error, para no evaluar con corridas que el modelo vio.
 - Una familia sin corridas de prueba: aparece con cero y sin metas inventadas.
 
@@ -81,20 +82,20 @@ El analista ve, para cada corrida, el tiempo medido desde la falla junto al que 
 
 ### Functional Requirements
 
-- **FR-001**: El sistema MUST determinar, para cada corrida de evento usable, el instante de la falla a partir de su registro de eventos (Transient Report): el instante de la primera línea que corresponde a la acción iniciadora de la falla.
+- **FR-001**: El sistema MUST determinar, para cada corrida de evento usable, el instante de la falla a partir de su registro de eventos (Transient Report): el instante de la primera línea que corresponde a la acción iniciadora de la falla. Esta búsqueda se hace solo en las corridas de transitorio con disparo (ATWS y TRIP_OK); en las demás clases el registro solo contiene consecuencias (por ejemplo, el disparo de turbina tras el scram de una LOCA) y se aplica FR-002.
 - **FR-002**: Cuando el registro no anota el instante de la falla (LOCA y otros casos sin línea del iniciador), el sistema MUST usar el instante programado de la falla: el retardo de la falla iniciadora en la configuración de la corrida (automáticas) o el instante del nombre de su carpeta (manuales), con la fuente «programado». Si la corrida no tiene ninguna de las dos fuentes, MUST quedar «incierta».
-- **FR-003**: El sistema MUST informar para cada corrida la fuente del instante de la falla, el inicio detectado por el validador y su diferencia; MUST marcar como «incierta» toda corrida en que el validador detecte cambios más de 2 s antes del instante de la falla, y MUST excluirla de las metas, informándola aparte.
+- **FR-003**: El sistema MUST informar para cada corrida la fuente del instante de la falla, el inicio detectado por el validador y su diferencia; MUST marcar como «incierta» toda corrida en que el validador detecte cambios más de 2 s antes del instante de la falla, y MUST excluirla de la meta de diagnóstico (la única que depende del instante de la falla), informándola aparte. La meta de ATWS se mide desde la demanda de disparo y MUST incluir las corridas inciertas.
 - **FR-004**: El sistema MUST evaluar cada corrida segundo a segundo de forma causal: la decisión de cada segundo usa solo datos hasta ese segundo.
 - **FR-005**: El sistema MUST aplicar la regla de confianza sostenida: una familia se confirma cuando su probabilidad es de al menos 0,80 en 2 segundos seguidos. El tiempo de diagnóstico es el primer segundo de confirmación de la familia correcta (con ambos segundos posteriores a la falla) menos el instante de la falla, o «no detectado».
 - **FR-006**: El sistema MUST medir el tiempo de ATWS con la regla de ATWS de 006 como el segundo de decisión «posible ATWS» menos la demanda de disparo (la señal de protección del Transient Report más el retardo de la lógica, como en 006): es el instante en que el disparo debía ocurrir y falló, y la meta de 3 s se mide desde ahí. MUST informar además, como dato, el tiempo desde la falla (evento iniciador).
 - **FR-007**: El sistema MUST NOT reentrenar ni ajustar nada: MUST usar el clasificador de Etapa 1 guardado por 005 y la regla de ATWS calibrada solo con entrenamiento (006), y MUST detenerse con un error si el clasificador guardado no corresponde al reparto sin fuga actual.
-- **FR-008**: El sistema MUST informar, sobre las corridas de prueba, la fracción de corridas de evento con diagnóstico en 10 s o menos (en total, por familia y, en LOCA, por tamaño de rotura) y la fracción de ATWS reconocidos en 3 s o menos, con su definición exacta y si se cumple la meta, o «sin datos».
-- **FR-009**: El sistema MUST contar las falsas alarmas: confirmaciones de una familia de evento en corridas de operación normal o antes de la falla, y recomendaciones «posible ATWS» en corridas que no son ATWS.
-- **FR-010**: El sistema MUST producir un reporte por corrida con: identificador, clase, conjunto, instante de la falla y su fuente, inicio del validador, tiempo de diagnóstico, tiempo de ATWS (si aplica), falsas alarmas y si es incierta.
+- **FR-008**: El sistema MUST informar la fracción de corridas de evento de prueba no inciertas con diagnóstico en 10 s o menos (en total, por familia y, en LOCA, por tamaño de rotura) y la fracción de ATWS de validación y prueba reconocidos en 3 s o menos desde la demanda (la regla de 006 se calibra solo con entrenamiento, así que validación no se usó para ajustarla), con la cifra de prueba aparte. Cada meta MUST llevar su definición exacta y si se cumple, o «sin datos».
+- **FR-009**: El sistema MUST contar las falsas alarmas: confirmaciones de una familia de evento en corridas de operación normal o antes de la falla (salvo en las corridas inciertas, donde «antes de la falla» no es fiable: allí se informan aparte), y recomendaciones «posible ATWS» en corridas que no son ATWS (en todas las corridas). MUST informar además las confusiones: corridas de evento cuya primera familia confirmada tras la falla no es la correcta.
+- **FR-010**: El sistema MUST producir un reporte por corrida con: identificador, clase, conjunto, instante de la falla y su fuente, inicio del validador, tiempo de diagnóstico, primera familia confirmada tras la falla, tiempo de ATWS (si aplica), falsas alarmas y si es incierta.
 - **FR-011**: El sistema MUST comparar, para cada corrida de evento, el tiempo de diagnóstico desde la falla con el tiempo medido desde el inicio del validador.
 - **FR-012**: El sistema MUST exportar la línea de tiempo de cada corrida evaluada, con una fila por segundo: probabilidades de cada familia, familia confirmada o ninguna, y decisión de la regla de ATWS en su segundo de decisión.
 - **FR-013**: El sistema MUST generar todo con una sola ejecución documentada, reproducible con la misma semilla, publicar sus resultados todos juntos o ninguno, e identificar toda salida como consultiva.
-- **FR-014**: El sistema MUST evaluar las corridas de prueba para las metas y MUST informar también las de validación, marcadas como referencia, porque el clasificador las usó para elegir su época.
+- **FR-014**: El sistema MUST evaluar las corridas de prueba para la meta de diagnóstico y MUST informar también las de validación, marcadas como referencia, porque el clasificador las usó para elegir su época. La meta de ATWS usa validación y prueba (FR-008).
 - **FR-015**: El sistema MUST NOT modificar los datos de origen ni usar datos de NPPAD.
 
 ### Key Entities

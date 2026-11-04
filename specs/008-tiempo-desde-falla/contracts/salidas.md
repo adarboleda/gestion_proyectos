@@ -2,8 +2,8 @@
 
 | Archivo | Contenido |
 |---|---|
-| `tiempos.json` | `aviso`, `configuracion` (semilla, umbral, confirmación, metas, tolerancia), `corridas` (un `ResultadoCorrida` por corrida de validación y prueba), `resumen`, `metas`, `falsas_alarmas`, `inciertas` (data-model.md) |
-| `tiempos.csv` | Una fila por corrida evaluada: `corrida, conjunto, clase, familia, area, t_falla, fuente_falla, incierta, inicio_validador, t_confirmacion, tiempo_diagnostico_s, tiempo_desde_validador_s, atws_recomendacion, t_demanda, tiempo_atws_demanda_s, tiempo_atws_falla_s, falsas_alarmas_etapa1` |
+| `tiempos.json` | `aviso`, `configuracion` (semilla, umbral, confirmación, metas, tolerancia), `corridas` (un `ResultadoCorrida` por corrida de validación y prueba), `resumen`, `metas`, `falsas_alarmas`, `confusiones`, `inciertas` (data-model.md) |
+| `tiempos.csv` | Una fila por corrida evaluada: `corrida, conjunto, clase, familia, area, t_falla, fuente_falla, incierta, inicio_validador, t_confirmacion, primera_familia, tiempo_diagnostico_s, tiempo_desde_validador_s, atws_recomendacion, t_demanda, tiempo_atws_demanda_s, tiempo_atws_falla_s, falsas_alarmas_etapa1` |
 | `lineas_tiempo.csv` | Una fila por corrida y segundo: `corrida, conjunto, tau, p_norm, p_loca, p_trans, confirmada, decision_atws` (`decision_atws` solo en el segundo de decisión de la regla) |
 | `reporte.txt` | Reporte legible; es lo que imprime el comando |
 
@@ -14,4 +14,4 @@ Los cuatro se publican juntos; otros archivos de la carpeta no se tocan. Se rege
 - Cada corrida de evento de validación y prueba aparece una vez en `tiempos.csv`.
 - `tiempo_diagnostico_s` = `t_confirmacion − t_falla` cuando ambos existen.
 - `lineas_tiempo.csv` tiene 295 filas por corrida (τ = 5…299).
-- Las corridas inciertas no cuentan en `metas`.
+- Las corridas inciertas no cuentan en la meta de diagnóstico; sí en la de ATWS (desde la demanda).
