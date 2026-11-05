@@ -5,8 +5,10 @@ metricas/.ultima-actividad
 metricas/salidas/
 
 # Python y artefactos regenerables de la preparacion de datos
-data_processed/
-data_processed_pwr3l/
+data_processed/*
+!data_processed/metadata.json
+data_processed_pwr3l/*
+!data_processed_pwr3l/metadata.json
 __pycache__/
 *.egg-info/
 .pytest_cache/
