@@ -31,13 +31,14 @@ Código en `src/informe_hito1/`; pruebas en `tests/hito1/` con el prefijo `test_
   - validación cruzada;
   - tiempos de prueba de 008;
   - regla por conjunto;
-  - Etapa 2;
+  - Etapa 2 con su cobertura; una meta cumplida sin decisiones queda como «cumple sin decisiones (cobertura 0 %)» (análisis U1);
   - falsas alarmas
 - [ ] T006 [P] [US1] Crear `tests/hito1/unit/test_hito1_informe.py`:
   - las 11 secciones en orden;
   - aviso consultivo al principio;
   - cada sección cita su KAN y su archivo;
-  - las tablas de metas y de la matriz con los valores de la fuente
+  - las tablas de metas y de la matriz con los valores de la fuente;
+  - la validación cruzada dice que reentrena por fold, mientras que prueba y validación usan el modelo publicado (análisis A1)
 - [ ] T007 [US1] Crear `src/informe_hito1/consolidar.py` con `consolidar(datos)`
 - [ ] T008 [US1] Crear `src/informe_hito1/informe.py` con `formatear_markdown(hito)`
 
