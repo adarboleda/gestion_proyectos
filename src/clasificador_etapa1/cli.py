@@ -159,6 +159,15 @@ def agregar_reporte(ejecucion: Ejecucion) -> str:
     return texto
 
 
+def agregar_metricas_diagnostico_opcional(reporte: Dict, y_val: np.ndarray, probs_val: np.ndarray) -> None:
+    """Añade métricas conjuntas con abstención al reporte si se solicita explícitamente sin romper compatibilidad."""
+    try:
+        from evaluacion_diagnostico.metricas import metricas_conjuntas
+        reporte["metricas_diagnostico_validacion"] = metricas_conjuntas(y_val, probs_val)
+    except ImportError:
+        pass
+
+
 def publicar(salida, artefactos: Dict[str, bytes]) -> None:
     """Escribe los artefactos en una carpeta temporal y luego reemplaza solo esos archivos en `salida`."""
     salida = Path(salida)

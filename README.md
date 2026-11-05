@@ -302,6 +302,25 @@ Documento técnico completo: [docs/README_FASE1.md](docs/README_FASE1.md).
 
 ---
 
+## Evaluación del Diagnóstico — Métricas, Abstenciones y Validación Cruzada (funcionalidad 011)
+
+Subsistema de evaluación rigurosa del diagnóstico para reactores PWR (PWR 3L) que transparenta la incertidumbre y previene la sobrestimación del desempeño:
+- **Métricas conjuntas**: Reporta juntas la **exactitud con abstención** (contando `UNCERTAIN` como no acierto), la **tasa de abstención** (cuando la confianza softmax es menor al 80 %) y la **tasa de errores con confianza alta** ($\ge 0.80$). Garantiza la identidad muestral: $\text{Acc}_{\text{abst}} + \text{Tasa}_{\text{abst}} + \text{Tasa}_{\text{err}} = 1.0$.
+- **Matriz de confusión rectangular $3 \times 4$**: Desglosa las clases verdaderas (`NORM`, `LOCA`, `TRANS`) frente a las predicciones (`NORM`, `LOCA`, `TRANS`) y la columna consultiva de abstención (`UNCERTAIN`).
+- **Intervalos de confianza al 95 %**: Calcula intervalos exactos de Wilson para todas las proporciones binomiales en validación y prueba, evitando colapsos a cero en muestras pequeñas.
+- **Validación cruzada agrupada (*Group K-Fold*, $k=5$)**: Particiona las corridas en 5 folds disjuntos agrupando pares de severidad (LOCA/LOCAC) y gemelos ATWS sin ninguna fuga de información (*Principio II*). Reporta media, desviación estándar e intervalos con distribución $t$-Student.
+- **Línea de órdenes `evaluar-diagnostico`**: Genera atómicamente `evaluacion_diagnostico.json` y `evaluacion_diagnostico.txt`.
+
+**Ejecución de la evaluación**:
+
+```powershell
+.venv\Scripts\evaluar-diagnostico.exe --origen "C:\Users\Administrador\Desktop\Nuecleare\IA-Nuclear\PWR 3L" --salida resultados_evaluacion_diagnostico
+```
+
+Detalle: [specs/011-evaluacion-diagnostico/quickstart.md](specs/011-evaluacion-diagnostico/quickstart.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
