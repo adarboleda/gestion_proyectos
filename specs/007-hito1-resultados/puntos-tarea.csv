@@ -1,0 +1,15 @@
+tarea,completada,paralela,historia,seccion,descripcion,tipo,complejidad,puntos,clasificado_por,origen,eliminada
+T001,no,no,,Phase 1: Setup,"Añadir a `pyproject.toml` el guion `informe-hito1 = ""informe_hito1.cli:main""` y nombrar 007 en `description`; crear `src/informe_hito1/__init__.py` y `__main__.py`; añadir `informe_hito1/` al `.gitignore`",configuracion,baja,1,agente,plan,no
+T002,no,no,,Phase 2: Foundational (fuentes),"Crear `tests/hito1/conftest.py` con archivos de resultados sintéticos que tengan la misma forma que los reales (reporte de 005; resumen y regla de 006; tiempos de 008; reporte de 009; evaluación de 011), escritos en un directorio temporal",prueba,media,2,agente,plan,no
+T003,no,si,,Phase 2: Foundational (fuentes),Crear `tests/hito1/unit/test_hito1_fuentes.py`:,prueba,baja,1,agente,plan,no
+T004,no,no,,Phase 2: Foundational (fuentes),"Crear `src/informe_hito1/config.py` (fuentes, aviso, limitaciones) y `src/informe_hito1/fuentes.py` (`ErrorFuente`, `cargar_fuentes(rutas)`)",datos,media,3,agente,plan,no
+T005,no,si,US1,Phase 3: US1 — informe del Hito 1 (P1),Crear `tests/hito1/unit/test_hito1_consolidar.py`:,prueba,media,2,agente,plan,no
+T006,no,si,US1,Phase 3: US1 — informe del Hito 1 (P1),Crear `tests/hito1/unit/test_hito1_informe.py`:,prueba,baja,1,agente,plan,no
+T007,no,no,US1,Phase 3: US1 — informe del Hito 1 (P1),Crear `src/informe_hito1/consolidar.py` con `consolidar(datos)`,logica,media,5,agente,plan,no
+T008,no,no,US1,Phase 3: US1 — informe del Hito 1 (P1),Crear `src/informe_hito1/informe.py` con `formatear_markdown(hito)`,interfaz,media,5,agente,plan,no
+T009,no,no,US2,"Phase 4: US2 — comando, trazabilidad y reproducibilidad (P1)",Crear `tests/hito1/integration/test_hito1_cli.py`:,prueba,media,2,agente,plan,no
+T010,no,no,US2,"Phase 4: US2 — comando, trazabilidad y reproducibilidad (P1)",Crear `src/informe_hito1/cli.py` y publicar todos o ninguno,integracion,baja,4,agente,plan,no
+T011,no,no,,"Phase 4: US2 — comando, trazabilidad y reproducibilidad (P1)",Crear `tests/hito1/integration/test_hito1_real.py` (se omite si no existen los resultados reales): código 0 y cada cifra clave del informe igual a la de su archivo,prueba,media,2,agente,plan,no
+T012,no,si,,Phase 5: Polish,"Añadir al `README.md` la sección «Informe del Hito 1 (funcionalidad 007, KAN-27)»",documentacion,baja,1,agente,plan,no
+T013,no,no,,Phase 5: Polish,Generar el informe con los resultados reales y anotar en `quickstart.md` las cifras principales,prueba,baja,1,agente,plan,no
+T014,no,no,,Phase 5: Polish,Ejecutar la suite completa,prueba,baja,1,agente,plan,no
