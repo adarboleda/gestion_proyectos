@@ -321,6 +321,26 @@ Detalle: [specs/011-evaluacion-diagnostico/quickstart.md](specs/011-evaluacion-d
 
 ---
 
+## Informe del Hito 1 (funcionalidad 007, KAN-27)
+
+Consolida en un solo informe, listo para la presentación, los resultados de la Fase 2:
+- **Etapa 1** (005, KAN-23): matriz y F1 por familia.
+- **Regla de ATWS** (006, KAN-22).
+- **Tiempo desde la falla** (008, KAN-25): metas de 10 s y 3 s.
+- **Etapa 2** (009, KAN-24).
+- **Evaluación con abstención y validación cruzada** (011, KAN-26).
+
+**No reentrena ni recalcula nada**: lee los archivos que publica cada comando y guarda el SHA-256 de cada uno. Es **consultivo**.
+
+```
+entrenar-etapa1 && evaluar-regla-atws && medir-tiempo-deteccion && entrenar-etapa2 && evaluar-diagnostico --modelo modelos/etapa1
+informe-hito1                     # → informe_hito1/hito1.md y hito1.json
+```
+
+Si falta un archivo, termina con código 1 y nombra el comando que lo genera. Copia del informe con los resultados reales del 2026-11-04: [specs/007-hito1-resultados/hito1-2026-11-04.md](specs/007-hito1-resultados/hito1-2026-11-04.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.
