@@ -18,3 +18,5 @@ __pycache__/
 modelos/
 resultados_regla_atws/
 resultados_tiempo_deteccion/
+# Informe del Hito 1 (regenerable con informe-hito1)
+/informe_hito1/

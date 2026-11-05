@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "preparacion-datos"
 version = "0.1.0"
-description = "Preparación sin fuga de los datos NPPAD (001) y PWR 3L (002-004), clasificador de Etapa 1 (005), regla determinista de ATWS (006), tiempo de detección desde la falla (008), clasificador de Etapa 2 (009) y evaluación del diagnóstico con abstención y validación cruzada (011)"
+description = "Preparación sin fuga de los datos NPPAD (001) y PWR 3L (002-004), clasificador de Etapa 1 (005), regla determinista de ATWS (006), tiempo de detección desde la falla (008), clasificador de Etapa 2 (009), evaluación del diagnóstico con abstención y validación cruzada (011) e informe del Hito 1 (007)"
 requires-python = ">=3.11"
 dependencies = [
     "pandas>=2.2",
@@ -26,6 +26,7 @@ evaluar-regla-atws = "regla_atws.cli:main"
 medir-tiempo-deteccion = "tiempo_deteccion.cli:main"
 entrenar-etapa2 = "clasificador_etapa2.cli:main"
 evaluar-diagnostico = "evaluacion_diagnostico.cli:main"
+informe-hito1 = "informe_hito1.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
