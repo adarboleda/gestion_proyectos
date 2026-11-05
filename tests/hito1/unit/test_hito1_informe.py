@@ -37,3 +37,9 @@ def test_tablas_con_los_valores_de_la_fuente(datos):
 def test_validacion_cruzada_dice_que_reentrena(datos):
     texto = _texto(datos)
     assert "reentrena" in texto and "modelo publicado" in texto
+
+
+def test_concordancia_y_nombres_legibles(datos):
+    texto = _texto(datos)
+    assert "1 falsa alarma (R54)" in texto and "1 falsas alarmas" not in texto
+    assert "| Tasa de abstención | 32.8 % |" in texto and "tasa abstencion" not in texto

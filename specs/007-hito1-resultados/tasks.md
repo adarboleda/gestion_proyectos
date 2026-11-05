@@ -59,3 +59,10 @@ Código en `src/informe_hito1/`; pruebas en `tests/hito1/` con el prefijo `test_
 - [ ] T012 [P] Añadir al `README.md` la sección «Informe del Hito 1 (funcionalidad 007, KAN-27)»
 - [ ] T013 Generar el informe con los resultados reales y anotar en `quickstart.md` las cifras principales
 - [ ] T014 Ejecutar la suite completa
+
+---
+
+## Phase 6: Convergence
+
+- [ ] T015 Concordancia en `src/informe_hito1/consolidar.py`: «1 falsa alarma» y no «1 falsas alarmas» en la meta de la regla per FR-008 (partial)
+- [ ] T016 Nombres legibles en la tabla de validación cruzada de `src/informe_hito1/informe.py` («Tasa de abstención», «Exactitud estándar»…), no las claves internas sin tildes per FR-008 (partial)
