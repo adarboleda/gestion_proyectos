@@ -25,3 +25,4 @@ El archivo `data_processed/metadata.json` debe cumplir estrictamente con:
 - Clave `class_mapping` con las 4 clases (`NORM: 0`, `LOCA: 1`, `LOCAC: 2`, `ATWS: 3`).
 - Claves `sequence_length: 150`, `time_step_seconds: 10`, `sequence_duration_seconds: 1500`.
 - Clave `known_limitations` con al menos 4 declaraciones explícitas en texto.
+

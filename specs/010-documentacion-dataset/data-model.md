@@ -81,3 +81,4 @@
 9. Limitaciones Conocidas y Recomendaciones Metodológicas
 10. Estructura de Metadatos y Verificación
 ```
+

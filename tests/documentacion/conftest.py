@@ -23,3 +23,4 @@ def ruta_metadata_json(raiz_repo: Path) -> Path:
 @pytest.fixture
 def ruta_readme_raiz(raiz_repo: Path) -> Path:
     return raiz_repo / "README.md"
+

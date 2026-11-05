@@ -59,3 +59,4 @@ gestion_proyectos/
 4. **Fase 4: Integración y documentación general**:
    - Actualizar `README.md` principal en la raíz con enlace y síntesis de la Fase 1.
    - Ejecutar la suite de pruebas unitarias y verificar 0 regresiones globales.
+

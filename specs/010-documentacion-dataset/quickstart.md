@@ -41,3 +41,4 @@ print("Verificación de documentación completada con éxito.")
 ```bash
 .venv\Scripts\python.exe -m pytest tests/documentacion -v
 ```
+

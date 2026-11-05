@@ -289,6 +289,19 @@ Detalle: [specs/009-clasificador-etapa2/quickstart.md](specs/009-clasificador-et
 
 ---
 
+## Documentación del Dataset — Fase 1 (funcionalidad 010)
+
+Documentación técnica integral del dataset de simulación de accidentes en reactores PWR (dataset **NPPAD** de la Universidad Tsinghua generado con **PCTRAN**):
+- **Origen y licenciamiento**: Simulador termohidráulico PCTRAN (Micro-Simulation Technology), proyecto NPPAD (THU-INET, Sci Data 2022, licencia MIT), modelo PWR comercial de 2 lazos al 100 % de potencia nominal.
+- **Variables**: Catálogo detallado de las 12 variables de entrada normalizadas para el Bi-LSTM (lazo primario y neutrónica) y las 7 variables de margen térmico en unidades físicas reales.
+- **Partición sin fuga**: Reparto 70 % train, 15 % val y 15 % test por simulación completa (*group split*).
+- **Limitaciones conocidas**: Declaración transparente de la ausencia de test en NORM por longitud insuficiente (302 < 450 filas), autocorrelación temporal en NORM y ATWS por archivo único, y fuerte desbalance de clases.
+- **Metadatos canónicos**: Estructura JSON disponible en [data_processed/metadata.json](data_processed/metadata.json).
+
+Documento técnico completo: [docs/README_FASE1.md](docs/README_FASE1.md).
+
+---
+
 ## Consejos
 
 - **No te saltes pasos obligatorios**: cada comando usa lo que generó el anterior.

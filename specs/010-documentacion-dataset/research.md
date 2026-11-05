@@ -36,3 +36,4 @@ Se analizaron las tres fuentes clave existentes en el repositorio de referencia:
   1. *Estrategia de 1 muestra por simulación* (la implementada en `src/preparacion_datos/cli.py`): genera 1 muestra de 150 pasos por archivo, resultando en `train`: 142 (70 LOCA, 70 LOCAC, 1 NORM, 1 ATWS), `val`: 30 (15 LOCA, 15 LOCAC), `test`: 30 (15 LOCA, 15 LOCAC), con advertencia de que NORM y ATWS no tienen val ni test.
   2. *Estrategia de ventaneo en archivos continuos* (la documentada en la referencia de `IA-Nuclear`): divide los archivos únicos de NORM y ATWS en bloques temporales disjuntos con paso deslizante, resultando en `train`: 151, `val`: 34, `test`: 33, con NORM test en 0.
 - Esto evita cualquier discrepancia conceptual o ambigüedad entre los miembros del equipo.
+

@@ -68,3 +68,4 @@ def test_metadata_json_declara_limitaciones_conocidas_y_escalador(ruta_metadata_
 
     escalador = data.get("scaler", {})
     assert escalador.get("fitted_on") == "train_only"
+

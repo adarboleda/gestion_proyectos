@@ -63,3 +63,4 @@ def test_readme_principal_enlaza_fase1(ruta_readme_raiz: Path):
     assert ruta_readme_raiz.is_file()
     texto = ruta_readme_raiz.read_text(encoding="utf-8")
     assert "README_FASE1.md" in texto or "Fase 1" in texto
+
