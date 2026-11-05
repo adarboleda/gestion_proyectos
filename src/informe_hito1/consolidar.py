@@ -43,7 +43,8 @@ def _metas(datos) -> List[Dict]:
     metas.append(_meta("KAN-24 SC-002", "KAN-24 (009)", "LOCA ≥ 50 cm² con su rama confirmada en ≤ 10 s en el 100 %",
                        f"{sc2['confirmadas_en_10s']} de {sc2['total']}", "prueba", _estado(sc2["cumple"])))
     falsas = [e for e in regla["errores"] if e["tipo"] == "falsa_alarma" and e["conjunto"] in ("val", "test")]
-    valor = f"{len(falsas)} falsas alarmas" + (f" ({', '.join(e['id'] for e in falsas)})" if falsas else "")
+    palabra = "falsa alarma" if len(falsas) == 1 else "falsas alarmas"
+    valor = f"{len(falsas)} {palabra}" + (f" ({', '.join(e['id'] for e in falsas)})" if falsas else "")
     metas.append(_meta("KAN-22 falsas alarmas", "KAN-22 (006)", "0 «posible ATWS» en corridas que no son ATWS",
                        valor, "validación y prueba", _estado(not falsas)))
     return metas

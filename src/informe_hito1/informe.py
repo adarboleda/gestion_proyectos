@@ -15,6 +15,9 @@ SECCIONES = (
     "11. Fuentes y reproducción",
 )
 CONJUNTOS = {"train": "Entrenamiento", "val": "Validación", "test": "Prueba"}
+NOMBRES_VC = {"exactitud_con_abstencion": "Exactitud con abstención", "tasa_abstencion": "Tasa de abstención",
+              "tasa_errores_alta_confianza": "Errores con confianza alta", "exactitud_decididas": "Exactitud de las decididas",
+              "exactitud_estandar": "Exactitud estándar"}
 
 
 def _pct(valor) -> str:
@@ -65,7 +68,7 @@ def formatear_markdown(hito: Dict) -> str:
                         "(secciones 3 y 4) usan el **modelo publicado** por `entrenar-etapa1`.", "",
                         "| Medida | Media | Desv. típ. | IC 95 % (t de Student) |", "|---|---|---|---|"]
     for clave, v in vc["resumen"].items():
-        l.append(f"| {clave.replace('_', ' ')} | {_pct(v['media'])} | {_pct(v['std'])} | {_ic(v['ci_95'])} |")
+        l.append(f"| {NOMBRES_VC.get(clave, clave)} | {_pct(v['media'])} | {_pct(v['std'])} | {_ic(v['ci_95'])} |")
 
     l += _seccion(6) + ["Fuente: KAN-25 (008). Tiempo desde la falla hasta la familia confirmada (Etapa 1) y, en los ATWS, "
                         "desde la demanda de disparo hasta «posible ATWS» (regla de 006).", "",
